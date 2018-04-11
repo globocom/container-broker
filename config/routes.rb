@@ -5,4 +5,6 @@ Rails.application.routes.draw do
 
   post "/handshake", controller: "handshake", action: "create"
 
+  require 'sidekiq/web'
+  mount Sidekiq::Web => '/sidekiq'
 end
