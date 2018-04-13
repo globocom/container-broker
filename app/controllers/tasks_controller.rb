@@ -15,7 +15,6 @@ class TasksController < ApplicationController
   end
 
   def show
-    GetTaskStatus.call(task: @task)
     render json: @task
   end
 
