@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :status, only: :index
+
   resources :tasks, only: [:create, :show]
 
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
