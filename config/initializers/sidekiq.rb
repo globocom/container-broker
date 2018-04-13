@@ -1,10 +1,39 @@
 Rails.application.config.active_job.queue_adapter = :sidekiq
 
-Sidekiq.configure_client do |config|
-  config.redis = {
-    url: (ENV["DBAAS_REDIS_ENDPOINT"] || "redis://localhost:6379/0/container-broker"),
-    concurrency: 1
-  }
+def redis_from_url(uri)
+  if uri.start_with?("sentinel")
+    m = uri.match("sentinel://:([^@]*)@([^/]*)/service_name:(.*)")
+    password = m[1]
+    sentinel_uris = m[2]
+    name = m[3]
+    url = "redis://:#{password}@#{name}"
+    sentinels = sentinel_uris.split(",").map do |sentinel_uri|
+      host, port = sentinel_uri.split(":")
+      {
+        host: host,
+        port: port,
+      }
+    end
+    Redis.new(url: url, sentinels: sentinels)
+  else
+    Redis.new(url: uri)
+  end
 end
 
-# Sidekiq.default_worker_options = { retry: 0, backtrace: 10 }
+connection = proc {
+  redis_from_url(Settings.sidekiq.redis.url)
+}
+
+Sidekiq.configure_server do |config|
+  config.redis = ConnectionPool.new(size: 20, &connection)
+end
+
+Sidekiq.configure_client do |config|
+  config.redis = ConnectionPool.new(size: 20, &connection)
+end
+
+if Settings.auth.enabled
+  Sidekiq::Web.use(Rack::Auth::Basic) do |user, password|
+    [user, password] == [Settings.auth.user, Settings.auth.pass]
+  end
+end
