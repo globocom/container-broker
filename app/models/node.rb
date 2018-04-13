@@ -35,11 +35,13 @@ class Node
   end
 
   def docker_connection
+    Docker.options[:read_timeout] = 5
     Docker::Connection.new(self.hostname, {})
   end
 
   def update_usage
-    self.update!(usage_percent: (available_slots.count / slots.count).to_i * 100)
+    usage = (1.0 - available_slots.count.to_f / slots.count) * 100
+    self.update!(usage_percent: usage)
   end
 
 end

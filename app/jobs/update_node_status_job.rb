@@ -18,5 +18,8 @@ class UpdateNodeStatusJob < ApplicationJob
         RemoveContainerJob.perform_later(node: node, container_id: container.id)
       end
     end
+  rescue Excon::Error => e
+    Rails.logger.info("Error contacting node #{node.id}: #{e}")
+    node.update(available: false)
   end
 end
