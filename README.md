@@ -1,5 +1,11 @@
 # GLOBERNETES
 
+
+## TODO
+* Create progress classes
+* Lock job and slot getting
+* Receive volumes in job creation api
+
 ## POST /handshake
   - Registro de um node no pool Globernetes
   - Parâmetros: `{ "hostname": "", "cores": 10, "memory": 4096 }`
