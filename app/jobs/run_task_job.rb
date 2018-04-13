@@ -20,6 +20,7 @@ class RunTaskJob < ApplicationJob
 
     task.update!(container_id: container.id, status: "starting", slot: slot)
     slot.attach_to(task: task)
+    slot.node.update_usage
 
     task
   end

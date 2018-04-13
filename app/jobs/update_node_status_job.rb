@@ -9,6 +9,7 @@ class UpdateNodeStatusJob < ApplicationJob
       if slot
         if container.info["State"] == "exited"
           ReleaseSlotJob.perform_later(slot: slot)
+          node.update_usage
         else
           UpdateTaskStatusJob.perform_later(Task.find(slot.current_task.id))
         end

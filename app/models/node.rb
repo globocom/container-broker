@@ -6,6 +6,7 @@ class Node
   field :cores, type: Integer
   field :memory, type: Integer
   field :available, type: Boolean
+  field :usage_percent, type: Integer
 
   has_many :slots
 
@@ -14,7 +15,11 @@ class Node
   end
 
   def find_available_slot
-    slots.to_a.find(&:available?)
+    available_slots.first
+  end
+
+  def available_slots
+    slots.to_a.select(&:available?)
   end
 
   def populate
@@ -31,6 +36,10 @@ class Node
 
   def docker_connection
     Docker::Connection.new(self.hostname, {})
+  end
+
+  def update_usage
+    self.update!(usage_percent: (available_slots.count / slots.count).to_i * 100)
   end
 
 end
