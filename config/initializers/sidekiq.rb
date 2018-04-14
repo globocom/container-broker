@@ -21,7 +21,7 @@ def redis_from_url(uri)
 end
 
 connection = proc {
-  redis_from_url(Settings.sidekiq.redis.url)
+  redis_from_url(Settings.sidekiq_url)
 }
 
 Sidekiq.configure_server do |config|
@@ -30,10 +30,4 @@ end
 
 Sidekiq.configure_client do |config|
   config.redis = ConnectionPool.new(size: 20, &connection)
-end
-
-if Settings.auth.enabled
-  Sidekiq::Web.use(Rack::Auth::Basic) do |user, password|
-    [user, password] == [Settings.auth.user, Settings.auth.pass]
-  end
 end
