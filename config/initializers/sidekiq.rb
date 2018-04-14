@@ -25,9 +25,9 @@ connection = proc {
 }
 
 Sidekiq.configure_server do |config|
-  config.redis = ConnectionPool.new(size: 20, &connection)
+  config.redis = ConnectionPool.new(size: 30, &connection)
 end
 
 Sidekiq.configure_client do |config|
-  config.redis = ConnectionPool.new(size: 20, &connection)
+  config.redis = ConnectionPool.new(size: 30, &connection)
 end
