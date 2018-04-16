@@ -5,7 +5,6 @@
 * Create progress classes
 * Lock job and slot getting
 * Receive volumes in job creation api
-* Select slot based on container load
 
 ## POST /handshake
   - Registro de um node no pool Globernetes
