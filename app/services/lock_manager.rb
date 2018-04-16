@@ -3,7 +3,7 @@ class LockManager
   attr_reader :manager
 
   def initialize
-    @manager = Redlock::Client.new([Settings.sidekiq_url])
+    @manager = Redlock::Client.new([ENV["DBAAS_REDIS_ENDPOINT"]])
   end
 
   def self.lock(resource, ttl, &block)
