@@ -1,4 +1,4 @@
-Rails.application.config.active_job.queue_adapter = :sidekiq
+Rails.application.config.active_job.queue_adapter = Rails.env.test? ? :test : :sidekiq
 
 def redis_from_url(uri)
   if uri.start_with?("sentinel")
