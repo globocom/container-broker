@@ -21,7 +21,7 @@ def redis_from_url(uri)
 end
 
 connection = proc {
-  redis_from_url(Settings.sidekiq_url)
+  redis_from_url(ENV["DBAAS_REDIS_ENDPOINT"] || "redis://localhost:6379/0/k9s")
 }
 
 Sidekiq.configure_server do |config|
