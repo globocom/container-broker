@@ -2,8 +2,6 @@ class RunTaskJob < ApplicationJob
   queue_as :default
 
   def perform(task:, slot:)
-    slot.attaching!
-
     image_name, image_tag = task.image.split(':')
     Docker::Image.create({'fromImage' => image_name, 'tag' => image_tag}, nil, slot.node.docker_connection)
     container = Docker::Container.create(
@@ -18,7 +16,7 @@ class RunTaskJob < ApplicationJob
     )
     container.start
 
-    task.update!(container_id: container.id, status: "starting", slot: slot)
+    task.update!(container_id: container.id, status: "started", slot: slot)
     slot.attach_to(task: task)
     slot.node.update_usage
 

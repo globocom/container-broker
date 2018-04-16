@@ -9,5 +9,4 @@ class LockManager
   def self.lock(resource, ttl, &block)
     instance.manager.lock(resource, ttl, &block)
   end
-
 end

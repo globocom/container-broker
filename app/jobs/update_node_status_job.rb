@@ -11,7 +11,7 @@ class UpdateNodeStatusJob < ApplicationJob
           ReleaseSlotJob.perform_later(slot: slot)
           node.update_usage
         else
-          UpdateTaskStatusJob.perform_later(Task.find(slot.current_task.id))
+          # UpdateTaskStatusJob.perform_later(Task.find(slot.current_task.id))
         end
       else
         Rails.logger.info("Container #{container.id} not attached with any slot")

@@ -31,6 +31,8 @@ class Node
       slots << Slot.create!
     end
 
+    update_usage
+
     self.cores
   end
 
