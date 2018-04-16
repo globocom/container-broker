@@ -1,7 +1,9 @@
-class UpdateNodeStatusJob < ApplicationJob
+class UpdateNodeStatusJob < DockerConnectionJob
   queue_as :default
 
   def perform(node:)
+    @node = node
+
     containers = Docker::Container.all({all: true}, node.docker_connection)
 
     containers.each do |container|
@@ -18,8 +20,5 @@ class UpdateNodeStatusJob < ApplicationJob
         RemoveContainerJob.perform_later(node: node, container_id: container.id)
       end
     end
-  rescue Excon::Error => e
-    Rails.logger.info("Error contacting node #{node.id}: #{e}")
-    node.update(available: false)
   end
 end

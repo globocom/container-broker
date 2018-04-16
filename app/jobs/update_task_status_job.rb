@@ -1,7 +1,9 @@
-class UpdateTaskStatusJob < ApplicationJob
+class UpdateTaskStatusJob < DockerConnectionJob
   queue_as :default
 
   def perform(task)
+    @node = task.slot.node
+
     container = Docker::Container.get(task.container_id, {all: true}, task.slot.node.docker_connection)
 
     status = container.info["State"]["Status"]

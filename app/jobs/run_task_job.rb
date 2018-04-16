@@ -1,7 +1,9 @@
-class RunTaskJob < ApplicationJob
+class RunTaskJob < DockerConnectionJob
   queue_as :default
 
   def perform(task:, slot:)
+    @node = slot.node
+
     image_name, image_tag = task.image.split(':')
     Docker::Image.create({'fromImage' => image_name, 'tag' => image_tag}, nil, slot.node.docker_connection)
     container = Docker::Container.create(

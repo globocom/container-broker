@@ -3,9 +3,9 @@
 
 ## TODO
 * Create progress classes
-* Lock job and slot getting
 * Receive volumes in job creation api
 * Deallocate slot when task creation fails
+* Remove dead workers
 
 ## POST /handshake
   - Registro de um node no pool Globernetes
