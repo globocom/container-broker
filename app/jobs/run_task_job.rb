@@ -19,9 +19,12 @@ class RunTaskJob < DockerConnectionJob
     container.start
 
     task.update!(container_id: container.id, status: "started", slot: slot)
-    slot.attach_to(task: task)
+    slot.update!(status: "running", current_task: task, container_id: task.container_id)
     slot.node.update_usage
 
     task
+  rescue StandardError => e
+    slot.release
+    task.update(status: "error", error: e.message, slot: nil, container_id: nil)
   end
 end
