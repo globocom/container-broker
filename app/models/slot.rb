@@ -18,6 +18,7 @@ class Slot
 
   def release
     self.update!(status: "idle", container_id: nil, current_task: nil)
+    self.node.update_usage
   end
 
   def attaching!
