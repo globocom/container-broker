@@ -2,6 +2,7 @@ class Slot
   include Mongoid::Document
   include GlobalID::Identification
 
+  field :name, type: String
   field :status, type: String
   field :container_id, type: String
   belongs_to :current_task, class_name: "Task", optional: true

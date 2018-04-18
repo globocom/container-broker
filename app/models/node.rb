@@ -2,6 +2,7 @@ class Node
   include Mongoid::Document
   include GlobalID::Identification
 
+  field :name, type: String
   field :hostname, type: String
   field :cores, type: Integer
   field :memory, type: Integer
@@ -32,6 +33,8 @@ class Node
     end
 
     update_usage
+
+    FriendlyNameNodes.new.call
 
     self.cores
   end
