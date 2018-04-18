@@ -125,7 +125,6 @@ GEM
       guard (~> 2.1)
       guard-compat (~> 1.1)
       rspec (>= 2.99.0, < 4.0)
-    hiredis (0.6.1)
     i18n (1.0.0)
       concurrent-ruby (~> 1.0)
     inflecto (0.0.2)
@@ -199,9 +198,6 @@ GEM
     redis (3.3.5)
     redis-namespace (1.5.2)
       redis (~> 3.0, >= 3.0.4)
-    redis-queue (0.0.4)
-      hiredis (~> 0.5, >= 0.5.2)
-      redis (~> 3.0, >= 3.0.4)
     redlock (0.2.2)
       redis (>= 3.0.0, < 5.0)
     rspec (3.7.0)
@@ -249,6 +245,8 @@ GEM
       connection_pool (~> 2.2, >= 2.2.0)
       rack-protection (>= 1.5.0)
       redis (>= 3.3.5, < 5)
+    sidekiq-failures (1.0.0)
+      sidekiq (>= 4.0.0)
     sidekiq-scheduler (2.2.1)
       redis (>= 3, < 5)
       rufus-scheduler (~> 3.2)
@@ -306,12 +304,12 @@ DEPENDENCIES
   puma (~> 3.7)
   rails (~> 5.1.6)
   redis-namespace
-  redis-queue
   redlock
   rspec-rails
   sass-rails (~> 5.0)
   selenium-webdriver
   sidekiq
+  sidekiq-failures
   sidekiq-scheduler
   spring
   spring-commands-rspec
@@ -321,4 +319,4 @@ DEPENDENCIES
   web-console (>= 3.3.0)
 
 BUNDLED WITH
-   1.16.0
+   1.16.1

@@ -56,9 +56,9 @@ group :development do
 end
 
 gem "sidekiq"
-gem "redis-queue"
-gem "awesome_print"
+gem "sidekiq-failures"
 gem "sidekiq-scheduler"
+gem "awesome_print"
 gem "redis-namespace"
 gem "guard-rspec"
 gem "config"
