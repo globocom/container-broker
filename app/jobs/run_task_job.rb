@@ -25,6 +25,7 @@ class RunTaskJob < DockerConnectionJob
     task
   rescue StandardError => e
     slot.release
-    task.update(status: "error", error: e.message, slot: nil, container_id: nil)
+    task.update(error: e.message, slot: nil, container_id: nil)
+    task.retry
   end
 end

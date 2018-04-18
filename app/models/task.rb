@@ -13,15 +13,24 @@ class Task
   field :started_at, type: DateTime
   field :finished_at, type: DateTime
   field :progress, type: String
+  field :try_count, type: Integer
 
   belongs_to :slot, optional: true
 
   after_initialize do |task|
     task.status ||= "waiting"
+    task.try_count ||= 0
   end
 
   def set_error_log(log)
     self.error_log = BSON::Binary.new(log, :generic)
-    # self.error_log = log
+  end
+
+  def retry
+    if self.try_count < Settings.task_retry_count
+      self.update(status: "retry", try_count: self.try_count + 1)
+    else
+      self.update(status: "error")
+    end
   end
 end

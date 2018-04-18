@@ -12,9 +12,11 @@ class UpdateTaskStatusJob < DockerConnectionJob
     if status == 'exited'
       if exit_code.zero?
         task.status = 'completed'
+        task.error = nil
       else
-        task.status = 'error'
+        task.retry
       end
+
       logs =  container.logs(stdout: true, stderr: true)
       logs.gsub!(/[\x00-\x09]/, "")
       puts logs
