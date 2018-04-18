@@ -10,7 +10,12 @@ class UpdateNodeStatusJob < DockerConnectionJob
       slot = node.slots.where(container_id: container.id).first
       if slot
         if container.info["State"] == "exited"
-          ReleaseSlotJob.perform_later(slot: slot)
+          if slot.status == "running"
+            LockManager.lock("release_slot_#{slot.id}", 2000) do
+              slot.update(status: "releasing")
+            end
+            ReleaseSlotJob.perform_later(slot: MongoidSerializableModel.new(slot))
+          end
         else
           # UpdateTaskStatusJob.perform_later(Task.find(slot.current_task.id))
         end
