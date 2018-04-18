@@ -37,7 +37,7 @@ class Node
   end
 
   def docker_connection
-    Docker::Connection.new(self.hostname, {connect_timeout: 3, read_timeout: 5, write_timeout: 5})
+    Docker::Connection.new(self.hostname, {connect_timeout: 10, read_timeout: 10, write_timeout: 10})
   end
 
   def update_usage
