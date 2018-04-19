@@ -26,6 +26,8 @@ class UpdateNodeStatusJob < DockerConnectionJob
         Rails.logger.info("Container #{container.id} not attached with any slot")
         RemoveContainerJob.perform_later(node: node, container_id: container.id)
       end
+
+      RunTasksJob.perform_later
     end
   end
 end
