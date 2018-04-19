@@ -198,8 +198,6 @@ GEM
     redis (3.3.5)
     redis-namespace (1.5.2)
       redis (~> 3.0, >= 3.0.4)
-    redlock (0.2.2)
-      redis (>= 3.0.0, < 5.0)
     rspec (3.7.0)
       rspec-core (~> 3.7.0)
       rspec-expectations (~> 3.7.0)
@@ -304,7 +302,6 @@ DEPENDENCIES
   puma (~> 3.7)
   rails (~> 5.1.6)
   redis-namespace
-  redlock
   rspec-rails
   sass-rails (~> 5.0)
   selenium-webdriver
