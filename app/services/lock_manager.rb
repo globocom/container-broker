@@ -1,7 +1,7 @@
 class LockManager
   attr_reader :redis, :resource, :expire, :wait, :locked, :key
 
-  def initialize(type:, id:, expire: 60, wait: true)
+  def initialize(type:, id:, expire:, wait: true)
     @key = "lockmanager-#{type}-#{id}"
     @redis = Redis.new(url: Settings.redis_url)
     @resource = resource

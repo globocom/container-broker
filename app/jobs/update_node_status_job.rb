@@ -42,7 +42,7 @@ class UpdateNodeStatusJob < DockerConnectionJob
 
       zombie_slots = node.slots.where(status: "running") - attached_slots
       zombie_slots.each do |slot|
-        ReleaseSlotJob.perform_later(slot: MongoidSerializableModel.new(slot))
+        # ReleaseSlotJob.perform_later(slot: MongoidSerializableModel.new(slot))
       end
 
       RunTasksJob.perform_later
