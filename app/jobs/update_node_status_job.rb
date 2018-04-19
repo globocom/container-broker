@@ -28,9 +28,15 @@ class UpdateNodeStatusJob < DockerConnectionJob
             # UpdateTaskStatusJob.perform_later(Task.find(slot.current_task.id))
           end
         else
-          puts "Container #{container.id} not attached with any slot"
-          Rails.logger.info("Container #{container.id} not attached with any slot")
-          RemoveContainerJob.perform_later(node: node, container_id: container.id)
+          # Here we remove lost containers, like those unknown to container-broker or by some cause
+          # not linked here. But we need to take care to not remove those just created because
+          # there is a sligthly time between their creation and its slot link that cannot be locked
+          # so we remove only containers created at a minimum of 5 minutes
+          if Time.parse(Docker.info(node.docker_connection)["SystemTime"]) - Time.at(container.info["Created"]) > 5.minutes
+            puts "Container #{container.id} not attached with any slot"
+            Rails.logger.info("Container #{container.id} not attached with any slot")
+            RemoveContainerJob.perform_later(node: node, container_id: container.id)
+          end
         end
       end
 
