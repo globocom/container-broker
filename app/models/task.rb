@@ -9,7 +9,7 @@ class Task
   field :status, type: String, default: "waiting"
   field :exit_code, type: Integer
   field :error, type: String
-  field :error_log, type: BSON::Binary
+  field :error_log, type: String
   field :started_at, type: DateTime
   field :finished_at, type: DateTime
   field :progress, type: String

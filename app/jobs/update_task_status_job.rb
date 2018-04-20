@@ -18,9 +18,7 @@ class UpdateTaskStatusJob < DockerConnectionJob
       end
 
       logs =  container.logs(stdout: true, stderr: true)
-      logs.gsub!(/[\x00-\x09]/, "")
-      puts logs
-      task.set_error_log(logs)
+      task.error_log = logs.to_s
 
       task.exit_code = exit_code
     else
