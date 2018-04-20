@@ -1,5 +1,5 @@
 class TasksController < ApplicationController
-  before_action :set_task, only: [:show]
+  before_action :set_task, only: [:show, :error_log]
 
   def create
     # todo: implementar mecanismo de seleção de slots
@@ -16,6 +16,10 @@ class TasksController < ApplicationController
 
   def show
     render json: @task
+  end
+
+  def error_log
+    render plain: @task.error_log
   end
 
   private
