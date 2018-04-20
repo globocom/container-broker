@@ -17,8 +17,8 @@ class UpdateTaskStatusJob < DockerConnectionJob
         task.retry
       end
 
-      logs =  container.logs(stdout: true, stderr: true)
-      task.error_log = logs.to_s
+      # Logs disabled after fluentd
+      # task.error_log = container.logs(stdout: true, stderr: true)
 
       task.exit_code = exit_code
     else
