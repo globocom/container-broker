@@ -12,7 +12,7 @@ class RunTaskJob < DockerConnectionJob
         'HostConfig' => {
           'Binds' => ['/root/ef-shared:/tmp/workdir']
         },
-        'Cmd' => task.cmd.split(/\s(?=(?:[^"]|"[^"]*")*$)/)
+        'Cmd' => task.cmd.split(/\s(?=(?:[^']|'[^']*')*$)/)
       },
       slot.node.docker_connection
     )
