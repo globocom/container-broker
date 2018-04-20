@@ -10,7 +10,13 @@ class RunTaskJob < DockerConnectionJob
       {
         'Image' => task.image,
         'HostConfig' => {
-          'Binds' => ['/root/ef-shared:/tmp/workdir']
+          'Binds' => ['/root/ef-shared:/tmp/workdir'],
+          'LogConfig' =>  {
+            'Type' => 'fluentd',
+            'Config' => {
+              "tag" => "docker.{{.ID}}"
+            }
+          }
         },
         'Cmd' => task.cmd.split(/\s(?=(?:[^']|'[^']*')*$)/)
       },
