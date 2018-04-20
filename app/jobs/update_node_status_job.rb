@@ -35,7 +35,7 @@ class UpdateNodeStatusJob < DockerConnectionJob
           if Time.parse(Docker.info(node.docker_connection)["SystemTime"]) - Time.at(container.info["Created"]) > 5.minutes
             puts "Container #{container.id} not attached with any slot"
             Rails.logger.info("Container #{container.id} not attached with any slot")
-            RemoveContainerJob.perform_later(node: node, container_id: container.id)
+            # RemoveContainerJob.perform_later(node: node, container_id: container.id)
           end
         end
       end
