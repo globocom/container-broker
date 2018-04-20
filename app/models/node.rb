@@ -6,7 +6,7 @@ class Node
   field :hostname, type: String
   field :cores, type: Integer
   field :memory, type: Integer
-  field :available, type: Boolean
+  field :available, type: Boolean, default: true
   field :usage_percent, type: Integer
 
   has_many :slots
