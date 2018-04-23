@@ -6,11 +6,15 @@ class RunTaskJob < ApplicationJob
 
     image_name, image_tag = task.image.split(':')
     Docker::Image.create({'fromImage' => image_name, 'tag' => image_tag}, nil, slot.node.docker_connection)
+
+    binds = []
+    binds << "/nfs:#{task.storage_mount}" if task.storage_mount.present?
+
     container = Docker::Container.create(
       {
         'Image' => task.image,
         'HostConfig' => {
-          'Binds' => ['/root/ef-shared:/tmp/workdir'],
+          'Binds' => binds,
           'LogConfig' =>  {
             'Type' => 'fluentd',
             'Config' => {

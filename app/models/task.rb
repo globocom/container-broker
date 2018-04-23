@@ -6,6 +6,7 @@ class Task
   field :container_id, type: String # do not remove - needed for update status after completion
   field :image, type: String
   field :cmd, type: String
+  field :storage_mount, type: String
   field :status, type: String, default: "waiting"
   field :exit_code, type: Integer
   field :error, type: String
