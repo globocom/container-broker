@@ -30,7 +30,7 @@ class UpdateTaskStatusJob < DockerConnectionJob
     task.finished_at = container.info["State"]["FinishedAt"]
 
     #todo: create progress type
-    task.progress = get_progress(container: container)
+    # task.progress = get_progress(container: container)
 
     task.save
   end
