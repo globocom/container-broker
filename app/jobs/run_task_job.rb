@@ -33,7 +33,7 @@ class RunTaskJob < ApplicationJob
     case e
     when Excon::Error then
       message = "Docker connection error: #{e.message}"
-      slot.node.update(available: false)
+      slot.node.mark_as_unavailable(error: message)
     when Docker::Error::NotFoundError then
       message = "Docker image not found: #{e.message}"
     end

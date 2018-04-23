@@ -8,6 +8,7 @@ class Node
   field :memory, type: Integer
   field :available, type: Boolean, default: true
   field :usage_percent, type: Integer
+  field :last_error, type: String
 
   has_many :slots
 
@@ -46,6 +47,10 @@ class Node
   def update_usage
     usage = (1.0 - available_slots.count.to_f / slots.count) * 100
     self.update!(usage_percent: usage)
+  end
+
+  def mark_as_unavailable(error: nil)
+    self.update(available: false, last_error: error)
   end
 
 end
