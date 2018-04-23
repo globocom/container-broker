@@ -1,4 +1,4 @@
-class RunTaskJob < DockerConnectionJob
+class RunTaskJob < ApplicationJob
   queue_as :default
 
   def perform(task:, slot:)
@@ -29,9 +29,17 @@ class RunTaskJob < DockerConnectionJob
     slot.node.update_usage
 
     task
-  rescue StandardError => e
+  rescue StandardError, Excon::Error => e
+    case e
+    when Excon::Error then
+      message = "Docker connection error: #{e.message}"
+      slot.node.update(available: false)
+    when Docker::Error::NotFoundError then
+      message = "Docker image not found: #{e.message}"
+    end
+
     slot.release
-    task.update(error: e.message, slot: nil, container_id: nil)
+    task.update(error: message, slot: nil, container_id: nil)
     task.retry
   end
 end

@@ -28,4 +28,12 @@ class Task
       self.update(status: "error")
     end
   end
+
+  def retry?
+    status == "retry"
+  end
+
+  def waiting?
+    status == "waiting"
+  end
 end

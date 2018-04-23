@@ -25,4 +25,8 @@ class Slot
   def attach_to(task:)
     self.update!(status: "running", current_task: task, container_id: task.container_id)
   end
+
+  def idle?
+    status == "idle"
+  end
 end
