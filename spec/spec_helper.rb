@@ -28,15 +28,16 @@ RSpec.configure do |config|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
   end
 
-  config.use_transactional_fixtures = false
-
   config.before :each do
     DatabaseCleaner.strategy = :truncation
     DatabaseCleaner.start
   end
 
-  config.after do
+  config.after :each do
     DatabaseCleaner.clean
+
+    ActiveJob::Base.queue_adapter.enqueued_jobs = []
+    ActiveJob::Base.queue_adapter.performed_jobs = []
   end
 
   # rspec-mocks config goes here. You can use an alternate test double
