@@ -46,14 +46,14 @@ class Node
 
   def update_usage
     usage = (1.0 - available_slots.count.to_f / slots.count) * 100
-    self.update!(usage_percent: usage)
+    update!(usage_percent: usage)
   end
 
   def unavailable!(error: nil)
-    self.update(available: false, last_error: error)
+    update!(available: false, last_error: error)
   end
 
   def available!
-    update(available: true, last_error: nil)
+    update!(available: true, last_error: nil)
   end
 end

@@ -8,7 +8,7 @@ class RunTasksJob < ApplicationJob
         if slot
           RunTaskJob.perform_later(slot: slot, task: task)
         else
-          task.update(status: "waiting")
+          task.waiting!
         end
       end
     end

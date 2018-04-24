@@ -14,19 +14,47 @@ class Slot
   end
 
   def release
-    self.update!(status: "idle", container_id: nil, current_task: nil)
-    self.node.update_usage
+    update!(container_id: nil, current_task: nil)
+    idle!
   end
 
   def attaching!
-    self.update!(status: "attaching")
+    update!(status: "attaching")
+    node.update_usage
+  end
+
+  def attaching?
+    status == "attaching"
   end
 
   def attach_to(task:)
-    self.update!(status: "running", current_task: task, container_id: task.container_id)
+    update!(status: "running", current_task: task, container_id: task.container_id)
   end
 
   def idle?
     status == "idle"
+  end
+
+  def idle!
+    update!(status: "idle")
+    node.update_usage
+  end
+
+  def running?
+    status == "running"
+  end
+
+  def running!
+    update!(status: "running")
+    node.update_usage
+  end
+
+  def releasing?
+    status == "releasing"
+  end
+
+  def releasing!
+    update!(status: "releasing")
+    node.update_usage
   end
 end

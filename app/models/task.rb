@@ -24,10 +24,14 @@ class Task
 
   def retry
     if self.try_count < Settings.task_retry_count
-      self.update(status: "retry", try_count: self.try_count + 1)
+      update(status: "retry", try_count: self.try_count + 1)
     else
-      self.update(status: "error")
+      update(status: "error")
     end
+  end
+
+  def starting!
+    update(status: "starting")
   end
 
   def retry?
@@ -36,5 +40,13 @@ class Task
 
   def waiting?
     status == "waiting"
+  end
+
+  def waiting!
+    update!(status: "waiting")
+  end
+
+  def started!
+    update(status: "started")
   end
 end

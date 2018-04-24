@@ -19,7 +19,7 @@ class UpdateNodeStatusJob < DockerConnectionJob
             if slot.status == "running"
                 # slot.reload
                 # if slot.status == "running" # if slot status STILLS running after locking
-                  slot.update(status: "releasing")
+                  slot.releasing!
                   ReleaseSlotJob.perform_later(slot: MongoidSerializableModel.new(slot))
                 # end
               # end

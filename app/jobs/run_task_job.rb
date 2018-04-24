@@ -28,9 +28,11 @@ class RunTaskJob < ApplicationJob
     )
     container.start
 
-    task.update!(container_id: container.id, status: "started", slot: slot)
-    slot.update!(status: "running", current_task: task, container_id: task.container_id)
-    slot.node.update_usage
+    task.started!
+    task.update!(container_id: container.id, slot: slot)
+
+    slot.running!
+    slot.update!(current_task: task, container_id: task.container_id)
 
     task
   rescue StandardError, Excon::Error => e
