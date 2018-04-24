@@ -3,7 +3,8 @@ require 'rails_helper'
 RSpec.describe UpdateTaskStatusJob, type: :job do
   let(:node) { Node.create!(hostname: "local.test")}
   let(:slot) { Slot.create!(node: node) }
-  let(:task) { Task.create!(slot: slot, container_id: container_id) }
+  let(:task) { Task.create!(slot: slot, container_id: container_id, status: task_status) }
+  let(:task_status) { "running" }
   let(:docker_connection) { double("Docker::Connection") }
   let(:container_id) { "11223344" }
   let(:container) { double("Docker::Container", info: container_info) }
@@ -89,6 +90,22 @@ RSpec.describe UpdateTaskStatusJob, type: :job do
   end
 
   context "when container stills running" do
+    let(:container_status) { "running" }
 
+    context "and task was running" do
+      let(:task_status) { "running" }
+      it "calls task running!" do
+        expect(task).to receive(:running!)
+        perform
+      end
+    end
+
+    context "and task was not running" do
+      let(:task_status) { "started" }
+
+      it "updates task status" do
+        expect{perform}.to change(task, :status).to("running")
+      end
+    end
   end
 end

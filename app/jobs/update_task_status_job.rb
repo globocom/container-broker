@@ -21,7 +21,7 @@ class UpdateTaskStatusJob < DockerConnectionJob
       task.exit_code = exit_code
       task.finished_at = container.info["State"]["FinishedAt"]
     else
-      task.status = status
+      task.running!
     end
 
     task.started_at = container.info["State"]["StartedAt"]
