@@ -47,6 +47,7 @@ end
 
 group :test do
   gem 'database_cleaner'
+  gem "rspec-nc"
 end
 
 group :development do
