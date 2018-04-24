@@ -11,39 +11,21 @@ class UpdateTaskStatusJob < DockerConnectionJob
 
     if status == 'exited'
       if exit_code.zero?
-        task.status = 'completed'
+        task.completed!
         task.error = nil
       else
+        task.error = container.info["State"]["Error"]
         task.retry
       end
 
-      # Logs disabled after fluentd
-      # task.error_log = container.logs(stdout: true, stderr: true)
-
       task.exit_code = exit_code
+      task.finished_at = container.info["State"]["FinishedAt"]
     else
       task.status = status
     end
 
-    task.error = container.info["State"]["Error"]
     task.started_at = container.info["State"]["StartedAt"]
-    task.finished_at = container.info["State"]["FinishedAt"]
-
-    #todo: create progress type
-    # task.progress = get_progress(container: container)
 
     task.save
-  end
-
-  def get_progress(container:)
-    lines = container.logs(stderr: true, stdout: true, tail: 5).split("\r")
-    regexp = / time=(\d{2}:\d{2}:\d{2}\.\d{2})/
-    progress_line = lines.reverse.find {|line| line =~ regexp }
-
-    if progress_line
-      progress_line.match(regexp).captures.first
-    else
-      "00:00:00.00"
-    end
   end
 end

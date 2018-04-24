@@ -49,4 +49,8 @@ class Task
   def started!
     update(status: "started")
   end
+
+  def completed!
+    update(status: "completed")
+  end
 end
