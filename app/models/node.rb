@@ -49,8 +49,11 @@ class Node
     self.update!(usage_percent: usage)
   end
 
-  def mark_as_unavailable(error: nil)
+  def unavailable!(error: nil)
     self.update(available: false, last_error: error)
   end
 
+  def available!
+    update(available: true, last_error: nil)
+  end
 end

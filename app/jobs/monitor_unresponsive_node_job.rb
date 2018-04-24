@@ -3,7 +3,7 @@ class MonitorUnresponsiveNodeJob < ApplicationJob
 
   def perform(node:)
     Docker.info(node.docker_connection)
-    node.update(available: true, last_error: nil)
+    node.available!
   rescue StandardError => e
     node.update(last_error: e.message)
     Rails.logger.info("Node #{node} still unresponsive")

@@ -10,7 +10,7 @@ class Slot
   belongs_to :node, optional: true
 
   def available?
-    status == "idle"
+    idle?
   end
 
   def release
