@@ -4,8 +4,8 @@ class Node
 
   field :name, type: String
   field :hostname, type: String
-  field :cores, type: Integer
-  field :memory, type: Integer
+  field :cores, type: Integer, default: 0
+  field :memory, type: Integer, default: 0
   field :available, type: Boolean, default: true
   field :usage_percent, type: Integer
   field :last_error, type: String
@@ -25,11 +25,12 @@ class Node
   end
 
   def populate
-    [slots.count - self.cores, 0].max.times.each do
-      self.slots.last.destroy!
+    [slots.count - cores, 0].max.times.each do
+      reload
+      slots.last.destroy!
     end
 
-    (self.cores - slots.count).times.each do
+    (cores - slots.count).times.each do
       slots << Slot.create!
     end
 
@@ -37,11 +38,11 @@ class Node
 
     FriendlyNameNodes.new.call
 
-    self.cores
+    cores
   end
 
   def docker_connection
-    Docker::Connection.new(self.hostname, {connect_timeout: 10, read_timeout: 10, write_timeout: 10})
+    Docker::Connection.new(hostname, {connect_timeout: 10, read_timeout: 10, write_timeout: 10})
   end
 
   def update_usage
