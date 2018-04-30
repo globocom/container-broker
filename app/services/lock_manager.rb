@@ -3,7 +3,7 @@ class LockManager
 
   def initialize(type:, id:, expire:, wait: true)
     @key = "lockmanager-#{type}-#{id}"
-    @redis = Redis.new(url: Settings.redis_url)
+    @redis = LockManager.redis_client
     @resource = resource
     @expire = expire
     @wait = wait
@@ -40,5 +40,9 @@ class LockManager
 
   def redis_set(options)
     redis.set(key, resource, options.merge(ex: expire))
+  end
+
+  def self.redis_client
+    Redis.new(url: Settings.redis_url)
   end
 end
