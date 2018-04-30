@@ -9,7 +9,7 @@ test:
     default:
       database: container-broker_test
       hosts:
-        - localhost:27017
+        - <%= ENV["MONGODB_URL"] || "localhost:27017" %>
       options:
         read:
           mode: :primary
