@@ -38,14 +38,30 @@ RSpec.describe RunTaskJob, type: :job do
     before do
       allow(Docker::Image).to receive(:create).and_raise(Excon::Error, "Error connecting to docker")
     end
+
     it "mark node as unavailable" do
       perform
       expect(node).to_not be_available
     end
 
     include_examples "releases slot and retry the task"
-    it "sets task error message" do
-      expect{perform}.to change(task, :error).to("Docker connection error: Error connecting to docker")
+
+    context "sets task error message" do
+      context "standard errors" do
+        it "sets simple error message" do
+          expect{perform}.to change(task, :error).to("Docker connection error: Error connecting to docker")
+        end
+      end
+
+      context "errors with response bodies" do
+        before do
+          allow(Docker::Image).to receive(:create).and_raise(Excon::Error::HTTPStatus.new("Error connecting to docker", nil, double(body: "Error details")))
+        end
+
+        it "sets message with error details from response body" do
+          expect{perform}.to change(task, :error).to("Docker connection error: Error connecting to docker\nError details")
+        end
+      end
     end
   end
 
