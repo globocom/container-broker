@@ -84,7 +84,7 @@ RSpec.describe RunTaskJob, type: :job do
       {
         "Image" => "#{image}:#{image_tag}",
         "HostConfig" => {
-          "Binds" => ["/nfs:/tmp/workdir"],
+          "Binds" => ["/tmp/ef-shared:/tmp/workdir"],
           "LogConfig" =>  {
             "Type" => "fluentd",
             "Config" => {
