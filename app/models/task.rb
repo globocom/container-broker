@@ -57,4 +57,8 @@ class Task
   def running!
     update(status: "running")
   end
+
+  def force_retry!
+    update(status: "waiting", try_count: 0)
+  end
 end

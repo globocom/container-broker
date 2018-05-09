@@ -4,26 +4,20 @@ class RunTaskJob < ApplicationJob
   def perform(task:, slot:)
     @node = slot.node
 
-    image_name, image_tag = task.image.split(':')
-    Docker::Image.create({'fromImage' => image_name, 'tag' => image_tag}, nil, slot.node.docker_connection)
+    image_name, image_tag = task.image.split(":")
+    Docker::Image.create({"fromImage" => image_name, "tag" => image_tag}, nil, slot.node.docker_connection)
 
     binds = []
-    binds << "/nfs:#{task.storage_mount}" if task.storage_mount.present?
+    binds << [Settings.filer_dir_base, task.storage_mount].join(":") if task.storage_mount.present?
 
     container = Docker::Container.create(
       {
-        'Image' => task.image,
-        'HostConfig' => {
-          'Binds' => binds,
-          'LogConfig' =>  {
-            'Type' => 'fluentd',
-            'Config' => {
-              "tag" => "docker.{{.ID}}",
-              "fluentd-sub-second-precision" => "true"
-            }
-          }
+        "Image" => task.image,
+        "HostConfig" => {
+          "Binds" => binds,
+          "LogConfig" => log_config
         },
-        'Cmd' => task.cmd.split(/\s(?=(?:[^']|'[^']*')*$)/)
+        "Cmd" => task.cmd.split(/\s(?=(?:[^']|'[^']*')*$)/)
       },
       slot.node.docker_connection
     )
@@ -40,6 +34,7 @@ class RunTaskJob < ApplicationJob
     case e
     when Excon::Error then
       message = "Docker connection error: #{e.message}"
+      message << "\n#{e.response.body}" if e.respond_to?(:response)
       slot.node.unavailable!(error: message)
     when Docker::Error::NotFoundError then
       message = "Docker image not found: #{e.message}"
@@ -48,5 +43,22 @@ class RunTaskJob < ApplicationJob
     slot.release
     task.update(error: message, slot: nil, container_id: nil)
     task.retry
+  end
+
+  def log_config
+    case Settings.docker_log_driver
+    when "fluentd" then
+      {
+        "Type" => "fluentd",
+        "Config" => {
+          "tag" => "docker.{{.ID}}",
+          "fluentd-sub-second-precision" => "true"
+        }
+      }
+    else
+      {
+        "Type" => "json-file"
+      }
+    end
   end
 end
