@@ -18,7 +18,8 @@ class RunTaskJob < ApplicationJob
           'LogConfig' =>  {
             'Type' => 'fluentd',
             'Config' => {
-              "tag" => "docker.{{.ID}}"
+              "tag" => "docker.{{.ID}}",
+              "fluentd-sub-second-precision" => "true"
             }
           }
         },
