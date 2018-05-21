@@ -64,7 +64,7 @@ end
 
 gem "sidekiq"
 gem "sidekiq-failures"
-gem 'sidekiq-pro', "> 4"
+gem 'sidekiq-pro', ">= 4"
 gem "sidekiq-scheduler"
 gem "awesome_print"
 gem "redis-namespace"

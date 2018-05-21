@@ -323,7 +323,7 @@ DEPENDENCIES
   selenium-webdriver
   sidekiq
   sidekiq-failures
-  sidekiq-pro (> 4)
+  sidekiq-pro (>= 4)
   sidekiq-scheduler
   spring
   spring-commands-rspec
