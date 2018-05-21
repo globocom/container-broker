@@ -1,8 +1,9 @@
 class LockManager
   attr_reader :redis, :resource, :expire, :wait, :locked, :key
+  KEY_PREFIX = "lockmanager-"
 
   def initialize(type:, id:, expire:, wait: true)
-    @key = "lockmanager-#{type}-#{id}"
+    @key = "#{KEY_PREFIX}-#{type}-#{id}"
     @redis = LockManager.redis_client
     @resource = resource
     @expire = expire
@@ -13,7 +14,7 @@ class LockManager
     if wait
       while !locked do
         sleep 0.1
-        @locked = redis_set(nx: true)
+        try_lock
       end
     else
       @locked = redis_set(nx: true)
@@ -32,10 +33,21 @@ class LockManager
     raise "Lock not aquired" unless locked
 
     if redis_set(xx: true)
-      puts "lock extended by #{expire}"
+      puts "[LockManager] lock extended by #{expire}"
     else
-      raise "Lock expired"
+      raise "[LockManager] Lock expired"
     end
+  end
+
+  def self.active_locks
+    redis_client.keys("#{KEY_PREFIX}*").inject(Hash.new) do |result, key|
+      result[key] = redis_client.ttl(key)
+      result
+    end
+  end
+
+  def try_lock
+    @locked = redis_set(nx: true)
   end
 
   def redis_set(options)
