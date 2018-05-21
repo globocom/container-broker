@@ -11,7 +11,8 @@ RSpec.describe Node, type: :model do
     end
 
     it "sets usage to percentual of used slots" do
-      expect{subject.update_usage}.to change(subject, :usage_percent).to(75)
+      subject.update_usage
+      expect(subject.usage_percent).to eq(75)
     end
   end
 

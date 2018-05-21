@@ -1,13 +1,14 @@
 class Task
   include GlobalID::Identification
   include Mongoid::Document
+  include MongoidEnumerable
 
   field :name, type: String
   field :container_id, type: String # do not remove - needed for update status after completion
   field :image, type: String
   field :cmd, type: String
   field :storage_mount, type: String
-  field :status, type: String, default: "waiting"
+  enumerable :status, %w(waiting starting started running retry error completed)
   field :exit_code, type: Integer
   field :error, type: String
   field :error_log, type: String
@@ -24,41 +25,15 @@ class Task
 
   def retry
     if self.try_count < Settings.task_retry_count
-      update(status: "retry", try_count: self.try_count + 1)
+      update(try_count: self.try_count + 1)
+      retry!
     else
-      update(status: "error")
+      error!
     end
   end
 
-  def starting!
-    update(status: "starting")
-  end
-
-  def retry?
-    status == "retry"
-  end
-
-  def waiting?
-    status == "waiting"
-  end
-
-  def waiting!
-    update!(status: "waiting")
-  end
-
-  def started!
-    update(status: "started")
-  end
-
-  def completed!
-    update(status: "completed")
-  end
-
-  def running!
-    update(status: "running")
-  end
-
   def force_retry!
-    update(status: "waiting", try_count: 0)
+    update(try_count: 0)
+    starting!
   end
 end

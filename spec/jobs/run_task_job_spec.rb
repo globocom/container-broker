@@ -76,10 +76,6 @@ RSpec.describe RunTaskJob, type: :job do
   end
 
   context "when node is available and image exists" do
-    before do
-
-    end
-
     let(:container_create_options) do
       {
         "Image" => "#{image}:#{image_tag}",
@@ -140,7 +136,7 @@ RSpec.describe RunTaskJob, type: :job do
     end
 
     it "calls node update_usage" do
-      expect(node).to receive(:update_usage)
+      expect(node).to receive(:update_usage).at_least(1).times
       perform
     end
   end
