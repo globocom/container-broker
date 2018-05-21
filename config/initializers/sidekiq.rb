@@ -1,5 +1,11 @@
 Rails.application.config.active_job.queue_adapter = Rails.env.test? ? :test : :sidekiq
 
+Sidekiq.default_worker_options = {
+  unique: :until_executed,
+  lock_expiration: 1.minute,
+  unique_args: ->(args) { [ args.first.except('job_id').tap{|r| puts "result: #{r}"} ] }
+}
+
 def redis_from_url(uri)
   if uri.start_with?("sentinel")
     m = uri.match("sentinel://:([^@]*)@([^/]*)/service_name:(.*)")
