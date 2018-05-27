@@ -24,6 +24,7 @@ class Slot
   def release
     update!(container_id: nil, current_task: nil)
     idle!
+    RunTasksJob.perform_later
   end
 
   def attaching!

@@ -19,6 +19,10 @@ class Task
 
   belongs_to :slot, optional: true
 
+  after_create do
+    RunTasksJob.perform_later
+  end
+
   def set_error_log(log)
     self.error_log = BSON::Binary.new(log, :generic)
   end
