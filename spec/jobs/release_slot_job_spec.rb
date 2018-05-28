@@ -28,6 +28,6 @@ RSpec.describe ReleaseSlotJob, type: :job do
 
   it "enqueues new tasks" do
     perform
-    expect(RunTasksJob).to have_been_enqueued#.with(node: slot.node, conainer_id: slot.container_id)
+    expect(RunTasksJob).to have_been_enqueued.at_least(1).times
   end
 end
