@@ -3,7 +3,7 @@ Rails.application.config.active_job.queue_adapter = Rails.env.test? ? :test : :s
 Sidekiq.default_worker_options = {
   unique: :until_executed,
   lock_expiration: 1.minute,
-  unique_args: ->(args) { [ args.first.except('job_id').tap{|r| puts "result: #{r}"} ] }
+  unique_args: ->(args) { [ args.first.except('job_id') ] }
 }
 
 def redis_from_url(uri)

@@ -4,10 +4,6 @@ class UpdateNodeStatusJob < DockerConnectionJob
   def perform(node:)
     @node = node
 
-    puts "sleeping 5 seconds"
-    sleep 5
-    puts "slept"
-
     containers = Docker::Container.all({all: true}, node.docker_connection)
 
     attached_slots = []
