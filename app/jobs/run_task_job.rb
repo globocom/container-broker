@@ -32,7 +32,7 @@ class RunTaskJob < ApplicationJob
     task
   rescue StandardError, Excon::Error => e
     case e
-    when Excon::Error then
+    when Excon::Error, Docker::Error::TimeoutError then
       message = "Docker connection error: #{e.message}"
       message << "\n#{e.response.body}" if e.respond_to?(:response)
       slot.node.unavailable!(error: message)
