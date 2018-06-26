@@ -14,6 +14,7 @@ RSpec.describe RunTaskJob, type: :job do
   before do
     allow(Docker::Image).to receive(:create)
     allow(Docker::Container).to receive(:create) { container }
+    allow(Docker::Image).to receive(:exist?)
     allow(container).to receive(:start)
   end
 
@@ -65,13 +66,24 @@ RSpec.describe RunTaskJob, type: :job do
     end
   end
 
-  context "when docker image does not exists" do
+  context "when docker image does not exists in registry" do
     before do
       allow(Docker::Image).to receive(:create).and_raise(Docker::Error::NotFoundError)
     end
     include_examples "releases slot and retry the task"
     it "sets task error message" do
       expect{perform}.to change(task, :error).to("Docker image not found: Docker::Error::NotFoundError")
+    end
+  end
+
+  context "when docker image does not exists locally in machine" do
+    before do
+      allow(Docker::Image).to receive(:exist?).with(task.image).and_return(false)
+    end
+
+    it "creates image in machine" do
+      expect(Docker::Image).to receive(:create).with({"fromImage" => image, "tag" => image_tag}, nil, a_kind_of(Docker::Connection))
+      perform
     end
   end
 
@@ -91,6 +103,16 @@ RSpec.describe RunTaskJob, type: :job do
         },
         "Cmd" => ["-i", "input.txt", "-metadata", "comment='Encoded by Globo.com'", "output.mp4"]
       }
+    end
+
+    context "and image exists locally in machine" do
+      before do
+        allow(Docker::Image).to receive(:exist?).with(task.image).and_return(true)
+      end
+
+      it "does not call image create" do
+        expect(Docker::Image).to_not receive(:create)
+      end
     end
 
     it "creates the image" do

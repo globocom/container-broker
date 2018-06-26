@@ -4,8 +4,10 @@ class RunTaskJob < ApplicationJob
   def perform(task:, slot:)
     @node = slot.node
 
-    image_name, image_tag = task.image.split(":")
-    Docker::Image.create({"fromImage" => image_name, "tag" => image_tag}, nil, slot.node.docker_connection)
+    unless Docker::Image.exist?(task.image, slot.node.docker_connection)
+      image_name, image_tag = task.image.split(":")
+      Docker::Image.create({"fromImage" => image_name, "tag" => image_tag}, nil, slot.node.docker_connection)
+    end
 
     binds = []
     binds << [Settings.filer_dir_base, task.storage_mount].join(":") if task.storage_mount.present?
