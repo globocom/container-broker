@@ -8,14 +8,14 @@ class TasksController < ApplicationController
     @task = Task.new(task_params)
 
     if @task.save
-      render json: @task, status: :created
+      render json: @task, except: :_id, status: :created
     else
       render json: @task.errors, status: :unprocessable_entity
     end
   end
 
   def show
-    render json: @task
+    render json: @task, except: :_id
   end
 
   def error_log
@@ -24,7 +24,7 @@ class TasksController < ApplicationController
 
   private
     def set_task
-      @task = Task.find(params[:id])
+      @task = Task.find_by(uuid: params[:uuid])
     end
 
     def task_params

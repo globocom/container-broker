@@ -1,6 +1,7 @@
 class Task
   include GlobalID::Identification
   include Mongoid::Document
+  include Mongoid::Uuid
   include MongoidEnumerable
 
   field :name, type: String

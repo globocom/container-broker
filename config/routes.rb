@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   resources :status, only: :index
 
-  resources :tasks, only: [:create, :show] do
+  resources :tasks, only: [:create, :show], param: :uuid do
     get :error_log, on: :member
   end
 
