@@ -1,5 +1,6 @@
 class Node
   include Mongoid::Document
+  include Mongoid::Uuid
   include GlobalID::Identification
 
   field :name, type: String
