@@ -4,10 +4,7 @@ class RunTaskJob < ApplicationJob
   def perform(task:, slot:)
     @node = slot.node
 
-    unless Docker::Image.exist?(task.image, slot.node.docker_connection)
-      image_name, image_tag = task.image.split(":")
-      Docker::Image.create({"fromImage" => image_name, "tag" => image_tag}, nil, slot.node.docker_connection)
-    end
+    pull_image(task: task, slot: slot)
 
     binds = []
     binds << [Settings.filer_dir_base, task.storage_mount].join(":") if task.storage_mount.present?
@@ -45,6 +42,13 @@ class RunTaskJob < ApplicationJob
     slot.release
     task.update(error: message, slot: nil, container_id: nil)
     task.retry
+  end
+
+  def pull_image(task:, slot:)
+    unless Docker::Image.exist?(task.image, slot.node.docker_connection)
+      image_name, image_tag = task.image.split(":")
+      Docker::Image.create({"fromImage" => image_name, "tag" => image_tag}, nil, slot.node.docker_connection)
+    end
   end
 
   def log_config
