@@ -30,6 +30,11 @@ class Task
     self.error_log = BSON::Binary.new(log, :generic)
   end
 
+  def mark_as_started(container_id:, slot:)
+    update!(container_id: container_id, slot: slot, started_at: Time.zone.now)
+    started!
+  end
+
   def retry
     if self.try_count < Settings.task_retry_count
       update(try_count: self.try_count + 1)

@@ -22,6 +22,11 @@ class Slot
     idle?
   end
 
+  def mark_as_running(current_task:, container_id:)
+    update!(current_task: current_task, container_id: container_id)
+    running!
+  end
+
   def release
     update!(container_id: nil, current_task: nil)
     idle!

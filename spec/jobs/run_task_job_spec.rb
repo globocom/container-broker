@@ -142,6 +142,14 @@ RSpec.describe RunTaskJob, type: :job do
       expect{perform}.to change(task, :status).to("started")
     end
 
+    it "updates task started_at" do
+      expect{perform}.to change(task, :started_at).to(a_kind_of(Date))
+    end
+
+    it "does not update task finished_at" do
+      expect{perform}.to_not change(task, :finished_at)
+    end
+
     it "updates task slot" do
       expect{perform}.to change(task, :slot).to(slot)
     end

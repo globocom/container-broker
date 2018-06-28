@@ -6,31 +6,15 @@ class RunTaskJob < ApplicationJob
 
     pull_image(task: task, slot: slot)
 
-    binds = []
-    binds << [Settings.filer_dir_base, task.storage_mount].join(":") if task.storage_mount.present?
-
-    container = Docker::Container.create(
-      {
-        "Image" => task.image,
-        "HostConfig" => {
-          "Binds" => binds,
-          "LogConfig" => log_config,
-          "NetworkMode" => ENV["DOCKER_CONTAINERS_NETWORK"].to_s
-        },
-        "Cmd" => task.cmd.split(/\s(?=(?:[^']|'[^']*')*$)/)
-      },
-      slot.node.docker_connection
-    )
+    container = create_container(task: task, slot: slot)
     container.start
 
-    task.started!
-    task.update!(container_id: container.id, slot: slot)
-
-    slot.running!
-    slot.update!(current_task: task, container_id: task.container_id)
+    task.mark_as_started(container_id: container.id, slot: slot)
+    slot.mark_as_running(current_task: task, container_id: container.id)
 
     task
   rescue StandardError, Excon::Error => e
+    Rails.logger.error("Error in RunTaskJob: #{e}")
     case e
     when Excon::Error, Docker::Error::TimeoutError then
       message = "Docker connection error: #{e.message}"
@@ -50,6 +34,24 @@ class RunTaskJob < ApplicationJob
       image_name, image_tag = task.image.split(":")
       Docker::Image.create({"fromImage" => image_name, "tag" => image_tag}, nil, slot.node.docker_connection)
     end
+  end
+
+  def create_container(task:, slot:)
+    binds = []
+    binds << [Settings.filer_dir_base, task.storage_mount].join(":") if task.storage_mount.present?
+
+    Docker::Container.create(
+      {
+        "Image" => task.image,
+        "HostConfig" => {
+          "Binds" => binds,
+          "LogConfig" => log_config,
+          "NetworkMode" => ENV["DOCKER_CONTAINERS_NETWORK"].to_s
+        },
+        "Cmd" => task.cmd.split(/\s(?=(?:[^']|'[^']*')*$)/)
+      },
+      slot.node.docker_connection
+    )
   end
 
   def log_config
