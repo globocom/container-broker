@@ -108,6 +108,7 @@ GEM
       tzinfo
     excon (0.62.0)
     execjs (2.7.0)
+    fabrication (2.20.1)
     ffi (1.9.23)
     formatador (0.2.5)
     globalid (0.4.1)
@@ -326,6 +327,7 @@ DEPENDENCIES
   config
   database_cleaner
   docker-api
+  fabrication
   guard-rspec
   jbuilder (~> 2.5)
   jquery-rails
@@ -355,4 +357,4 @@ DEPENDENCIES
   web-console (>= 3.3.0)
 
 BUNDLED WITH
-   1.16.1
+   1.16.2
