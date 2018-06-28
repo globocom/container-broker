@@ -42,6 +42,10 @@ class Task
     end
   end
 
+  def seconds_running
+    finished_at.sec - started_at.sec if completed?
+  end
+
   def force_retry!
     update(try_count: 0)
     starting!

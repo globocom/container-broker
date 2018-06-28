@@ -15,4 +15,13 @@ RSpec.describe Task, type: :model do
     end
   end
 
+  context "for completed tasks" do
+    subject do
+      Fabricate(:task, started_at: "2018-01-25 15:32:10", finished_at: "2018-01-25 15:32:32", status: "completed")
+    end
+    it "calculates duration" do
+      expect(subject.seconds_running).to eq(22.seconds)
+    end
+  end
+
 end
