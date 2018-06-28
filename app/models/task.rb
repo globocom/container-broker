@@ -13,6 +13,7 @@ class Task
   field :exit_code, type: Integer
   field :error, type: String
   field :error_log, type: String
+  field :created_at, type: DateTime
   field :started_at, type: DateTime
   field :finished_at, type: DateTime
   field :progress, type: String
@@ -23,6 +24,7 @@ class Task
   after_create do
     RunTasksJob.perform_later
   end
+  before_create {|task| task.created_at = Time.zone.now }
 
   def set_error_log(log)
     self.error_log = BSON::Binary.new(log, :generic)
