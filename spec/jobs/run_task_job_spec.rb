@@ -78,7 +78,7 @@ RSpec.describe RunTaskJob, type: :job do
 
   context "when docker image does not exists locally in machine" do
     before do
-      allow(Docker::Image).to receive(:exist?).with(task.image).and_return(false)
+      allow(Docker::Image).to receive(:exist?).with(task.image, hash, a_kind_of(Docker::Connection)).and_return(false)
     end
 
     it "creates image in machine" do
@@ -108,7 +108,7 @@ RSpec.describe RunTaskJob, type: :job do
 
     context "and image exists locally in machine" do
       before do
-        allow(Docker::Image).to receive(:exist?).with(task.image).and_return(true)
+        allow(Docker::Image).to receive(:exist?).with(task.image, kind_of(Hash), a_kind_of(Docker::Connection)).and_return(true)
       end
 
       it "does not call image create" do
