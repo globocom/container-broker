@@ -21,10 +21,8 @@ class Task
 
   belongs_to :slot, optional: true
 
-  after_create do
-    RunTasksJob.perform_later
-  end
   before_create {|task| task.created_at = Time.zone.now }
+  after_create { RunTasksJob.perform_later }
 
   def set_error_log(log)
     self.error_log = BSON::Binary.new(log, :generic)

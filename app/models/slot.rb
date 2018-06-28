@@ -33,27 +33,7 @@ class Slot
     RunTasksJob.perform_later
   end
 
-  def attaching!
-    update!(status: "attaching")
-    # node.update_usage
-  end
-
   def attach_to(task:)
     update!(status: "running", current_task: task, container_id: task.container_id)
-  end
-
-  def idle!
-    update!(status: "idle")
-    # node.update_usage
-  end
-
-  def running!
-    update!(status: "running")
-    # node.update_usage
-  end
-
-  def releasing!
-    update!(status: "releasing")
-    # node.update_usage
   end
 end

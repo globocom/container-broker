@@ -9,6 +9,10 @@ RSpec.describe Task, type: :model do
       allow(Time.zone).to receive(:now).and_return(now)
       expect(subject.created_at).to eq(now)
     end
+
+    it "starts with waiting status" do
+      expect(described_class.new).to be_waiting
+    end
   end
 
 end
