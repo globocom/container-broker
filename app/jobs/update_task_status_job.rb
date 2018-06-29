@@ -9,7 +9,12 @@ class UpdateTaskStatusJob < DockerConnectionJob
     status = container.info["State"]["Status"]
     exit_code = container.info["State"]["ExitCode"]
 
+    task.started_at = container.info["State"]["StartedAt"]
+
     if status == 'exited'
+      task.exit_code = exit_code
+      task.finished_at = container.info["State"]["FinishedAt"]
+
       if exit_code.zero?
         task.completed!
         task.error = nil
@@ -17,14 +22,9 @@ class UpdateTaskStatusJob < DockerConnectionJob
         task.error = container.info["State"]["Error"]
         task.retry
       end
-
-      task.exit_code = exit_code
-      task.finished_at = container.info["State"]["FinishedAt"]
     else
       task.running!
     end
-
-    task.started_at = container.info["State"]["StartedAt"]
 
     task.save
   end

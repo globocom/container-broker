@@ -40,6 +40,7 @@ class Task
     if self.try_count < Settings.task_retry_count
       update(try_count: self.try_count + 1)
       retry!
+      RunTasksJob.perform_later
     else
       error!
     end
