@@ -18,6 +18,7 @@ class Task
   field :finished_at, type: DateTime
   field :progress, type: String
   field :try_count, type: Integer, default: 0
+  field :tags, type: Hash, default: Hash.new
 
   belongs_to :slot, optional: true
 

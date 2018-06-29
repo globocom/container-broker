@@ -7,6 +7,14 @@ RSpec.describe "Tasks", type: :request do
     let(:task_image) { "busybox:1.25" }
     let(:task_cmd) { "sleep 5" }
     let(:task_storage_mount) { "/var/log" }
+    let(:task_tags) do
+      {
+        "api_id" => "123456",
+        "media_id" => "6c4cf8d6-36a3-4c0d-8799-0ae79fffa9ce",
+        "slug" => "tag1",
+      }
+    end
+
     let(:data) do
       {
         task: {
@@ -14,6 +22,7 @@ RSpec.describe "Tasks", type: :request do
           image: task_image,
           cmd: task_cmd,
           storage_mount: task_storage_mount,
+          tags: task_tags,
         }
       }
     end
@@ -30,7 +39,12 @@ RSpec.describe "Tasks", type: :request do
 
       it "with valid parameters" do
         perform
-        expect(Task.last).to have_attributes(name: task_name, image: task_image, cmd: task_cmd, storage_mount: task_storage_mount)
+        expect(Task.last).to have_attributes(
+          name: task_name,
+          image: task_image,
+          cmd: task_cmd,
+          storage_mount: task_storage_mount,
+          tags: task_tags)
       end
     end
 

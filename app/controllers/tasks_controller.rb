@@ -25,6 +25,6 @@ class TasksController < ApplicationController
     end
 
     def task_params
-      params.require(:task).permit(:name, :image, :cmd, :storage_mount)
+      params.require(:task).permit(:name, :image, :cmd, :storage_mount, tags: {})
     end
 end
