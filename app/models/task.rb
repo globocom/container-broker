@@ -24,6 +24,8 @@ class Task
   before_create {|task| task.created_at = Time.zone.now }
   after_create { RunTasksJob.perform_later }
 
+  validates :name, :image, :cmd, presence: true
+
   def set_error_log(log)
     self.error_log = BSON::Binary.new(log, :generic)
   end
