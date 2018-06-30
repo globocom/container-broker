@@ -7,10 +7,10 @@ class StatusController < ApplicationController
   end
 
   def nodes
-    render json: Node.all, include: :slots
+    render json: Node.all, each_serializer: StatusPanelNodeSerializer
   end
 
   def tasks
-    render json: Task.all.limit(1000)
+    render json: Task.all.limit(1000), each_serializer: StatusPanelTaskSerializer
   end
 end
