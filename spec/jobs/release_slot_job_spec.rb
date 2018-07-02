@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe ReleaseSlotJob, type: :job do
   let(:node) { Node.create!(hostname: "local.test" ) }
   let(:slot) { Slot.create!(node: node, status: "releasing", current_task: task, container_id: container_id)}
-  let(:task) { Task.create! }
+  let(:task) { Fabricate(:task) }
   let(:container_id) { "11223344" }
 
   let(:perform) { subject.perform(slot: slot) }

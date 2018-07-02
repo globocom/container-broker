@@ -72,7 +72,6 @@ RSpec.describe "Tasks", type: :request do
       perform
       expect(JSON.parse(response.body)).to match({
         "uuid" => task.uuid,
-        "name" => task.name,
         "created_at" => task.created_at.iso8601(3),
         "error" => task.error,
         "exit_code" => task.exit_code,

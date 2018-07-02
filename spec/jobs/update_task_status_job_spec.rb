@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe UpdateTaskStatusJob, type: :job do
   let(:node) { Node.create!(hostname: "local.test")}
   let(:slot) { Slot.create!(node: node) }
-  let(:task) { Task.create!(slot: slot, container_id: container_id, status: task_status) }
+  let(:task) { Fabricate(:task, slot: slot, container_id: container_id, status: task_status) }
   let(:task_status) { "running" }
   let(:docker_connection) { double("Docker::Connection") }
   let(:container_id) { "11223344" }
