@@ -14,7 +14,7 @@ class StatusController < ApplicationController
     @tasks  = Task.all
     if params[:tags]
       params.require(:tags).each do |tag, value|
-        @tasks = @tasks.where("tags.#{tag}" => value)
+        @tasks = @tasks.where("tags.#{tag}" => value.to_s)
       end
     end
     render json: @tasks.limit(1000), each_serializer: StatusPanelTaskSerializer
@@ -27,6 +27,6 @@ class StatusController < ApplicationController
 
   def tag_values
     @tag = TaskTag.find_by(name: params[:tag_name])
-    render json: @tag.values
+    render json: @tag.values.take(50)
   end
 end
