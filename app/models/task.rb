@@ -47,11 +47,15 @@ class Task
   end
 
   def seconds_running
-    finished_at.sec - started_at.sec if completed?
+    ((finished_at - started_at) * 1.day.seconds).to_i if completed?
   end
 
   def force_retry!
     update(try_count: 0)
     starting!
+  end
+
+  def add_tags
+    AddTaskTagsJob.perform_later(task: self)
   end
 end

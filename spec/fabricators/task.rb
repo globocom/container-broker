@@ -13,4 +13,5 @@ Fabricator(:task) do
   finished_at "2018-03-01 18:10:00"
   progress nil
   try_count 0
+  tags { {"x" => "y"} }
 end

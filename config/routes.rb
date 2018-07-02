@@ -1,6 +1,11 @@
 Rails.application.routes.draw do
   resources :status, only: :index do
-    get :nodes, :tasks, on: :collection
+    collection do
+      get :nodes
+      get :tasks
+      get :tags
+      get :tag_values
+    end
   end
 
   resources :tasks, only: [:create, :show], param: :uuid do
