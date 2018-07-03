@@ -3,7 +3,7 @@ development:
     default:
       database: container-broker_development
       hosts:
-        - localhost:27017
+        - <%= ENV["CONTAINER_BROKER_MONGODB_HOST"] || "localhost" %>:27017
 test:
   clients:
     default:
