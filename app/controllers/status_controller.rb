@@ -7,7 +7,7 @@ class StatusController < ApplicationController
   end
 
   def nodes
-    render json: Node.all, each_serializer: StatusPanelNodeSerializer
+    render json: Node.includes(:slots) , each_serializer: StatusPanelNodeSerializer
   end
 
   def tasks
