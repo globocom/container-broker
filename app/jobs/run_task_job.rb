@@ -22,6 +22,8 @@ class RunTaskJob < ApplicationJob
       slot.node.unavailable!(error: message)
     when Docker::Error::NotFoundError then
       message = "Docker image not found: #{e.message}"
+    else
+      message = e.message
     end
 
     slot.release

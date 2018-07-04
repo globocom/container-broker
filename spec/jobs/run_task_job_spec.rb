@@ -113,6 +113,18 @@ RSpec.describe RunTaskJob, type: :job do
 
       it "does not call image create" do
         expect(Docker::Image).to_not receive(:create)
+        perform
+      end
+    end
+
+    context "and command is invalid" do
+      before do
+        allow(container).to receive(:start).and_raise(Docker::Error::ClientError, "executable file not found")
+      end
+
+      it "saves the error in task" do
+        perform
+        expect(task.error).to eq("executable file not found")
       end
     end
 
