@@ -23,7 +23,10 @@ class Task
   belongs_to :slot, optional: true
 
   before_create {|task| task.created_at = Time.zone.now }
-  after_create { RunTasksJob.perform_later }
+  after_create do
+    RunTasksJob.perform_later
+    AddTaskTagsJob.perform_later(task: self)
+  end
 
   validates :name, :image, :cmd, presence: true
 
@@ -53,9 +56,5 @@ class Task
   def force_retry!
     update(try_count: 0)
     starting!
-  end
-
-  def add_tags
-    AddTaskTagsJob.perform_later(task: self)
   end
 end
