@@ -7,11 +7,11 @@ class StatusController < ApplicationController
   end
 
   def nodes
-    render json: Node.includes(:slots) , each_serializer: StatusPanelNodeSerializer
+    render json: Node.includes(:slots), each_serializer: StatusPanelNodeSerializer
   end
 
   def tasks
-    @tasks  = Task.all
+    @tasks  = Task.includes(:slot)
     if params[:tags]
       params.require(:tags).each do |tag, value|
         @tasks = @tasks.where("tags.#{tag}" => value.to_s)
