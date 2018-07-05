@@ -11,7 +11,8 @@ class StatusController < ApplicationController
   end
 
   def tasks
-    @tasks  = Task.includes(:slot)
+    @tasks = Task.includes(:slot)
+    @tasks = @tasks.where(status: params[:status]) if params[:status]
     if params[:tags]
       params.require(:tags).each do |tag, value|
         @tasks = @tasks.where("tags.#{tag}" => value.to_s)
@@ -23,6 +24,10 @@ class StatusController < ApplicationController
   def tags
     @tags = TaskTag.pluck(:name)
     render json: @tags
+  end
+
+  def task_statuses
+    render json: Task.distinct(:status)
   end
 
   def tag_values

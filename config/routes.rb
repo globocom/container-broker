@@ -5,6 +5,7 @@ Rails.application.routes.draw do
       get :tasks
       get :tags
       get :tag_values
+      get :task_statuses
     end
   end
 
