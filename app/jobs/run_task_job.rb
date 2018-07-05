@@ -7,9 +7,10 @@ class RunTaskJob < ApplicationJob
     pull_image(task: task, slot: slot)
 
     container = create_container(task: task, slot: slot)
-    container.start
+    task.update!(container_id: container.id, slot: slot)
 
-    task.mark_as_started(container_id: container.id, slot: slot)
+    container.start
+    task.mark_as_started!
     slot.mark_as_running(current_task: task, container_id: container.id)
 
     task
@@ -27,7 +28,7 @@ class RunTaskJob < ApplicationJob
     end
 
     slot.release
-    task.update(error: message, slot: nil, container_id: nil)
+    task.update(error: message)
     task.retry
   end
 

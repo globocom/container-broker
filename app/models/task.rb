@@ -34,8 +34,9 @@ class Task
     self.error_log = BSON::Binary.new(log, :generic)
   end
 
-  def mark_as_started(container_id:, slot:)
-    update!(container_id: container_id, slot: slot, started_at: Time.zone.now)
+  def mark_as_started!
+    update!(started_at: Time.zone.now)
+
     started!
   end
 

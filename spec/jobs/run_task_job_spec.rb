@@ -70,7 +70,9 @@ RSpec.describe RunTaskJob, type: :job do
     before do
       allow(Docker::Image).to receive(:create).and_raise(Docker::Error::NotFoundError)
     end
+
     include_examples "releases slot and retry the task"
+
     it "sets task error message" do
       expect{perform}.to change(task, :error).to("Docker image not found: Docker::Error::NotFoundError")
     end
@@ -125,6 +127,11 @@ RSpec.describe RunTaskJob, type: :job do
       it "saves the error in task" do
         perform
         expect(task.error).to eq("executable file not found")
+      end
+
+      it "saves container_id in task" do
+        perform
+        expect(task.container_id).to eq(container.id)
       end
     end
 
