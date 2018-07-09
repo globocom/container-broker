@@ -6,6 +6,7 @@ Rails.application.routes.draw do
       get :tags
       get :tag_values
       get :task_statuses
+      post "retry_task/:uuid", action: :retry_task
     end
   end
 
