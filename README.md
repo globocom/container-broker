@@ -1,16 +1,13 @@
-# GLOBERNETES
+# Container Broker
 
+## Routes
 
-## TODO
-* Create progress classes
-* Receive volumes in job creation api
-
-## POST /handshake
+### POST /handshake
   - Registro de um node no pool Globernetes
   - Parâmetros: `{ "hostname": "", "cores": 10, "memory": 4096 }`
   - Resposta:   `{ "status": "ok|error" }`
 
-## POST /job
+### POST /job
   - Cria de um container que executa um determinado comando dentro de uma imagem
   - Parâmetros: `{ "name": "", "image": "", "cmd": "" }`
   - Retorno:
@@ -21,7 +18,7 @@
   }
   ```
 
-## GET /job/:id
+### GET /job/:id
   - Exibe informações de um determinado job
   - Parâmetro (via query-string): `id`
   - Retorno:
@@ -32,7 +29,7 @@
   }
   ```
 
-## GET /status
+### GET /status
   - Exibe informações do pool
   - Retorno:
   ```
@@ -52,3 +49,15 @@
     ]
   }
   ```
+
+## Deploy
+
+
+
+
+
+
+
+
+
+
