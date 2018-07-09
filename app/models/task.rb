@@ -56,6 +56,6 @@ class Task
 
   def force_retry!
     update(try_count: 0)
-    starting!
+    waiting!
   end
 end
