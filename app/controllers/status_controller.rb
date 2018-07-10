@@ -11,7 +11,7 @@ class StatusController < ApplicationController
   end
 
   def tasks
-    @tasks = Task.includes(:slot)
+    @tasks = Task.includes(:slot).order_by("created_at" => "asc")
     @tasks = @tasks.where(status: params[:status]) if params[:status]
     if params[:tags]
       params.require(:tags).each do |tag, value|
