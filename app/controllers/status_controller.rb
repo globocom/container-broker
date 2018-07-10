@@ -27,7 +27,7 @@ class StatusController < ApplicationController
   end
 
   def task_statuses
-    render json: Task.distinct(:status)
+    render json: Task.all_status
   end
 
   def tag_values
