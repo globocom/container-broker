@@ -22,6 +22,9 @@ class Task
 
   belongs_to :slot, optional: true
 
+  index({created_at: 1}, {expire_after_seconds: 1.month})
+  index({tags: 1})
+
   before_create {|task| task.created_at = Time.zone.now }
   after_create do
     RunTasksJob.perform_later
