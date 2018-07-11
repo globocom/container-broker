@@ -15,7 +15,7 @@ class RunTaskJob < ApplicationJob
         "HostConfig" => {
           "Binds" => binds,
           "LogConfig" => log_config,
-          "NetworkMode" => ENV["ELASTIC_ENCODER_TEST_NETWORK"].to_s
+          "NetworkMode" => ENV["DOCKER_CONTAINERS_NETWORK"].to_s
         },
         "Cmd" => task.cmd.split(/\s(?=(?:[^']|'[^']*')*$)/)
       },
