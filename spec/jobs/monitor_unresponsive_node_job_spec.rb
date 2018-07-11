@@ -3,11 +3,11 @@ require 'rails_helper'
 RSpec.describe MonitorUnresponsiveNodeJob, type: :job do
 
   context "when node is available" do
-    let(:node) { Node.create!(available: false, last_error: "connection error", hostname: "localhost") }
+    let(:node) { Node.create!(status: "unavailable", last_error: "connection error", hostname: "localhost") }
     before { allow(Docker).to receive(:info) { "ok" } }
 
     it "marks node available again" do
-      expect { subject.perform(node: node) }.to change(node, :available).to(true)
+      expect { subject.perform(node: node) }.to change(node, :status).to("available")
     end
 
     it "clears last error" do

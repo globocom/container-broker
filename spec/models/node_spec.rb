@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Node, type: :model do
 
-  describe "#update_usage" do
+  context "updating usage" do
     before do
       Slot.create(node: subject, status: "running")
       Slot.create(node: subject, status: "attaching")
@@ -16,20 +16,7 @@ RSpec.describe Node, type: :model do
     end
   end
 
-  describe ".available" do
-    before do
-      Node.create!(available: true)
-      Node.create!(available: true)
-      Node.create!(available: false)
-      Node.create!(available: true)
-    end
-
-    it "returns only available slots" do
-      expect(described_class.available).to have(3).nodes
-    end
-  end
-
-  describe "#populate" do
+  context "populating slots" do
     it "calls node naming" do
       expect_any_instance_of(FriendlyNameNodes).to receive(:call)
       subject.populate
@@ -65,27 +52,34 @@ RSpec.describe Node, type: :model do
     end
   end
 
-  describe "#available!" do
-    subject { described_class.new(available: false, last_error: "generic error") }
-
-    it "updates available to true" do
-      expect { subject.available! }.to change(subject, :available).to(true)
+  context "registering error" do
+    context "when node was available" do
+      subject { described_class.new(status: "available", last_error: nil) }
+      it "updates node status" do
+        expect { subject.register_error("generic error") }.to change(subject, :status).to("unstable")
+      end
     end
 
-    it "clears last_error" do
-      expect { subject.available! }.to change(subject, :last_error).to(nil)
-    end
-  end
+    context "when node was unstable" do
+      subject { described_class.new(status: "unstable", last_error: nil, last_success_at: last_success_at) }
 
-  describe "#unavailable!" do
-    subject { described_class.new(available: true, last_error: nil) }
+      before { allow(Settings).to receive(:node_unavailable_after_seconds).and_return(10.minutes) }
 
-    it "updates available to false" do
-      expect { subject.unavailable! }.to change(subject, :available).to(false)
-    end
+      context "for less than the allowed time" do
+        let(:last_success_at) { Time.zone.now - 1.minute }
 
-    it "clears last_error" do
-      expect { subject.unavailable!(error: "generic error") }.to change(subject, :last_error).to("generic error")
+        it "does not change node status" do
+          expect { subject.register_error("generic error") }.to_not change(subject, :status)
+        end
+      end
+
+      context "for more than the allowed time" do
+        let(:last_success_at) { Time.zone.now - 15.minutes }
+
+        it "changes node status" do
+          expect { subject.register_error("generic error") }.to change(subject, :status).to("unavailable")
+        end
+      end
     end
   end
 end
