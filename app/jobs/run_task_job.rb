@@ -9,16 +9,13 @@ class RunTaskJob < ApplicationJob
     binds = []
     binds << [Settings.filer_dir_base, task.storage_mount].join(":") if task.storage_mount.present?
 
-    network_mode = []
-    network_mode << ENV["ELASTIC_ENCODER_TEST_NETWORK"] if ENV["ELASTIC_ENCODER_TEST_NETWORK"]
-
     container = Docker::Container.create(
       {
         "Image" => task.image,
         "HostConfig" => {
           "Binds" => binds,
           "LogConfig" => log_config,
-          "NetworkMode" => network_mode
+          "NetworkMode" => ENV["ELASTIC_ENCODER_TEST_NETWORK"].to_s
         },
         "Cmd" => task.cmd.split(/\s(?=(?:[^']|'[^']*')*$)/)
       },
