@@ -14,7 +14,8 @@ class RunTaskJob < ApplicationJob
         "Image" => task.image,
         "HostConfig" => {
           "Binds" => binds,
-          "LogConfig" => log_config
+          "LogConfig" => log_config,
+          "NetworkMode" => ENV["DOCKER_CONTAINERS_NETWORK"].to_s
         },
         "Cmd" => task.cmd.split(/\s(?=(?:[^']|'[^']*')*$)/)
       },

@@ -45,13 +45,13 @@ group :development, :test do
   gem 'capybara', '~> 2.13'
   gem 'selenium-webdriver'
   gem 'rspec-rails'
-  gem 'mini_racer'
 end
 
 group :test do
   gem 'database_cleaner'
   gem "rspec-nc"
   gem "rspec-collection_matchers"
+  gem 'mini_racer'
 end
 
 group :development do

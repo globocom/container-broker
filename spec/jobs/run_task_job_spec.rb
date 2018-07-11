@@ -99,7 +99,8 @@ RSpec.describe RunTaskJob, type: :job do
               "tag" => "docker.{{.ID}}",
               "fluentd-sub-second-precision" => "true"
             }
-          }
+          },
+          "NetworkMode"=> ""
         },
         "Cmd" => ["-i", "input.txt", "-metadata", "comment='Encoded by Globo.com'", "output.mp4"]
       }
