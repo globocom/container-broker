@@ -3,45 +3,46 @@
 ## Routes
 
 ### POST /handshake
-  - Registro de um node no pool Globernetes
-  - Parâmetros: `{ "hostname": "", "cores": 10, "memory": 4096 }`
-  - Resposta:   `{ "status": "ok|error" }`
+  - Register a new node to container broker pool
+  - Paramters: `{ "hostname": "", "cores": 10, "memory": 4096 }`
+  - Response:   `{ "status": "ok|error" }`
 
 ### POST /job
   - Cria de um container que executa um determinado comando dentro de uma imagem
-  - Parâmetros: `{ "name": "", "image": "", "cmd": "" }`
+  - Creates a container from given image to run given command
+  - Paramters: `{ "name": "", "image": "", "cmd": "", "storage_mount": "", "tags": {"slug": "slug3166h", "type": "video"} }`
   - Retorno:
-  ```
+  ```json
   {
     "status": "ok|error",
-    "id": "abc123xyz"
+    "uuid": "2d272b5c-953c-44e9-ad15-6c31187903c9"
   }
   ```
 
-### GET /job/:id
-  - Exibe informações de um determinado job
-  - Parâmetro (via query-string): `id`
-  - Retorno:
-  ```
+### GET /job/:uuid
+  - Show information about some job
+  - Parameters (query string): `id`
+  - Response:
+  ```json
   {
-    "id": "abcxyz",
+    "uuid": "2d272b5c-953c-44e9-ad15-6c31187903c9",
     "status": "waiting|running|completed|error"
   }
   ```
 
 ### GET /status
-  - Exibe informações do pool
-  - Retorno:
-  ```
+  - Show pool informations
+  - Response:
+  ```json
   {
     "nodes": [
       {
-        "hostname": ""
+        "hostname": "",
         "cores": 10,
         "memory": 4096,
         "jobs": [
           {
-            "id": "abc123"
+            "uuid": "2d272b5c-953c-44e9-ad15-6c31187903c9",
             "status": "waiting|running|completed|error"
           }
         ]
@@ -51,6 +52,9 @@
   ```
 
 ## Deploy
+
+### Tsuru
+Command: `tsuru app-deploy -a container-broker-dev`
 
 
 
