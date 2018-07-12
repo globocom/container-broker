@@ -16,16 +16,12 @@ class Node
 
   has_many :slots
 
-  def self.available
-    Node.where(available: true)
-  end
-
   def find_available_slot
     available_slots.first
   end
 
   def available_slots
-    slots.to_a.select(&:available?)
+    slots.idle
   end
 
   def populate
@@ -59,6 +55,7 @@ class Node
     update!(last_error: error)
     if last_success_at && last_success_at < Settings.node_unavailable_after_seconds.seconds.ago
       unavailable!
+      MigrateTasksFromDeadNodeJob.perform_later(node: self)
     else
       unstable!
     end

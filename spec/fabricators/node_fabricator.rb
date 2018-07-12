@@ -3,6 +3,6 @@ Fabricator(:node) do
   hostname "worker.test"
   cores 8
   memory 32768
-  available true
+  status "available"
   usage_percent 0
 end

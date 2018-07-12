@@ -76,8 +76,13 @@ RSpec.describe Node, type: :model do
       context "for more than the allowed time" do
         let(:last_success_at) { Time.zone.now - 15.minutes }
 
-        it "changes node status" do
+        it "changes node status to unavailable" do
           expect { subject.register_error("generic error") }.to change(subject, :status).to("unavailable")
+        end
+
+        it "migrate running tasts to another node" do
+          subject.register_error("generic error")
+          expect(MigrateTasksFromDeadNodeJob).to have_been_enqueued.with(node: subject)
         end
       end
     end
