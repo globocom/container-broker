@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe MonitorUnresponsiveNodeJob, type: :job do
 
-  context "when node is available" do
+  context "when node is unavailable" do
     let(:node) { Node.create!(status: "unavailable", last_error: "connection error", hostname: "localhost") }
     before { allow(Docker).to receive(:info) { "ok" } }
 
@@ -16,7 +16,7 @@ RSpec.describe MonitorUnresponsiveNodeJob, type: :job do
   end
 
   context "when node still unavailable" do
-    let(:node) { Node.create!(available: true, hostname: "localhost") }
+    let(:node) { Node.create!(status: "available", hostname: "localhost") }
     before { allow(Docker).to receive(:info).and_raise("error getting docker info") }
 
     it "marks node as unavailable" do
