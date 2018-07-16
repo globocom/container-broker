@@ -2,6 +2,7 @@ class Node
   include Mongoid::Document
   include Mongoid::Uuid
   include GlobalID::Identification
+  include MongoidEnumerable
 
   field :name, type: String
   field :hostname, type: String
@@ -10,19 +11,17 @@ class Node
   field :available, type: Boolean, default: true
   field :usage_percent, type: Integer
   field :last_error, type: String
+  field :last_success_at, type: DateTime
+  enumerable :status, %w(available unstable unavailable), default: "unavailable", after_change: :status_change
 
   has_many :slots
-
-  def self.available
-    Node.where(available: true)
-  end
 
   def find_available_slot
     available_slots.first
   end
 
   def available_slots
-    slots.to_a.select(&:available?)
+    slots.idle
   end
 
   def populate
@@ -52,11 +51,17 @@ class Node
     update!(usage_percent: usage)
   end
 
-  def unavailable!(error: nil)
-    update!(available: false, last_error: error)
+  def register_error(error)
+    update!(last_error: error)
+    if last_success_at && last_success_at < Settings.node_unavailable_after_seconds.seconds.ago
+      unavailable!
+      MigrateTasksFromDeadNodeJob.perform_later(node: self)
+    else
+      unstable!
+    end
   end
 
-  def available!
-    update!(available: true, last_error: nil)
+  def update_last_success
+    update!(last_success_at: Time.zone.now)
   end
 end

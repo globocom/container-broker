@@ -14,15 +14,9 @@ class UpdateNodeStatusJob < DockerConnectionJob
         attached_slots << slot
         if container.info["State"] == "exited"
           if slot.status == "running"
-              # slot.reload
-              # if slot.status == "running" # if slot status STILLS running after locking
-                slot.releasing!
-                ReleaseSlotJob.perform_later(slot: MongoidSerializableModel.new(slot))
-              # end
-            # end
+            slot.releasing!
+            ReleaseSlotJob.perform_later(slot: MongoidSerializableModel.new(slot))
           end
-        else
-          # UpdateTaskStatusJob.perform_later(Task.find(slot.current_task.id))
         end
       else
         # Here we remove lost containers, like those unknown to container-broker or by some cause
@@ -37,10 +31,7 @@ class UpdateNodeStatusJob < DockerConnectionJob
       end
     end
 
-    # zombie_slots = node.slots.where(status: "running") - attached_slots
-    # zombie_slots.each do |slot|
-    #   # ReleaseSlotJob.perform_later(slot: MongoidSerializableModel.new(slot))
-    # end
+    node.update_last_success
   end
 
   def get_node_system_time(node:)
