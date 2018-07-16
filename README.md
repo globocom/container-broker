@@ -8,10 +8,9 @@
   - Response:   `{ "status": "ok|error" }`
 
 ### POST /job
-  - Cria de um container que executa um determinado comando dentro de uma imagem
   - Creates a container from given image to run given command
   - Paramters: `{ "name": "", "image": "", "cmd": "", "storage_mount": "", "tags": {"slug": "slug3166h", "type": "video"} }`
-  - Retorno:
+  - Response:
   ```json
   {
     "status": "ok|error",
