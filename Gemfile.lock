@@ -177,7 +177,7 @@ GEM
       mongoid (>= 3.0, < 8)
       rake
       uuid (>= 2.3, < 3)
-    mongoid_enumerable (0.2.0)
+    mongoid_enumerable (0.2.1)
       mongoid (>= 4.0)
     multi_json (1.13.1)
     nenv (0.3.0)
