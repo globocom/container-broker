@@ -70,7 +70,9 @@ RSpec.describe RunTaskJob, type: :job do
     before do
       allow(Docker::Image).to receive(:create).and_raise(Docker::Error::NotFoundError)
     end
+
     include_examples "releases slot and retry the task"
+
     it "sets task error message" do
       expect{perform}.to change(task, :error).to("Docker image not found: Docker::Error::NotFoundError")
     end
@@ -78,7 +80,7 @@ RSpec.describe RunTaskJob, type: :job do
 
   context "when docker image does not exists locally in machine" do
     before do
-      allow(Docker::Image).to receive(:exist?).with(task.image).and_return(false)
+      allow(Docker::Image).to receive(:exist?).with(task.image, hash, a_kind_of(Docker::Connection)).and_return(false)
     end
 
     it "creates image in machine" do
@@ -108,11 +110,28 @@ RSpec.describe RunTaskJob, type: :job do
 
     context "and image exists locally in machine" do
       before do
-        allow(Docker::Image).to receive(:exist?).with(task.image).and_return(true)
+        allow(Docker::Image).to receive(:exist?).with(task.image, kind_of(Hash), a_kind_of(Docker::Connection)).and_return(true)
       end
 
       it "does not call image create" do
         expect(Docker::Image).to_not receive(:create)
+        perform
+      end
+    end
+
+    context "and command is invalid" do
+      before do
+        allow(container).to receive(:start).and_raise(Docker::Error::ClientError, "executable file not found")
+      end
+
+      it "saves the error in task" do
+        perform
+        expect(task.error).to eq("executable file not found")
+      end
+
+      it "saves container_id in task" do
+        perform
+        expect(task.container_id).to eq(container.id)
       end
     end
 
@@ -140,6 +159,14 @@ RSpec.describe RunTaskJob, type: :job do
 
     it "updates task status" do
       expect{perform}.to change(task, :status).to("started")
+    end
+
+    it "updates task started_at" do
+      expect{perform}.to change(task, :started_at).to(a_kind_of(Date))
+    end
+
+    it "does not update task finished_at" do
+      expect{perform}.to_not change(task, :finished_at)
     end
 
     it "updates task slot" do

@@ -29,7 +29,7 @@ class UpdateNodeStatusJob < DockerConnectionJob
         # not linked here. But we need to take care to not remove those just created because
         # there is a sligthly time between their creation and its slot link that cannot be locked
         # so we remove only containers created at a minimum of 5 minutes
-        if Time.parse(Docker.info(node.docker_connection)["SystemTime"]) - Time.at(container.info["Created"]) > 5.minutes
+        if get_node_system_time(node: node) - Time.at(container.info["Created"]) > 5.minutes
           puts "Container #{container.id} not attached with any slot"
           Rails.logger.info("Container #{container.id} not attached with any slot")
           # RemoveContainerJob.perform_later(node: node, container_id: container.id)
@@ -41,5 +41,9 @@ class UpdateNodeStatusJob < DockerConnectionJob
     # zombie_slots.each do |slot|
     #   # ReleaseSlotJob.perform_later(slot: MongoidSerializableModel.new(slot))
     # end
+  end
+
+  def get_node_system_time(node:)
+    @node_system_time ||= Time.parse(Docker.info(node.docker_connection)["SystemTime"])
   end
 end

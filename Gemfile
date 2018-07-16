@@ -20,6 +20,8 @@ gem 'sass-rails', '~> 5.0'
 gem 'uglifier', '>= 1.3.0'
 # See https://github.com/rails/execjs#readme for more supported runtimes
 # gem 'therubyracer', platforms: :ruby
+gem 'webpacker'
+gem 'react-rails'
 
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 4.2'
@@ -45,6 +47,7 @@ group :development, :test do
   gem 'capybara', '~> 2.13'
   gem 'selenium-webdriver'
   gem 'rspec-rails'
+  gem "fabrication"
 end
 
 group :test do
@@ -74,3 +77,4 @@ gem "redis-namespace"
 gem "guard-rspec"
 gem "config"
 gem "mongoid-uuid"
+gem "active_model_serializers"

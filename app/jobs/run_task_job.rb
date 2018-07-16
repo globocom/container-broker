@@ -6,10 +6,44 @@ class RunTaskJob < ApplicationJob
 
     pull_image(task: task, slot: slot)
 
+    container = create_container(task: task, slot: slot)
+    task.update!(container_id: container.id, slot: slot)
+
+    container.start
+    task.mark_as_started!
+    slot.mark_as_running(current_task: task, container_id: container.id)
+
+    task
+  rescue StandardError, Excon::Error => e
+    Rails.logger.error("Error in RunTaskJob: #{e}")
+    case e
+    when Excon::Error, Docker::Error::TimeoutError then
+      message = "Docker connection error: #{e.message}"
+      message << "\n#{e.response.body}" if e.respond_to?(:response)
+      slot.node.unavailable!(error: message)
+    when Docker::Error::NotFoundError then
+      message = "Docker image not found: #{e.message}"
+    else
+      message = e.message
+    end
+
+    slot.release
+    task.update(error: message)
+    task.retry
+  end
+
+  def pull_image(task:, slot:)
+    unless Docker::Image.exist?(task.image, {}, slot.node.docker_connection)
+      image_name, image_tag = task.image.split(":")
+      Docker::Image.create({"fromImage" => image_name, "tag" => image_tag}, nil, slot.node.docker_connection)
+    end
+  end
+
+  def create_container(task:, slot:)
     binds = []
     binds << [Settings.filer_dir_base, task.storage_mount].join(":") if task.storage_mount.present?
 
-    container = Docker::Container.create(
+    Docker::Container.create(
       {
         "Image" => task.image,
         "HostConfig" => {
@@ -21,35 +55,6 @@ class RunTaskJob < ApplicationJob
       },
       slot.node.docker_connection
     )
-    container.start
-
-    task.started!
-    task.update!(container_id: container.id, slot: slot)
-
-    slot.running!
-    slot.update!(current_task: task, container_id: task.container_id)
-
-    task
-  rescue StandardError, Excon::Error => e
-    case e
-    when Excon::Error, Docker::Error::TimeoutError then
-      message = "Docker connection error: #{e.message}"
-      message << "\n#{e.response.body}" if e.respond_to?(:response)
-      slot.node.unavailable!(error: message)
-    when Docker::Error::NotFoundError then
-      message = "Docker image not found: #{e.message}"
-    end
-
-    slot.release
-    task.update(error: message, slot: nil, container_id: nil)
-    task.retry
-  end
-
-  def pull_image(task:, slot:)
-    unless Docker::Image.exist?(task.image, {}, slot.node.docker_connection)
-      image_name, image_tag = task.image.split(":")
-      Docker::Image.create({"fromImage" => image_name, "tag" => image_tag}, nil, slot.node.docker_connection)
-    end
   end
 
   def log_config

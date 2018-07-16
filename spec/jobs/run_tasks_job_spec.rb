@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe RunTasksJob, type: :service do
-  let(:task) { Task.create! }
+  let(:task) { Fabricate(:task) }
   let(:slot) { Node.create!(cores: 2).tap(&:populate).slots.first }
 
   context "when there are tasks to run" do
