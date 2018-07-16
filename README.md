@@ -4,12 +4,12 @@
 
 ### POST /handshake
   - Register a new node to container broker pool
-  - Paramters: `{ "hostname": "", "cores": 10, "memory": 4096 }`
+  - Parameters: `{ "hostname": "", "cores": 10, "memory": 4096 }`
   - Response:   `{ "status": "ok|error" }`
 
 ### POST /job
   - Creates a container from given image to run given command
-  - Paramters: `{ "name": "", "image": "", "cmd": "", "storage_mount": "", "tags": {"slug": "slug3166h", "type": "video"} }`
+  - Parameters: `{ "name": "", "image": "", "cmd": "", "storage_mount": "", "tags": {"slug": "slug3166h", "type": "video"} }`
   - Response:
   ```json
   {
