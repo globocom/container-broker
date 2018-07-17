@@ -57,6 +57,6 @@ class LockManager
   end
 
   def self.redis_client
-    Redis.new(url: Settings.redis_url)
+    redis_from_url(Settings.redis_url)
   end
 end
