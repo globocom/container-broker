@@ -10,6 +10,11 @@ RSpec.describe MonitorUnresponsiveNodeJob, type: :job do
       expect { subject.perform(node: node) }.to change(node, :status).to("available")
     end
 
+    it "tries to run new tasks" do
+      subject.perform(node: node)
+      expect(RunTasksJob).to have_been_enqueued
+    end
+
     it "clears last error" do
       expect { subject.perform(node: node) }.to change(node, :last_error).to(nil)
     end
