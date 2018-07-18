@@ -51,7 +51,8 @@ class RunTaskJob < ApplicationJob
           "LogConfig" => log_config,
           "NetworkMode" => ENV["DOCKER_CONTAINERS_NETWORK"].to_s
         },
-        "Cmd" => task.cmd.split(/\s(?=(?:[^']|'[^']*')*$)/)
+        # "Cmd" => task.cmd.split(/\s(?=(?:[^']|'[^']*')*$)/)
+        "Cmd" => ["sh", "-c", task.cmd]
       },
       slot.node.docker_connection
     )
