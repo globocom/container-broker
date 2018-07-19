@@ -104,6 +104,7 @@ RSpec.describe RunTaskJob, type: :job do
           },
           "NetworkMode"=> ""
         },
+        "Entrypoint" => [],
         "Cmd" => ["sh", "-c", "-i input.txt -metadata comment='Encoded by Globo.com' output.mp4"]
       }
     end
