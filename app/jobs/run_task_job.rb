@@ -48,7 +48,7 @@ class RunTaskJob < ApplicationJob
         "Image" => task.image,
         "HostConfig" => {
           "Binds" => binds,
-          "LogConfig" => log_config,
+          "LogConfig" => log_config(task: task),
           "NetworkMode" => ENV["DOCKER_CONTAINERS_NETWORK"].to_s
         },
         "Entrypoint" => [],
@@ -58,20 +58,26 @@ class RunTaskJob < ApplicationJob
     )
   end
 
-  def log_config
-    case Settings.docker_log_driver
-    when "fluentd" then
-      {
-        "Type" => "fluentd",
-        "Config" => {
-          "tag" => "docker.{{.ID}}",
-          "fluentd-sub-second-precision" => "true"
-        }
-      }
-    else
+  def log_config(task:)
+    if task.persist_logs
       {
         "Type" => "json-file"
       }
+    else
+      case Settings.docker_log_driver
+      when "fluentd" then
+        {
+          "Type" => "fluentd",
+          "Config" => {
+            "tag" => "docker.{{.ID}}",
+            "fluentd-sub-second-precision" => "true"
+          }
+        }
+      else
+        {
+          "Type" => "json-file"
+        }
+      end
     end
   end
 end
