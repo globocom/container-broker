@@ -26,6 +26,12 @@ class UpdateTaskStatusJob < DockerConnectionJob
       task.running!
     end
 
+    # make sure we will persist last container state and start/finish time
     task.save
+
+    if task.persist_logs and status == 'exited'
+      task.set_logs(container.logs(stdout: true, stderr: true))
+      task.save
+    end
   end
 end
