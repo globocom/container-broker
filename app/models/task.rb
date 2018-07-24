@@ -12,7 +12,7 @@ class Task
   enumerable :status, %w(waiting starting started running retry error completed)
   field :exit_code, type: Integer
   field :error, type: String
-  field :error_log, type: String
+  field :logs, type: String
   field :created_at, type: DateTime
   field :started_at, type: DateTime
   field :finished_at, type: DateTime
@@ -33,8 +33,8 @@ class Task
 
   validates :name, :image, :cmd, presence: true
 
-  def set_error_log(log)
-    self.error_log = BSON::Binary.new(log, :generic)
+  def set_logs(logs)
+    self.logs = BSON::Binary.new(logs, :generic)
   end
 
   def mark_as_started!

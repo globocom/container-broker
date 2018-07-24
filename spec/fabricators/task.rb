@@ -7,7 +7,7 @@ Fabricator(:task) do
   status "waiting"
   exit_code nil
   error nil
-  error_log nil
+  log nil
   created_at "2018-03-01 18:10:00"
   started_at "2018-03-01 18:10:00"
   finished_at "2018-03-01 18:10:00"

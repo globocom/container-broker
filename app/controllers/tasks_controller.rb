@@ -1,5 +1,5 @@
 class TasksController < ApplicationController
-  before_action :set_task, only: [:show, :error_log]
+  before_action :set_task, only: [:show, :logs]
 
   def create
     @task = Task.new(task_params)
@@ -15,8 +15,8 @@ class TasksController < ApplicationController
     render json: @task
   end
 
-  def error_log
-    render plain: @task.error_log
+  def logs
+    render plain: @task.logs
   end
 
   private
