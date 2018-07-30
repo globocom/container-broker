@@ -3,7 +3,8 @@ require 'rails_helper'
 RSpec.describe UpdateTaskStatusJob, type: :job do
   let(:node) { Node.create!(hostname: "local.test")}
   let(:slot) { Slot.create!(node: node) }
-  let(:task) { Fabricate(:task, slot: slot, container_id: container_id, status: task_status) }
+  let(:task_persist_logs) { false }
+  let(:task) { Fabricate(:task, slot: slot, container_id: container_id, status: task_status, persist_logs: task_persist_logs) }
   let(:task_status) { "running" }
   let(:docker_connection) { double("Docker::Connection") }
   let(:container_id) { "11223344" }
@@ -86,7 +87,19 @@ RSpec.describe UpdateTaskStatusJob, type: :job do
       end
     end
 
+    context "and persist_logs flag is TRUE" do
+      let(:logs) { "persist me" }
+      let(:task_persist_logs) { true }
 
+      before do
+        allow(container).to receive(:streaming_logs).with(stdout: true, stderr: true).and_return(logs)
+      end
+
+      it "persist container logs to Task" do
+        expect(task).to receive(:set_logs).with(logs)
+        perform
+      end
+    end
   end
 
   context "when container stills running" do
