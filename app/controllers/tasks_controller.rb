@@ -1,5 +1,5 @@
 class TasksController < ApplicationController
-  before_action :set_task, only: [:show, :error_log]
+  before_action :set_task, only: [:show, :logs]
 
   def create
     @task = Task.new(task_params)
@@ -15,8 +15,8 @@ class TasksController < ApplicationController
     render json: @task
   end
 
-  def error_log
-    render plain: @task.error_log
+  def logs
+    render json: { logs: @task.get_logs }
   end
 
   private
@@ -25,6 +25,6 @@ class TasksController < ApplicationController
     end
 
     def task_params
-      params.require(:task).permit(:name, :image, :cmd, :storage_mount, tags: {})
+      params.require(:task).permit(:name, :image, :cmd, :storage_mount, :persist_logs, tags: {})
     end
 end
