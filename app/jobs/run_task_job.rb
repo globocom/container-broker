@@ -59,10 +59,10 @@ class RunTaskJob < ApplicationJob
   end
 
   def log_config(task:)
+    log_type_json_file = { "Type" => "json-file" }
+
     if task.persist_logs
-      {
-        "Type" => "json-file"
-      }
+      log_type_json_file
     else
       case Settings.docker_log_driver
       when "fluentd" then
@@ -74,9 +74,7 @@ class RunTaskJob < ApplicationJob
           }
         }
       else
-        {
-          "Type" => "json-file"
-        }
+        log_type_json_file
       end
     end
   end

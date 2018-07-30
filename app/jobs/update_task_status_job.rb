@@ -26,11 +26,15 @@ class UpdateTaskStatusJob < DockerConnectionJob
       task.running!
     end
 
-    # make sure we will persist last container state and start/finish time
+    # make sure we persist last state prior to persisting logs
     task.save
 
     if task.persist_logs and status == 'exited'
-      task.set_logs(container.logs(stdout: true, stderr: true))
+      # streaming_logs avoids some encoding issues and should be safe since container status = exited
+      # (see https://github.com/swipely/docker-api/issues/290 for reference)
+      container_logs = container.streaming_logs(stdout: true, stderr: true)
+
+      task.set_logs(container_logs)
       task.save
     end
   end

@@ -16,7 +16,7 @@ class TasksController < ApplicationController
   end
 
   def logs
-    render plain: @task.logs
+    render json: { logs: @task.get_logs }
   end
 
   private
