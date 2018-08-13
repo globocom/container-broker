@@ -78,3 +78,5 @@ gem "guard-rspec"
 gem "config"
 gem "mongoid-uuid"
 gem "active_model_serializers"
+gem "sentry-raven"
+
