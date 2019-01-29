@@ -7,7 +7,7 @@
   - Parameters: `{ "hostname": "", "cores": 10, "memory": 4096 }`
   - Response:   `{ "status": "ok|error" }`
 
-### POST /job
+### POST /task
   - Creates a container from given image to run given command
   - Parameters: `{ "name": "", "image": "", "cmd": "", "storage_mount": "", "tags": {"slug": "slug3166h", "type": "video"} }`
   - Response:
@@ -18,7 +18,7 @@
   }
   ```
 
-### GET /job/:uuid
+### GET /task/:uuid
   - Show information about some job
   - Parameters (query string): `id`
   - Response:
