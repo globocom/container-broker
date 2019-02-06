@@ -3,6 +3,7 @@ Rails.application.config.active_job.queue_adapter = Rails.env.test? ? :test : :s
 Sidekiq.default_worker_options = {
   unique: :until_executed,
   lock_expiration: 1.minute,
+  backtrace: true,
   unique_args: ->(args) { [ args.first.except('job_id') ] }
 }
 
