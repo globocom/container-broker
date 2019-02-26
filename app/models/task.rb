@@ -26,6 +26,7 @@ class Task
   index({created_at: 1}, {expire_after_seconds: 1.month})
   index({tags: 1})
 
+  before_validation :normalize_tags
   before_create {|task| task.created_at = Time.zone.now }
   after_create do
     RunTasksJob.perform_later
@@ -66,5 +67,9 @@ class Task
     update(try_count: 0)
     waiting!
     RunTasksJob.perform_later
+  end
+
+  def normalize_tags
+    tags.transform_values!(&:to_s)
   end
 end
