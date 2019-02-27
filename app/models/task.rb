@@ -60,7 +60,11 @@ class Task
   end
 
   def seconds_running
-    ((finished_at - started_at) * 1.day.seconds).to_i if completed?
+    if completed? || error?
+      ((finished_at - started_at) * 1.day.seconds).to_i
+    elsif started? || running?
+      (Time.zone.now - started_at).to_i
+    end
   end
 
   def force_retry!
