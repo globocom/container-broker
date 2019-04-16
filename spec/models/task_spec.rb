@@ -31,4 +31,26 @@ RSpec.describe Task, type: :model do
       expect(subject.seconds_running).to eq(22.seconds)
     end
   end
+
+  context "for errored tasks" do
+    context "with start and finish timestamps" do
+      subject do
+        Fabricate(:task, started_at: "2018-01-25 15:32:10", finished_at: "2018-01-25 15:32:32", status: "error")
+      end
+
+      it "calculates duration" do
+        expect(subject.seconds_running).to eq(22.seconds)
+      end
+    end
+
+    context "without start and finish timestamps" do
+      subject do
+        Fabricate(:task, started_at: nil, finished_at: nil, status: "error")
+      end
+
+      it "does not calculate duration" do
+        expect(subject.seconds_running).to be_nil
+      end
+    end
+  end
 end
