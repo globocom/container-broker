@@ -23,5 +23,6 @@ Rails.application.routes.draw do
   get "/healthcheck" => "healthcheck#index"
 
   require 'sidekiq/web'
+  require 'sidekiq-scheduler/web'
   mount Sidekiq::Web => '/jobs'
 end
