@@ -63,7 +63,7 @@ class Task
     if completed? || error?
       calculate_second_span(started_at, finished_at)
     elsif started? || running?
-      calculate_second_span(started_at, Time.zone.now)
+      calculate_second_span(started_at, Time.zone.now.to_datetime)
     end
   end
 

@@ -20,6 +20,25 @@ RSpec.describe Task, type: :model do
 
       expect(task.tags["api_id"]).to eq("12345")
     end
+
+    it "calculates duration" do
+      expect(subject.seconds_running).to be_nil
+    end
+  end
+
+  context "for started tasks" do
+    subject do
+      Fabricate(:task, started_at: "2018-01-25 15:32:10", finished_at: nil, status: "started")
+    end
+
+    before do
+      allow(Time.zone).to receive(:now).and_return(Time.zone.parse("2018-01-25 15:33:00"))
+    end
+
+    it "calculates duration" do
+      expect(subject.seconds_running).to eq(50)
+    end
+
   end
 
   context "for completed tasks" do
