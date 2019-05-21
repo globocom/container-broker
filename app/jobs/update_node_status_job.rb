@@ -21,7 +21,7 @@ class UpdateNodeStatusJob < DockerConnectionJob
       else
         container_names = container.info["Names"].map{|name| name.gsub(/\A\//, "") }
 
-        if Settings.ignore_containers.none? {|name| container_names.include?(name) }
+        if Settings.ignore_containers.none? { |name| container_names.any?{ |container_name| container_name.include?(name) } }
           # Here we remove lost containers, like those unknown to container-broker or by some cause
           # not linked here. But we need to take care to not remove those just created because
           # there is a sligthly time between their creation and its slot link that cannot be locked
