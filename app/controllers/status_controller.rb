@@ -1,9 +1,8 @@
 class StatusController < ApplicationController
   layout proc { false if request.xhr? }
+  LIMIT_TASKS = 200
 
   def index
-    @nodes = Node.includes(:slots)
-    @tasks = Task.includes(slot: :node).to_a
   end
 
   def nodes
@@ -11,14 +10,21 @@ class StatusController < ApplicationController
   end
 
   def tasks
-    @tasks = Task.includes(:slot).order_by("created_at" => "desc")
+    @tasks = Task
+      .only(Task.attribute_names - %w[logs])
+      .includes(:slot)
+      .order_by("created_at" => "desc")
+      .batch_size(LIMIT_TASKS)
+      .limit(LIMIT_TASKS)
+
     @tasks = @tasks.where(status: params[:status]) if params[:status]
     if params[:tags]
       params.require(:tags).each do |tag, value|
         @tasks = @tasks.where("tags.#{tag}" => value.to_s)
       end
     end
-    render json: @tasks.limit(1000), each_serializer: StatusPanelTaskSerializer
+
+    render json: @tasks, each_serializer: StatusPanelTaskSerializer
   end
 
   def tags
