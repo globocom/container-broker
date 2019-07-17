@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Node, type: :model do
 
+
   context "updating usage" do
     before do
       Slot.create(node: subject, status: "running")
@@ -17,38 +18,30 @@ RSpec.describe Node, type: :model do
   end
 
   context "populating slots" do
+    let(:slots) do
+      [
+        { tag: "cpu", amount: 1 },
+        { tag: "io", amount: 5 },
+        { tag: "network", amount: 15 },
+      ]
+    end
+
+    it "creates slots with tag" do
+      subject.populate(slots)
+
+      expect(subject.slots.select{|s| s.tag == "network" }.count).to eq(15)
+    end
+
     it "calls node naming" do
       expect_any_instance_of(FriendlyNameNodes).to receive(:call)
-      subject.populate
+
+      subject.populate(slots)
     end
 
     it "calls update usage" do
-      expect(subject).to receive(:update_usage)
-      subject.populate
-    end
+      expect(subject).to receive(:update_usage).exactly(21).times
 
-    context "when there is more nodes than cores" do
-      before do
-        8.times {Slot.create!(node: subject)}
-        subject.update!(cores: 2)
-      end
-
-      it "removes extra nodes" do
-        subject.populate
-        expect(subject.slots.count).to eq(2)
-      end
-    end
-
-    context "when there is less nodes than cores" do
-      before do
-        2.times {Slot.create!(node: subject)}
-        subject.update!(cores: 8)
-      end
-
-      it "creates remaining nodes" do
-        subject.populate
-        expect(subject.slots.count).to eq(8)
-      end
+      subject.populate(slots)
     end
   end
 

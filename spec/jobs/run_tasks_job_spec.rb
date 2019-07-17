@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe RunTasksJob, type: :service do
   let(:task) { Fabricate(:task) }
-  let(:slot) { Node.create!(cores: 2).tap(&:populate).slots.first }
+  let!(:slot) { Fabricate(:slot, name: "slot1_1", tag: "io") }
 
   context "when there are tasks to run" do
     before do
@@ -12,8 +12,8 @@ RSpec.describe RunTasksJob, type: :service do
 
     context "and there is an slot available" do
       before do
-        allow(AllocateSlot).to receive(:slots_available?).and_return(true, false)
-        allow(AllocateSlot).to receive(:first_available).and_return(slot, slot, slot, nil)
+        allow_any_instance_of(AllocateSlot).to receive(:slots_available?).and_return(true, false)
+        allow_any_instance_of(AllocateSlot).to receive(:first_available).and_return(slot, slot, slot, nil)
       end
 
       context "and the task aquiring was successful" do
@@ -32,7 +32,7 @@ RSpec.describe RunTasksJob, type: :service do
           end
 
           it "mark task as waiting again" do
-            expect { subject.perform } .to_not change(task, :status)
+            expect { subject.perform }.to_not change(task, :status)
           end
         end
       end
@@ -51,8 +51,8 @@ RSpec.describe RunTasksJob, type: :service do
 
     context "and there is no slots available" do
       before do
-        allow(AllocateSlot).to receive(:slots_available?).and_return(false)
-        allow(AllocateSlot).to receive(:first_available).and_return(nil)
+        allow_any_instance_of(AllocateSlot).to receive(:slots_available?).and_return(false)
+        allow_any_instance_of(AllocateSlot).to receive(:first_available).and_return(nil)
       end
 
       it "does not schedule RunTaskJob" do

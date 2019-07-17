@@ -16,29 +16,30 @@ class Node
 
   has_many :slots
 
-  def find_available_slot
-    available_slots.first
+  def find_available_slot_with_tag(tag)
+    available_slots.to_a.find{|slot| slot.tag == tag }
+  end
+
+  def slot_available_with_tag?(tag)
+    available_slots.map(&:tag).include?(tag)
   end
 
   def available_slots
     slots.idle
   end
 
-  def populate
-    [slots.count - cores, 0].max.times.each do
-      reload
-      slots.last.destroy!
-    end
+  def available_slots
+    slots.idle
+  end
 
-    (cores - slots.count).times.each do
-      slots << Slot.create!
+  def populate(slot_tag_groups)
+    slot_tag_groups.each do |slot_tag_group|
+      slot_tag_group[:amount].times do
+        Slot.create!(tag: slot_tag_group[:tag], node: self)
+      end
     end
-
-    update_usage
 
     FriendlyNameNodes.new.call
-
-    cores
   end
 
   def docker_connection

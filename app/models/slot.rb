@@ -7,6 +7,7 @@ class Slot
   enumerable :status, %w(idle attaching running releasing)
 
   field :name, type: String
+  field :tag, type: String
   field :container_id, type: String
   belongs_to :current_task, class_name: "Task", optional: true
 
