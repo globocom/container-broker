@@ -3,8 +3,7 @@ require 'rails_helper'
 RSpec.describe RunTaskJob, type: :job do
 
   let(:node) { Node.create!(hostname: "docker.test") }
-  let(:task_persist_logs) { false }
-  let(:task) { Task.create!(name: "task-name", image: "#{image}:#{image_tag}", cmd: "-i input.txt -metadata comment='Encoded by Globo.com' output.mp4", storage_mount: "/tmp/workdir", persist_logs: task_persist_logs) }
+  let(:task) { Task.create!(name: "task-name", image: "#{image}:#{image_tag}", cmd: "-i input.txt -metadata comment='Encoded by Globo.com' output.mp4", storage_mount: "/tmp/workdir") }
   let(:slot) { Slot.create!(node: node, status: "attaching") }
   let(:image) { "busybox" }
   let(:image_tag) { "3.1" }
@@ -91,22 +90,11 @@ RSpec.describe RunTaskJob, type: :job do
   end
 
   context "when node is available and image exists" do
-    let(:container_log_options) do
-      {
-        "Type" => "fluentd",
-        "Config" => {
-          "tag" => "docker.{{.ID}}",
-          "fluentd-sub-second-precision" => "true"
-        }
-      }
-    end
-
     let(:container_create_options) do
       {
         "Image" => "#{image}:#{image_tag}",
         "HostConfig" => {
           "Binds" => ["/tmp/ef-shared:/tmp/workdir"],
-          "LogConfig" =>  container_log_options,
           "NetworkMode"=> ""
         },
         "Entrypoint" => [],
@@ -194,16 +182,6 @@ RSpec.describe RunTaskJob, type: :job do
     it "calls node update_usage" do
       expect(node).to receive(:update_usage).at_least(1).times
       perform
-    end
-
-    context "and task is configured to persist logs" do
-      let(:task_persist_logs) { true }
-      let(:container_log_options) { { "Type" => "json-file" } }
-
-      it "creates container with json-file log options" do
-        expect(Docker::Container).to receive(:create).with(container_create_options, a_kind_of(Docker::Connection))
-        perform
-      end
     end
   end
 end
