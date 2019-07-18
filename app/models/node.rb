@@ -33,6 +33,8 @@ class Node
   end
 
   def populate(slot_tag_groups)
+    destroy_slots if slots
+
     slot_tag_groups.each do |slot_tag_group|
       slot_tag_group[:amount].times do
         Slot.create!(tag: slot_tag_group[:tag], node: self)
@@ -40,6 +42,10 @@ class Node
     end
 
     FriendlyNameNodes.new.call
+  end
+
+  def destroy_slots
+    slots.destroy_all
   end
 
   def docker_connection
