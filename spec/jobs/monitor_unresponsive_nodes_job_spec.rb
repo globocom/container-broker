@@ -1,9 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe MonitorUnresponsiveNodesJob, type: :job do
-  let!(:available_node) { Node.create!(status: "available") }
-  let!(:unstable_node) { Node.create!(status: "unstable") }
-  let!(:unavailable_node) { Node.create!(status: "unavailable") }
+  let!(:available_node) { Fabricate(:node, status: "available") }
+  let!(:unstable_node) { Fabricate(:node, status: "unstable") }
+  let!(:unavailable_node) { Fabricate(:node, status: "unavailable") }
 
   it "enqueues MonitorUnresponsiveNodeJob for unavailable nodes" do
     subject.perform

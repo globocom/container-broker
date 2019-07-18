@@ -1,5 +1,5 @@
 Fabricator(:node) do
-  name "Node"
-  hostname "worker.test"
+  name { sequence(:node_index) {|index| "n#{index}" }}
+  hostname { sequence(:node_index) {|index| "worker#{index}.test" }}
   status "available"
 end

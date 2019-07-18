@@ -1,35 +1,69 @@
 require 'rails_helper'
 
 RSpec.describe MonitorUnresponsiveNodeJob, type: :job do
-
   context "when node is unavailable" do
-    let(:node) { Node.create!(status: "unavailable", last_error: "connection error", hostname: "localhost") }
-    before { allow(Docker).to receive(:info) { "ok" } }
+    let(:node) { Fabricate(:node, status: "unavailable", last_error: "connection error") }
 
-    it "marks node available again" do
-      expect { subject.perform(node: node) }.to change(node, :status).to("available")
+    context "and it becomes available" do
+      before { allow(Docker).to receive(:info) { "ok" } }
+
+      it "marks node available again" do
+        expect { subject.perform(node: node) }.to change(node, :status).to("available")
+      end
+
+      it "tries to run new tasks" do
+        subject.perform(node: node)
+        expect(RunTasksJob).to have_been_enqueued
+      end
+
+      it "clears last error" do
+        expect { subject.perform(node: node) }.to change(node, :last_error).to(nil)
+      end
     end
 
-    it "tries to run new tasks" do
-      subject.perform(node: node)
-      expect(RunTasksJob).to have_been_enqueued
-    end
+    context "when node still unavailable" do
+      before { allow(Docker).to receive(:info).and_raise("error getting docker info") }
 
-    it "clears last error" do
-      expect { subject.perform(node: node) }.to change(node, :last_error).to(nil)
+      it "marks node as unavailable" do
+        expect { subject.perform(node: node) }.to_not change(node, :available?)
+      end
+
+      it "sets last error" do
+        expect { subject.perform(node: node) }.to change(node, :last_error).to("error getting docker info")
+      end
     end
   end
 
-  context "when node still unavailable" do
-    let(:node) { Node.create!(status: "available", hostname: "localhost") }
-    before { allow(Docker).to receive(:info).and_raise("error getting docker info") }
+  context "when node is unstable" do
+    let(:node) { Fabricate(:node, status: "unstable", last_error: "connection error") }
 
-    it "marks node as unavailable" do
-      expect { subject.perform(node: node) }.to_not change(node, :available)
+    context "and it becomes available" do
+      before { allow(Docker).to receive(:info) { "ok" } }
+
+      it "marks node available again" do
+        expect { subject.perform(node: node) }.to change(node, :status).to("available")
+      end
+
+      it "tries to run new tasks" do
+        subject.perform(node: node)
+        expect(RunTasksJob).to have_been_enqueued
+      end
+
+      it "clears last error" do
+        expect { subject.perform(node: node) }.to change(node, :last_error).to(nil)
+      end
     end
 
-    it "sets last error" do
-      expect { subject.perform(node: node) }.to change(node, :last_error).to("error getting docker info")
+    context "when node still unavailable" do
+      before { allow(Docker).to receive(:info).and_raise("error getting docker info") }
+
+      it "marks node as unavailable" do
+        expect { subject.perform(node: node) }.to_not change(node, :available?)
+      end
+
+      it "sets last error" do
+        expect { subject.perform(node: node) }.to change(node, :last_error).to("error getting docker info")
+      end
     end
   end
 end
