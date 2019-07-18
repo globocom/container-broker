@@ -1,24 +1,23 @@
 class RunTasksJob < ApplicationJob
   def perform
-    while FetchTask.have_tasks? do
-      first_pending = FetchTask.first_pending
-      allocate_task_service = AllocateSlot.new(tag: first_pending.tag)
+    return unless Node.available.any?
 
-      if allocate_task_service.slots_available?
-        task = FetchTask.new.call
-        return if !task
+    pending_tasks.each do |pending_task|
+      allocate_slot_service = AllocateSlot.new(tag: pending_task.tag)
 
-        allocate_task_service = AllocateSlot.new(tag: task.tag)
+      slot = allocate_slot_service.call
 
-        if task
-          slot = allocate_task_service.call
-          if slot
-            RunTaskJob.perform_later(slot: slot, task: task)
-          else
-            task.waiting!
-          end
-        end
+      if slot
+        RunTaskJob.perform_later(slot: slot, task: pending_task)
+      elsif Slot.where(tag: pending_task.tag).none?
+        pending_task.no_tag_available!
       end
     end
+  end
+
+  private
+
+  def pending_tasks
+    FetchTask.all_pending
   end
 end
