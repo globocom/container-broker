@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe RunTasksJob, type: :service do
   let(:task) { Fabricate(:task) }
-  let!(:slot) { Fabricate(:slot, name: "slot1_1", tag: "io") }
+  let!(:slot) { Fabricate(:slot, name: "slot1_1", execution_type: "io") }
 
   context "when there are tasks to run" do
     before do

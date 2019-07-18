@@ -7,10 +7,10 @@ class Task
   field :name, type: String
   field :container_id, type: String # do not remove - needed for update status after completion
   field :image, type: String
-  field :tag, type: String
+  field :execution_type, type: String
   field :cmd, type: String
   field :storage_mount, type: String
-  enumerable :status, %w(waiting starting started running retry error completed no_tag_available)
+  enumerable :status, %w(waiting starting started running retry error completed no_execution_type_available)
   field :exit_code, type: Integer
   field :error, type: String
   field :logs, type: BSON::Binary

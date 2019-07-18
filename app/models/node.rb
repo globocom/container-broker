@@ -16,28 +16,28 @@ class Node
 
   has_many :slots
 
-  def find_available_slot_with_tag(tag)
-    available_slots.to_a.find{|slot| slot.tag == tag }
+  def find_available_slot_with_execution_type(execution_type)
+    available_slots.to_a.find{|slot| slot.execution_type == execution_type }
   end
 
-  def slot_available_with_tag?(tag)
-    available_slots.map(&:tag).include?(tag)
-  end
-
-  def available_slots
-    slots.idle
+  def slot_available_with_execution_type?(execution_type)
+    available_slots.map(&:execution_type).include?(execution_type)
   end
 
   def available_slots
     slots.idle
   end
 
-  def populate(slot_tag_groups)
+  def available_slots
+    slots.idle
+  end
+
+  def populate(slot_execution_type_groups)
     destroy_slots if slots
 
-    slot_tag_groups.each do |slot_tag_group|
-      slot_tag_group[:amount].times do
-        Slot.create!(tag: slot_tag_group[:tag], node: self)
+    slot_execution_type_groups.each do |slot_execution_type_group|
+      slot_execution_type_group[:amount].times do
+        Slot.create!(execution_type: slot_execution_type_group[:execution_type], node: self)
       end
     end
 

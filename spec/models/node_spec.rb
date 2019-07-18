@@ -19,16 +19,16 @@ RSpec.describe Node, type: :model do
   context "populating slots" do
     let(:slots) do
       [
-        { tag: "cpu", amount: 1 },
-        { tag: "io", amount: 5 },
-        { tag: "network", amount: 15 },
+        { execution_type: "cpu", amount: 1 },
+        { execution_type: "io", amount: 5 },
+        { execution_type: "network", amount: 15 },
       ]
     end
 
-    it "creates slots with tag" do
+    it "creates slots with execution_type" do
       subject.populate(slots)
 
-      expect(subject.slots.select{|s| s.tag == "network" }.count).to eq(15)
+      expect(subject.slots.select{|s| s.execution_type == "network" }.count).to eq(15)
     end
 
     it "calls node naming" do
