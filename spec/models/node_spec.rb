@@ -2,7 +2,6 @@ require 'rails_helper'
 
 RSpec.describe Node, type: :model do
 
-
   context "updating usage" do
     before do
       Slot.create(node: subject, status: "running")
