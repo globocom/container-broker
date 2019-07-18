@@ -56,6 +56,7 @@ group :test do
   gem 'database_cleaner'
   gem "rspec-nc"
   gem "rspec-collection_matchers"
+  gem "rspec-json_expectations"
   gem 'mini_racer'
 end
 

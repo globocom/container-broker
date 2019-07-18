@@ -253,6 +253,7 @@ GEM
     rspec-expectations (3.7.0)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.7.0)
+    rspec-json_expectations (2.2.0)
     rspec-mocks (3.7.0)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.7.0)
@@ -372,6 +373,7 @@ DEPENDENCIES
   react-rails
   redis-namespace
   rspec-collection_matchers
+  rspec-json_expectations
   rspec-nc
   rspec-rails
   sass-rails (~> 5.0)
