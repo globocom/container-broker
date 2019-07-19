@@ -10,7 +10,7 @@ class Task
   field :execution_type, type: String
   field :cmd, type: String
   field :storage_mount, type: String
-  enumerable :status, %w(waiting starting started running retry error completed no_execution_type_available)
+  enumerable :status, %w(waiting starting started running retry error completed no_execution_type)
   field :exit_code, type: Integer
   field :error, type: String
   field :logs, type: BSON::Binary

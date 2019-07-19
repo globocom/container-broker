@@ -10,7 +10,7 @@ class RunTasksJob < ApplicationJob
       if slot
         RunTaskJob.perform_later(slot: slot, task: pending_task)
       elsif Slot.where(execution_type: pending_task.execution_type).none?
-        pending_task.no_execution_type_available!
+        pending_task.no_execution_type!
       end
     end
   end

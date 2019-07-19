@@ -47,7 +47,7 @@ RSpec.describe RunTasksJob, type: :service do
           end
 
           it "marks task as no execution type available" do
-            expect{subject.perform; task.reload}.to change(task, :no_execution_type_available?).from(false).to(true)
+            expect{subject.perform; task.reload}.to change(task, :no_execution_type?).from(false).to(true)
           end
         end
       end
