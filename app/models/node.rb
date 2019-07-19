@@ -9,6 +9,7 @@ class Node
   field :available, type: Boolean, default: true
   field :last_error, type: String
   field :last_success_at, type: DateTime
+  field :accept_new_tasks, type: Boolean, default: true
   enumerable :status, %w(available unstable unavailable), default: "unavailable", after_change: :status_change
 
   has_many :slots

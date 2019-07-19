@@ -44,7 +44,11 @@ class Task
   end
 
   def get_logs
-    logs.try(:data)
+    if started? || running?
+      GetTaskContainer.new.call(task: self).streaming_logs(stdout: true, stderr: true, tail: 1_000)
+    else
+      logs.try(:data)
+    end
   end
 
   def mark_as_started!

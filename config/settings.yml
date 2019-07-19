@@ -1,3 +1,6 @@
 ignore_containers:
   - fluentbit
   - sftp-local
+  - redis
+  - mongo
+  - elasticsearch

@@ -4,7 +4,7 @@ class UpdateTaskStatusJob < DockerConnectionJob
   def perform(task)
     @node = task.slot.node
 
-    container = Docker::Container.get(task.container_id, {all: true}, task.slot.node.docker_connection)
+    container = GetTaskContainer.new.call(task: task)
 
     status = container.info["State"]["Status"]
     exit_code = container.info["State"]["ExitCode"]
