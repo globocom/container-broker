@@ -3,9 +3,7 @@ class RunTasksJob < ApplicationJob
     return unless Node.available.any?
 
     pending_tasks.each do |pending_task|
-      allocate_slot_service = AllocateSlot.new(execution_type: pending_task.execution_type)
-
-      slot = allocate_slot_service.call
+      slot = AllocateSlot.new(execution_type: pending_task.execution_type).call
 
       if slot
         RunTaskJob.perform_later(slot: slot, task: pending_task)
