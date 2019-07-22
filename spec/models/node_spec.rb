@@ -29,6 +29,8 @@ RSpec.describe Node, type: :model do
       subject.populate(slots)
 
       expect(subject.slots.select{|s| s.execution_type == "network" }.count).to eq(15)
+      expect(subject.available_slot_with_execution_type("cpu")).to have_attributes(execution_type: "cpu")
+      expect(subject.available_slot_with_execution_type("unexistent")).to be(nil)
     end
 
     it "calls node naming" do

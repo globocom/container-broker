@@ -16,12 +16,8 @@ class Node
 
   has_many :slots
 
-  def find_available_slot_with_execution_type(execution_type)
+  def available_slot_with_execution_type(execution_type)
     available_slots.to_a.find{|slot| slot.execution_type == execution_type }
-  end
-
-  def slot_available_with_execution_type?(execution_type)
-    available_slots.map(&:execution_type).include?(execution_type)
   end
 
   def available_slots
