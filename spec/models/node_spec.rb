@@ -29,6 +29,11 @@ RSpec.describe Node, type: :model do
       subject.populate(slots)
 
       expect(subject.slots.select{|s| s.execution_type == "network" }.count).to eq(15)
+    end
+
+    it "finds available slot with execution_type" do
+      subject.populate(slots)
+
       expect(subject.available_slot_with_execution_type("cpu")).to have_attributes(execution_type: "cpu")
       expect(subject.available_slot_with_execution_type("unexistent")).to be(nil)
     end
@@ -43,6 +48,26 @@ RSpec.describe Node, type: :model do
       expect(subject).to receive(:update_usage).exactly(21).times
 
       subject.populate(slots)
+    end
+
+    context "with existing slots for node" do
+      let(:temp_slots) do
+        [
+          { execution_type: "cpu", amount: 1 },
+        ]
+      end
+
+      before do
+        subject.populate(slots)
+      end
+
+      it "detroys slots and create new ones" do
+        expect(subject.slots.count).to eq(21)
+
+        subject.populate(temp_slots)
+
+        expect(subject.slots.count).to eq(1)
+      end
     end
   end
 
