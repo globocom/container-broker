@@ -33,7 +33,7 @@ class Node
 
     slot_execution_type_groups.each do |slot_execution_type_group|
       slot_execution_type_group[:amount].times do
-        Slot.create!(execution_type: slot_execution_type_group[:execution_type], node: self)
+        slots.create!(execution_type: slot_execution_type_group[:execution_type])
       end
     end
 

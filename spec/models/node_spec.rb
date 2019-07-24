@@ -25,6 +25,10 @@ RSpec.describe Node, type: :model do
       ]
     end
 
+    before do
+      subject.save!
+    end
+
     it "creates slots with execution_type" do
       subject.populate(slots)
 
