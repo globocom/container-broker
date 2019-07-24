@@ -13,12 +13,6 @@ class Slot
 
   belongs_to :node, optional: true
 
-  after_save do
-    if status_changed?
-      node.update_usage if node
-    end
-  end
-
   def available?
     idle?
   end

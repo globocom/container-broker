@@ -9,7 +9,6 @@ class Node
   field :cores, type: Integer, default: 0
   field :memory, type: Integer, default: 0
   field :available, type: Boolean, default: true
-  field :usage_percent, type: Integer
   field :last_error, type: String
   field :last_success_at, type: DateTime
   enumerable :status, %w(available unstable unavailable), default: "unavailable", after_change: :status_change
@@ -43,11 +42,6 @@ class Node
   def docker_connection
     Docker.logger = Logger.new(STDOUT)
     Docker::Connection.new(hostname, {connect_timeout: 10, read_timeout: 10, write_timeout: 10})
-  end
-
-  def update_usage
-    usage = (1.0 - available_slots.count.to_f / slots.count) * 100
-    update!(usage_percent: usage)
   end
 
   def register_error(error)

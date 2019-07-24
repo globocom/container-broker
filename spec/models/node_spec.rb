@@ -2,20 +2,6 @@ require 'rails_helper'
 
 RSpec.describe Node, type: :model do
 
-  context "updating usage" do
-    before do
-      Slot.create(node: subject, status: "running")
-      Slot.create(node: subject, status: "attaching")
-      Slot.create(node: subject, status: "idle")
-      Slot.create(node: subject, status: "releasing")
-    end
-
-    it "sets usage to percentual of used slots" do
-      subject.update_usage
-      expect(subject.usage_percent).to eq(75)
-    end
-  end
-
   context "populating slots" do
     let(:slots) do
       [
@@ -44,12 +30,6 @@ RSpec.describe Node, type: :model do
 
     it "calls node naming" do
       expect_any_instance_of(FriendlyNameNodes).to receive(:call)
-
-      subject.populate(slots)
-    end
-
-    it "calls update usage" do
-      expect(subject).to receive(:update_usage).exactly(21).times
 
       subject.populate(slots)
     end
