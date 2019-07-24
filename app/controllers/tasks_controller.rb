@@ -21,7 +21,7 @@ class TasksController < ApplicationController
 
   private
     def set_task
-      @task = Task.find_by(uuid: params[:uuid])
+      @task = Task.find_by!(uuid: params[:uuid])
     end
 
     def task_params

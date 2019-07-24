@@ -17,7 +17,7 @@ class Node
   has_many :slots
 
   def available_slot_with_execution_type(execution_type)
-    available_slots.to_a.find{|slot| slot.execution_type == execution_type }
+    available_slots.find_by(execution_type: execution_type)
   end
 
   def available_slots
