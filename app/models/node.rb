@@ -24,10 +24,6 @@ class Node
     slots.idle
   end
 
-  def available_slots
-    slots.idle
-  end
-
   def populate(slot_execution_type_groups)
     destroy_slots if slots
 
