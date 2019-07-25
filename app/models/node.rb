@@ -18,6 +18,8 @@ class Node
     NodeUsagePercentagePerExecutionType.new(self).perform
   end
 
+  scope :accepting_new_tasks, -> { where(accept_new_tasks: true) }
+
   def available_slot_with_execution_type(execution_type)
     available_slots.find_by(execution_type: execution_type)
   end
