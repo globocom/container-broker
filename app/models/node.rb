@@ -10,6 +10,8 @@ class Node
   field :last_error, type: String
   field :last_success_at, type: DateTime
   field :accept_new_tasks, type: Boolean, default: true
+  field :slots_execution_types, type: Hash, default: {}
+
   enumerable :status, %w(available unstable unavailable), default: "unavailable", after_change: :status_change
 
   has_many :slots
@@ -17,6 +19,9 @@ class Node
   def usage_per_execution_type
     NodeUsagePercentagePerExecutionType.new(self).perform
   end
+
+  validates :hostname, presence: true
+  validates :slots_execution_types, presence: true
 
   scope :accepting_new_tasks, -> { where(accept_new_tasks: true) }
 
@@ -28,17 +33,17 @@ class Node
     slots.idle
   end
 
-  def populate(slot_execution_type_groups)
-    destroy_slots if slots
+  # def populate(slot_execution_type_groups)
+  #   destroy_slots if slots
 
-    slot_execution_type_groups.each do |slot_execution_type_group|
-      slot_execution_type_group[:amount].times do
-        slots.create!(execution_type: slot_execution_type_group[:execution_type])
-      end
-    end
+  #   slot_execution_type_groups.each do |slot_execution_type_group|
+  #     slot_execution_type_group[:amount].times do
+  #       slots.create!(execution_type: slot_execution_type_group[:execution_type])
+  #     end
+  #   end
 
-    FriendlyNameNodes.new.call
-  end
+  #   FriendlyNameNodes.new.call
+  # end
 
   def destroy_slots
     slots.destroy_all

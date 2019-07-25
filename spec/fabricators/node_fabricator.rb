@@ -3,4 +3,5 @@ Fabricator(:node) do
   hostname { sequence(:node_index) {|index| "worker#{index}.test" }}
   status "available"
   accept_new_tasks true
+  slots_execution_types { { io: 10, cpu: 5 } }
 end

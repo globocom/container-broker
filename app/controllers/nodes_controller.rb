@@ -46,6 +46,6 @@ class NodesController < ApplicationController
   end
 
   def node_params
-    params.require(:node).permit(:hostname)
+    params.require(:node).permit(:hostname, slots_execution_types: {})
   end
 end

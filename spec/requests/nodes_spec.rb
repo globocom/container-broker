@@ -2,17 +2,34 @@ require 'rails_helper'
 
 RSpec.describe "Nodes", type: :request do
   describe "POST /node" do
-    it "creates a new node" do
-      post nodes_path, params: { node: { hostname: "host1.test" } }
+    let(:params) do
+      {
+        node: {
+          hostname: "host1.test",
+          slots_execution_types: {
+            cpu: 1,
+            network: 3
+          }
+        }
+      }
+    end
 
+    it "creates a new node" do
+      post nodes_path, params: params
       expect(response).to be_created
     end
 
     it "returns the newly created node" do
-      post nodes_path, params: { node: { hostname: "host1.test" } }
+      post nodes_path, params: params
 
       expect(json_response).to include_json(hostname: "host1.test")
       expect(json_response).to match(hash_including("uuid"))
+      expect(json_response).to match(hash_including(
+        "slots_execution_types" => {
+          "cpu" => "1",
+          "network" => "3"
+        }
+      ))
     end
   end
 
