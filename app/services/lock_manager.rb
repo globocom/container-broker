@@ -9,6 +9,16 @@ class LockManager
   end
 
   def lock
+    if lock!
+      yield(self)
+    else
+      false
+    end
+  ensure
+    unlock!
+  end
+
+  def lock!
     try_lock
 
     if wait
@@ -18,13 +28,12 @@ class LockManager
       end
     end
 
-    if locked
-      return yield(self)
-    else
-      false
-    end
-  ensure
+    locked
+  end
+
+  def unlock!
     redis_client.del(key)
+    @locked = false
   end
 
   def keep_locked
