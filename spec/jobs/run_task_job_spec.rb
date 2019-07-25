@@ -178,10 +178,5 @@ RSpec.describe RunTaskJob, type: :job do
     it "updates slot container_id" do
       expect{perform}.to change(slot, :container_id).to(container.id)
     end
-
-    it "calls node update_usage" do
-      expect(node).to receive(:update_usage).at_least(1).times
-      perform
-    end
   end
 end

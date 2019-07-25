@@ -21,10 +21,10 @@ class TasksController < ApplicationController
 
   private
     def set_task
-      @task = Task.find_by(uuid: params[:uuid])
+      @task = Task.find_by!(uuid: params[:uuid])
     end
 
     def task_params
-      params.require(:task).permit(:name, :image, :cmd, :storage_mount, :persist_logs, tags: {})
+      params.require(:task).permit(:name, :image, :cmd, :storage_mount, :persist_logs, :execution_type, tags: {})
     end
 end

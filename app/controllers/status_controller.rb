@@ -37,12 +37,12 @@ class StatusController < ApplicationController
   end
 
   def tag_values
-    @tag = TaskTag.find_by(name: params[:tag_name])
+    @tag = TaskTag.find_by!(name: params[:tag_name])
     render json: @tag.values.take(50)
   end
 
   def retry_task
-    @task = Task.find_by(uuid: params[:uuid])
+    @task = Task.find_by!(uuid: params[:uuid])
     @task.force_retry!
 
     head :ok

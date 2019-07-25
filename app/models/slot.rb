@@ -7,16 +7,11 @@ class Slot
   enumerable :status, %w(idle attaching running releasing)
 
   field :name, type: String
+  field :execution_type, type: String
   field :container_id, type: String
   belongs_to :current_task, class_name: "Task", optional: true
 
   belongs_to :node, optional: true
-
-  after_save do
-    if status_changed?
-      node.update_usage if node
-    end
-  end
 
   def available?
     idle?

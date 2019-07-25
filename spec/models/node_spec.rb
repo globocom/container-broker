@@ -2,52 +2,55 @@ require 'rails_helper'
 
 RSpec.describe Node, type: :model do
 
-  context "updating usage" do
-    before do
-      Slot.create(node: subject, status: "running")
-      Slot.create(node: subject, status: "attaching")
-      Slot.create(node: subject, status: "idle")
-      Slot.create(node: subject, status: "releasing")
-    end
-
-    it "sets usage to percentual of used slots" do
-      subject.update_usage
-      expect(subject.usage_percent).to eq(75)
-    end
-  end
-
   context "populating slots" do
+    let(:slots) do
+      [
+        { execution_type: "cpu", amount: 1 },
+        { execution_type: "io", amount: 5 },
+        { execution_type: "network", amount: 15 },
+      ]
+    end
+
+    before do
+      subject.save!
+    end
+
+    it "creates slots with execution_type" do
+      subject.populate(slots)
+
+      expect(subject.slots.select{|s| s.execution_type == "network" }.count).to eq(15)
+    end
+
+    it "finds available slot with execution_type" do
+      subject.populate(slots)
+
+      expect(subject.available_slot_with_execution_type("cpu")).to have_attributes(execution_type: "cpu")
+      expect(subject.available_slot_with_execution_type("unexistent")).to be(nil)
+    end
+
     it "calls node naming" do
       expect_any_instance_of(FriendlyNameNodes).to receive(:call)
-      subject.populate
+
+      subject.populate(slots)
     end
 
-    it "calls update usage" do
-      expect(subject).to receive(:update_usage)
-      subject.populate
-    end
+    context "with existing slots for node" do
+      let(:temp_slots) do
+        [
+          { execution_type: "cpu", amount: 1 },
+        ]
+      end
 
-    context "when there is more nodes than cores" do
       before do
-        8.times {Slot.create!(node: subject)}
-        subject.update!(cores: 2)
+        subject.populate(slots)
       end
 
-      it "removes extra nodes" do
-        subject.populate
-        expect(subject.slots.count).to eq(2)
-      end
-    end
+      it "detroys slots and create new ones" do
+        expect(subject.slots.count).to eq(21)
 
-    context "when there is less nodes than cores" do
-      before do
-        2.times {Slot.create!(node: subject)}
-        subject.update!(cores: 8)
-      end
+        subject.populate(temp_slots)
 
-      it "creates remaining nodes" do
-        subject.populate
-        expect(subject.slots.count).to eq(8)
+        expect(subject.slots.count).to eq(1)
       end
     end
   end

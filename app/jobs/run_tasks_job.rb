@@ -1,16 +1,29 @@
 class RunTasksJob < ApplicationJob
-
   def perform
-    while FetchTask.have_tasks? && AllocateSlot.slots_available? do
-      task = FetchTask.new.call
-      if task
-        slot = AllocateSlot.new.call
-        if slot
-          RunTaskJob.perform_later(slot: slot, task: task)
-        else
-          task.waiting!
-        end
+    return unless Node.available.any?
+
+    pending_tasks.each do |pending_task|
+      slot = AllocateSlot.new(execution_type: pending_task.execution_type).call
+
+      if slot
+        RunTaskJob.perform_later(slot: slot, task: pending_task)
+      elsif Slot.where(execution_type: pending_task.execution_type).none?
+        pending_task.no_execution_type!
+      else
+        pending_task.waiting!
       end
     end
+  end
+
+  private
+
+  def pending_tasks
+    pending_tasks = []
+
+    while pending_task = FetchTask.new.call do
+      pending_tasks << pending_task
+    end
+
+    pending_tasks
   end
 end

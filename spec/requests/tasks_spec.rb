@@ -80,6 +80,7 @@ RSpec.describe "Tasks", type: :request do
         "seconds_running" => task.seconds_running,
         "started_at" => task.started_at.iso8601(3),
         "status" => task.status,
+        "execution_type" => task.execution_type,
         "try_count" => task.try_count,
       })
     end

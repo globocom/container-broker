@@ -1,79 +1,64 @@
 require 'rails_helper'
 
 RSpec.describe RunTasksJob, type: :service do
-  let(:task) { Fabricate(:task) }
-  let(:slot) { Node.create!(cores: 2).tap(&:populate).slots.first }
+  let!(:task) { Fabricate(:task, execution_type: "cpu") }
+  let!(:slot) { Fabricate(:slot, execution_type: "cpu") }
 
-  context "when there are tasks to run" do
+  context "with no available nodes" do
     before do
-      allow(FetchTask).to receive(:have_tasks?).and_return(true, false)
-      allow(FetchTask).to receive(:first_pending) { task }
+      allow(Node).to receive(:available).and_return([])
     end
 
-    context "and there is an slot available" do
-      before do
-        allow(AllocateSlot).to receive(:slots_available?).and_return(true, false)
-        allow(AllocateSlot).to receive(:first_available).and_return(slot, slot, slot, nil)
-      end
+    it "does not check the tasks" do
+      expect(FetchTask).not_to receive(:all_pending)
 
-      context "and the task aquiring was successful" do
-        it "schedule RunTaskJob with slot and task" do
-          subject.perform
-          expect(RunTaskJob).to have_been_enqueued.with(task: task, slot: slot)
-        end
-
-        it "marks task as starting" do
-          expect { subject.perform }.to change(task, :status).to("starting")
-        end
-
-        context "and the slot aquiring was not successful" do
-          before do
-            allow_any_instance_of(AllocateSlot).to receive(:call).and_return(nil)
-          end
-
-          it "mark task as waiting again" do
-            expect { subject.perform } .to_not change(task, :status)
-          end
-        end
-      end
-
-      context "and the task aquiring was not successful" do
-        before do
-          allow_any_instance_of(FetchTask).to receive(:call).and_return(nil)
-        end
-        it "does not schedule RunTaskJob" do
-          subject.perform
-          expect(RunTaskJob).to_not have_been_enqueued
-        end
-
-      end
-    end
-
-    context "and there is no slots available" do
-      before do
-        allow(AllocateSlot).to receive(:slots_available?).and_return(false)
-        allow(AllocateSlot).to receive(:first_available).and_return(nil)
-      end
-
-      it "does not schedule RunTaskJob" do
-        subject.perform
-        expect(RunTaskJob).to_not have_been_enqueued
-      end
-
-      it "does not change task status" do
-        expect { subject.perform }.to_not change(task, :status)
-      end
+      subject.perform
     end
   end
 
-  context "when there is no task to run" do
-    before do
-      allow(FetchTask).to receive(:have_tasks?).and_return(false)
+  context "with available nodes" do
+    context "and no pending tasks" do
+      before do
+        allow(FetchTask).to receive(:all_pending).and_return([])
+      end
+
+      it "does not check the slots" do
+        expect(AllocateSlot).not_to receive(:new)
+
+        subject.perform
+      end
     end
 
-    it "does not schedule RunTaskJob with slot and task" do
-      subject.perform
-      expect(RunTaskJob).to_not have_been_enqueued
+    context "and pending tasks" do
+      context "and no available slots for execution type" do
+        before do
+          allow_any_instance_of(AllocateSlot).to receive(:call).and_return(nil)
+        end
+
+        it "does not run task job" do
+          expect(RunTaskJob).to_not have_been_enqueued
+
+          subject.perform
+        end
+
+        context "and no busy or available slots for execution type" do
+          before do
+            allow(Slot).to receive(:where).with(execution_type: "cpu").and_return([])
+          end
+
+          it "marks task as no execution type available" do
+            expect{subject.perform; task.reload}.to change(task, :no_execution_type?).from(false).to(true)
+          end
+        end
+      end
+
+      context "and available slots for execution_type" do
+        it "creates run task job" do
+          subject.perform
+
+          expect(RunTaskJob).to have_been_enqueued.with(task: task, slot: slot)
+        end
+      end
     end
   end
 end
