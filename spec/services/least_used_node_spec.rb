@@ -51,16 +51,18 @@ RSpec.describe LeastUsedNode, type: :service do
   context "with io execution_type" do
     let(:execution_type) { "io" }
 
-    it "returns least used node with specific execution_type" do
-      expect(subject).to eq(node3)
-    end
-
     it "does not return most used nodes" do
       expect(subject).not_to eq(node2)
     end
+
+    context "and there are 2 nodes with the same usage for the specific execution type" do
+      it "returns first of the least used nodes" do
+        expect(subject).to eq(node1)
+      end
+    end
   end
 
-  context "with existent but busy execution type" do
+  context "with existent but busy execution type for all nodes" do
     let(:execution_type) { "network" }
 
     it "does not return any node" do

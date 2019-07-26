@@ -4,7 +4,7 @@ class LeastUsedNode
   end
 
   def call
-    available_nodes_ordered_by_usage.last
+    available_nodes_ordered_by_usage.first
   end
 
   private
@@ -17,7 +17,7 @@ class LeastUsedNode
       .sort_by do |node|
         slots = node.slots.where(execution_type: @execution_type)
 
-        slots.idle.size.to_f / slots.size
+        SlotsUsagePercentage.new(slots).perform
       end
   end
 end
