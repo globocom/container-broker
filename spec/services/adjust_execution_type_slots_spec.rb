@@ -7,6 +7,11 @@ RSpec.describe AdjustExecutionTypeSlots, type: :service do
   let(:node) { Fabricate(:node, slots_execution_types: slots_execution_types) }
   let(:amount_io) { "<defined-in-each-context>" }
   let(:amount_cpu) { "<defined-in-each-context>" }
+  let(:friendly_name_slots_instance) { double("FriendlyNameSlots", perform: true) }
+
+  before do
+    allow(FriendlyNameSlots).to receive(:new).and_return(friendly_name_slots_instance)
+  end
 
   context "when slots need to be incremented" do
     let(:amount_io) { 2 }
@@ -25,7 +30,7 @@ RSpec.describe AdjustExecutionTypeSlots, type: :service do
     end
 
     it "calls node naming" do
-      expect_any_instance_of(FriendlyNameNodes).to receive(:call)
+      expect(friendly_name_slots_instance).to receive(:perform)
 
       described_class.new(node: node, execution_type: :cpu).perform
     end
