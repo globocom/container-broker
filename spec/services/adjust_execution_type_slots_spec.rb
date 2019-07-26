@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe AdjustExecutionTypeSlots, type: :service do
   let(:slots_execution_types) { { io: amount_io, cpu: amount_cpu } }
