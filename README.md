@@ -2,9 +2,9 @@
 
 ## Routes
 
-### POST /handshake
+### POST /nodes
   - Register a new node to container broker pool
-  - Parameters: `{ "hostname": "", "cores": 10, "memory": 4096 }`
+  - Parameters: `{ "hostname": "", "slots_execution_types": {"cpu": 2, "network", 10} }`
   - Response:   `{ "status": "ok|error" }`
 
 ### POST /tasks

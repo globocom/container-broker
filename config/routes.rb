@@ -22,8 +22,6 @@ Rails.application.routes.draw do
 
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 
-  post "/handshake", controller: "handshake", action: "create"
-
   root to: "status#index"
 
   get "/healthcheck" => "healthcheck#index"
