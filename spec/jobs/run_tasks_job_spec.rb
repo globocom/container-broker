@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe RunTasksJob, type: :service do
   let!(:task) { Fabricate(:task, execution_type: "cpu") }
+
   let!(:slot) { Fabricate(:slot, execution_type: "cpu") }
 
   context "with no available nodes" do
