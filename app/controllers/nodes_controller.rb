@@ -8,17 +8,25 @@ class NodesController < ApplicationController
   def create
     @node = Node.create!(node_params)
 
+    FriendlyNameNodes.new.perform
+    AdjustNodeSlotsJob.perform_later(node: @node)
+
     render json: @node, status: :created, serializer: NodeSerializer
   end
 
   def update
     @node.update!(node_params)
+    AdjustNodeSlotsJob.perform_later(node: @node)
 
     head :ok
   end
 
   def destroy
+    # Block destroy if performing
     @node.destroy!
+    FriendlyNameNodes.new.perform
+
+    head :ok
   end
 
   def reject_new_tasks

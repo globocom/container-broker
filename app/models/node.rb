@@ -33,18 +33,6 @@ class Node
     slots.idle
   end
 
-  # def populate(slot_execution_type_groups)
-  #   destroy_slots if slots
-
-  #   slot_execution_type_groups.each do |slot_execution_type_group|
-  #     slot_execution_type_group[:amount].times do
-  #       slots.create!(execution_type: slot_execution_type_group[:execution_type])
-  #     end
-  #   end
-
-  #   FriendlyNameNodes.new.call
-  # end
-
   def destroy_slots
     slots.destroy_all
   end

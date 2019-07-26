@@ -12,10 +12,8 @@ class AdjustExecutionTypeSlots
     increment_slots
 
     decrement_slots
-  end
 
-  def self.decrement_slot_if_needed(slot:)
-    slot.destroy! if new(node: slot.node, execution_type: slot.execution_type).decrement_slots?
+    FriendlyNameSlots.new(node: node).perform
   end
 
   def increment?
@@ -29,7 +27,7 @@ class AdjustExecutionTypeSlots
   private
 
   def count_by_execution_type
-    node.slots.where(execution_type: execution_type).size
+    node.slots.where(execution_type: execution_type).count
   end
 
   def amount
@@ -38,13 +36,14 @@ class AdjustExecutionTypeSlots
 
   def increment_slots
     node.slots.create!(execution_type: execution_type) while increment?
+
+    RunTasksJob.perform_later
   end
 
   def decrement_slots
     while decrement?
       slot = AllocateSlot.new(execution_type: execution_type, node: node).call
       break unless slot
-
       slot.destroy!
     end
   end

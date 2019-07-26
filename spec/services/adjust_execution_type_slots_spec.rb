@@ -23,6 +23,12 @@ RSpec.describe AdjustExecutionTypeSlots, type: :service do
         described_class.new(node: node, execution_type: :cpu).perform
       end.to change{ node.slots.count }.by(3)
     end
+
+    it "calls node naming" do
+      expect_any_instance_of(FriendlyNameNodes).to receive(:call)
+
+      described_class.new(node: node, execution_type: :cpu).perform
+    end
   end
 
   context "when slots need to be decremented" do

@@ -11,6 +11,8 @@ class CheckForSlotRemoval
     return unless adjust_execution_type_slots_instance.decrement?
 
     slot.destroy!
+    FriendlyNameSlots.new(node: slot.node.reload).perform
+
     @removed = true
   end
 
