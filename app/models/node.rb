@@ -6,14 +6,16 @@ class Node
 
   field :name, type: String
   field :hostname, type: String
-  field :cores, type: Integer, default: 0
-  field :memory, type: Integer, default: 0
   field :available, type: Boolean, default: true
   field :last_error, type: String
   field :last_success_at, type: DateTime
   enumerable :status, %w(available unstable unavailable), default: "unavailable", after_change: :status_change
 
   has_many :slots
+
+  def usage_per_execution_type
+    NodeUsagePercentagePerExecutionType.new(self).perform
+  end
 
   def available_slot_with_execution_type(execution_type)
     available_slots.find_by(execution_type: execution_type)
