@@ -2,6 +2,14 @@ class UpdateNodeStatusJob < DockerConnectionJob
   queue_as :default
 
   def perform(node:)
+    LockManager.new(type: "update-node-status", id: node.id, expire: 1.minute, wait: false).lock do
+      update_node_status(node)
+    end
+  end
+
+  private
+
+  def update_node_status(node)
     @node = node
 
     containers = Docker::Container.all({all: true}, node.docker_connection)

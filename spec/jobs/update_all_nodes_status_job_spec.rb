@@ -30,27 +30,4 @@ RSpec.describe UpdateAllNodesStatusJob, type: :job do
     end
   end
 
-  context "when UpdateNodeStatusJob is locked" do
-    let(:lock_manager) do
-      LockManager.new(
-        type: "update-node-status",
-        id: node_available_1.id,
-        expire: 1.minute,
-        wait: true
-      )
-    end
-
-    before { lock_manager.lock! }
-    after { lock_manager.unlock! }
-
-    it "does not enqueue another job" do
-      subject.perform
-      expect(UpdateNodeStatusJob).to_not have_been_enqueued.with(node: node_available_1)
-    end
-
-    it "enqueues not locked nodes" do
-      subject.perform
-      expect(UpdateNodeStatusJob).to have_been_enqueued.with(node: node_available_2)
-    end
-  end
 end
