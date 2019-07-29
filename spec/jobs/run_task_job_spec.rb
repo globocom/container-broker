@@ -4,7 +4,7 @@ RSpec.describe RunTaskJob, type: :job do
 
   let(:node) { Node.create!(hostname: "docker.test") }
   let(:task) { Task.create!(name: "task-name", image: "#{image}:#{image_tag}", cmd: "-i input.txt -metadata comment='Encoded by Globo.com' output.mp4", storage_mount: "/tmp/workdir") }
-  let(:slot) { Slot.create!(node: node, status: "attaching") }
+  let(:slot) { Slot.create!(node: node, status: "attaching", execution_type: "test") }
   let(:image) { "busybox" }
   let(:image_tag) { "3.1" }
 
