@@ -7,14 +7,6 @@ RSpec.describe LockManager do
   let(:original_lock_duration) { 1 }
   let(:expire_time) { 5 }
   let(:object) { double }
-  # let(:redis_client) { double("RedisClient") }
-
-  before do
-    # allow(object).to receive(:update)
-    # allow(redis_client).to receive(:set)
-    # allow(redis_client).to receive(:del)
-    # allow(subject).to receive(:redis_client).and_return(redis_client)
-  end
 
   after { subject.unlock! }
 
