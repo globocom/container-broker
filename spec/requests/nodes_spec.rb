@@ -67,6 +67,38 @@ RSpec.describe "Nodes", type: :request do
     end
   end
 
+  describe "DELETE /nodes/:uuid" do
+    let!(:node) { Fabricate(:node, hostname: "node1.test") }
+
+    context "when node is working" do
+      before { Fabricate(:slot_running, node: node) }
+
+      it "returns error" do
+        delete node_path(node.uuid)
+
+        expect(response.status).to eq(406)
+      end
+
+      it "does not remove the node" do
+        expect { delete node_path(node.uuid) }
+          .to_not change(Node, :count)
+      end
+    end
+
+    context "when node is idle" do
+      it "returns ok" do
+        delete node_path(node.uuid)
+
+        expect(response).to be_ok
+      end
+
+      it "removes the node" do
+        expect { delete node_path(node.uuid) }
+          .to change(Node, :count).by(-1)
+      end
+    end
+  end
+
   context "POST /nodes/:uuid/accept_new_tasks" do
     let!(:node) { Fabricate(:node, accept_new_tasks: false) }
 

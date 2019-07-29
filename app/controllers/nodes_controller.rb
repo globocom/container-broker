@@ -22,11 +22,12 @@ class NodesController < ApplicationController
   end
 
   def destroy
-    # Block destroy if performing
-    @node.destroy!
+    DeleteNode.new(node: @node).perform
     FriendlyNameNodes.new.perform
 
     head :ok
+  rescue DeleteNode::NodeWithRunningSlotsError
+    head :not_acceptable
   end
 
   def reject_new_tasks

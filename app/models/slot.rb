@@ -16,6 +16,8 @@ class Slot
   validates :execution_type, format: { with: /\A([a-z])+(\-[a-z]+)*\z/,
              message: "only allows lowercase letters and hyphen symbol" }
 
+  scope :working, -> { where(:status.in => %w[attaching running releasing]) }
+
   def available?
     idle?
   end
