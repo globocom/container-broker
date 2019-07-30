@@ -15,7 +15,7 @@ class NodesController < ApplicationController
   end
 
   def update
-    @node.update!(node_params)
+    @node.update!(node_params.slice(:slots_execution_types))
     AdjustNodeSlotsJob.perform_later(node: @node)
 
     head :ok

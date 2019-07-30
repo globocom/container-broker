@@ -52,6 +52,7 @@ RSpec.describe "Nodes", type: :request do
   describe "PATCH /nodes/:uuid" do
     let!(:node) { Fabricate(:node, hostname: "node1.test") }
     let(:new_hostname) { "node2.test" }
+    let(:new_slots_execution_type) { { "cpu" => "3", "network" => "8" } }
 
     it "returns ok" do
       patch node_path(node.uuid), params: {node: {hostname: new_hostname}}
@@ -59,11 +60,18 @@ RSpec.describe "Nodes", type: :request do
       expect(response).to be_ok
     end
 
-    it "update the node" do
-      patch node_path(node.uuid), params: {node: {hostname: new_hostname}}
+    it "updates the slots_execution_types" do
+      patch node_path(node.uuid), params: {node: {hostname: new_hostname, slots_execution_types: new_slots_execution_type}}
 
       node.reload
-      expect(node.hostname).to eq(new_hostname)
+      expect(node.slots_execution_types).to eq(new_slots_execution_type)
+    end
+
+    it "does not update the hostname" do
+      expect do
+        patch node_path(node.uuid), params: {node: {hostname: new_hostname}, slots_execution_types: new_slots_execution_type}
+        node.reload
+      end.to_not change(node, :hostname)
     end
   end
 
