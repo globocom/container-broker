@@ -35,6 +35,9 @@ class Task
   end
 
   validates :name, :image, :cmd, presence: true
+  validates :execution_type, format: { with: /\A([a-z])+(\-[a-z]+)*\z/,
+             message: "only allows lowercase letters and hyphen symbol" }
+
 
   def set_logs(logs)
     self.logs = BSON::Binary.new(logs, :generic)
