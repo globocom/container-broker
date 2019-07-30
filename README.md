@@ -2,13 +2,27 @@
 
 ## Routes
 
-### POST /nodes
-  - Register a new node to container broker pool
-  - Parameters: `{ "hostname": "", "slots_execution_types": {"cpu": 2, "network", 10} }`
-  - Response:   `{ "status": "ok|error" }`
+### Nodes
 
-### POST /tasks
-  - Creates a container from given image to run given command
+#### List
+  - `GET /nodes`
+
+#### Add
+  - `POST /nodes`
+  - Parameters: `{ "hostname": "", "slots_execution_types": {"cpu": 2, "network", 10} }`
+
+#### Update
+  - `PATCH /nodes/:uuid`
+  - Parameters: `{ "slots_execution_types": {"cpu": 2, "network", 10} }`
+
+#### Remove
+  - `DELETE /nodes/:uuid`
+  - Parameters: `{ "slots_execution_types": {"cpu": 2, "network", 10} }`
+
+### Tasks
+
+#### Create
+  - `POST /tasks`
   - Parameters: `{ "name": "", "image": "", "cmd": "", "storage_mount": "", "tags": {"slug": "slug3166h", "type": "video"} }`
   - Response:
   ```json
@@ -18,7 +32,7 @@
   }
   ```
 
-### GET /task/:uuid
+#### Task Details
   - Show information about some job
   - Parameters (query string): `id`
   - Response:
