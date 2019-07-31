@@ -1,12 +1,18 @@
 require 'rails_helper'
 
 RSpec.describe LockManager do
-  subject do
-    described_class.new(type: "test-lock", id: 2, expire: expire_time, wait: wait)
+  let(:lock_args) do
+    { type: "test-lock",
+      id: 2,
+      expire: expire_time,
+      wait: wait
+    }
   end
   let(:original_lock_duration) { 1 }
   let(:expire_time) { 5 }
   let(:object) { double }
+
+  subject { described_class.new(**lock_args) }
 
   after { subject.unlock! }
 
@@ -41,8 +47,8 @@ RSpec.describe LockManager do
     let(:wait) { false }
 
     context "and it is locked" do
-      before { subject.lock! }
-      after { subject.unlock! }
+      before { described_class.new(**args).lock! }
+      after { described_class.new(**args).lock! }
 
       context "with a block" do
         it "does not yield when lock aquired" do
@@ -51,6 +57,11 @@ RSpec.describe LockManager do
 
         it "returns false" do
           expect(subject.lock{}).to be_falsey
+        end
+
+        it "does not release the lock" do
+          subject.lock{}
+          expect(subject.locked).to be_falsey
         end
       end
 

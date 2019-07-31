@@ -10,12 +10,14 @@ class LockManager
 
   def lock
     if lock!
-      yield(self)
+      begin
+        yield(self)
+      ensure
+        unlock!
+      end
     else
       false
     end
-  ensure
-    unlock!
   end
 
   def lock!
