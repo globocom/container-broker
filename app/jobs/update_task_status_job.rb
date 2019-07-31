@@ -2,8 +2,6 @@ class UpdateTaskStatusJob < DockerConnectionJob
   queue_as :default
 
   def perform(task)
-    raise "Task is nil" unless task
-
     Rails.logger.debug("Updating status for task #{task}")
     Rails.logger.debug("Task #{task} is running in slot #{task.slot}")
 
@@ -33,14 +31,12 @@ class UpdateTaskStatusJob < DockerConnectionJob
         task.error = container_state["Error"]
         task.retry
       end
-    else
-      raise "Task status should be exited (current status: #{task.status})"
     end
 
-    # make sure we persist last state prior to persisting logs
     task.save!
 
     if task.persist_logs && container_status == 'exited'
+      Rails.logger.debug("Persisting logs for #{task}")
       # streaming_logs avoids some encoding issues and should be safe since container status = exited
       # (see https://github.com/swipely/docker-api/issues/290 for reference)
       container_logs = container.streaming_logs(stdout: true, stderr: true, tail: 100)

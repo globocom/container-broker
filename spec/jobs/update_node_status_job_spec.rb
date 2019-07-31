@@ -9,17 +9,19 @@ RSpec.describe UpdateNodeStatusJob, type: :job do
     allow(Docker).to receive(:info).and_return("SystemTime" => Time.zone.now.to_s)
   end
 
-  xcontext "for all containers" do
+  context "for all containers" do
     let(:containers) { [container] }
     let(:container_id) { SecureRandom.hex }
     let(:container_creation_date) { 2.minutes.ago.to_s.to_i }
-    let(:container) { double("Docker::Container", id: container_id, info: {"State" => state, "Names" => [], "Created" => container_creation_date})}
-    let(:state) { "" }
+    let(:container) { double("Docker::Container", id: container_id, info: {"State" => container_state, "Names" => [], "Created" => container_creation_date})}
+    let(:container_state) { "" }
 
     let!(:slot) { Fabricate(:slot_running, node: node, container_id: container_id) }
 
     context "when a slot is found with that container id" do
       context "and the container status is exited" do
+        let(:container_state) { "exited" }
+
         context "and the slot is running" do
           it "marks slot as releasing" do
             expect do
@@ -28,10 +30,26 @@ RSpec.describe UpdateNodeStatusJob, type: :job do
             end.to change(slot, :status).to("releasing")
           end
 
-          it "enqueues job releasing job" do
+          it "enqueues slot releasing job" do
             subject.perform(node: node)
             expect(ReleaseSlotJob).to have_been_enqueued.with(slot: slot)
           end
+        end
+      end
+
+      context "and the container status is running" do
+        let(:container_state) { "running" }
+
+        it "keeps slot as running" do
+          expect do
+            subject.perform(node: node)
+            slot.reload
+          end.to_not change(slot, :status)
+        end
+
+        it "does not enqueue slot releasing job" do
+          subject.perform(node: node)
+          expect(ReleaseSlotJob).to_not have_been_enqueued.with(slot: slot)
         end
       end
     end

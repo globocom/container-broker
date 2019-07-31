@@ -7,6 +7,7 @@ class UpdateNodeStatusJob < DockerConnectionJob
       Rails.logger.debug("Lock acquired for update status of #{node}")
       update_node_status(node)
       Rails.logger.debug("Releasing lock for update status of #{node}")
+      true
     end
     if updated
       Rails.logger.debug("Lock released for update status of #{node}")
