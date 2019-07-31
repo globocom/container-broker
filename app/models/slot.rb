@@ -40,7 +40,7 @@ class Slot
     update!(status: "running", current_task: task, container_id: task.container_id)
   end
 
-  def inspect
-    "Slot #{name} #{uuid}"
+  def to_s
+    "Slot #{name} #{uuid} (#{status})"
   end
 end

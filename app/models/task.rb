@@ -93,7 +93,7 @@ class Task
     tags.transform_values!(&:to_s)
   end
 
-  def inspect
-    "Task #{name} #{uuid}"
+  def to_s
+    "Task #{name} #{uuid} (#{status})"
   end
 end

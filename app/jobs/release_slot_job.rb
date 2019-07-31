@@ -2,7 +2,7 @@ class ReleaseSlotJob < ApplicationJob
   queue_as :default
 
   def perform(slot:)
-    Rails.logger.debug("ReleaseSlotJob for #{slot.inspect}")
+    Rails.logger.debug("ReleaseSlotJob for #{slot}")
     UpdateTaskStatusJob.perform_now(slot.current_task)
 
     Rails.logger.debug "Enqueueing container removal"

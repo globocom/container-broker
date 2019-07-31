@@ -4,8 +4,8 @@ class UpdateTaskStatusJob < DockerConnectionJob
   def perform(task)
     raise "Task is nil" unless task
 
-    Rails.logger.debug("Updating status for task #{task.inspect}")
-    Rails.logger.debug("Task #{task.inspect} is running in slot #{task.slot.inspect}")
+    Rails.logger.debug("Updating status for task #{task}")
+    Rails.logger.debug("Task #{task} is running in slot #{task.slot}")
 
     container = GetTaskContainer.new.call(task: task)
 

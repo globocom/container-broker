@@ -56,7 +56,7 @@ class Node
     update!(last_success_at: Time.zone.now)
   end
 
-  def inspect
+  def to_s
     "Node #{name} #{uuid}"
   end
 end

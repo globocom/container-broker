@@ -2,16 +2,22 @@ class RunTaskJob < ApplicationJob
   queue_as :default
 
   def perform(task:, slot:)
-    @node = slot.node
+    Rails.logger.debug("Performing RunTaskJob for #{task} #{slot}")
 
     pull_image(task: task, slot: slot)
+    Rails.logger.debug("Image pulled for #{task} #{slot}")
 
     container = create_container(task: task, slot: slot)
+    Rails.logger.debug("Container #{container.id} created for #{task} #{slot}")
     task.update!(container_id: container.id, slot: slot)
+    Rails.logger.debug("#{task} updated with #{container.id} #{slot}")
 
     container.start
+    Rails.logger.debug("Container #{container.id} started")
     task.mark_as_started!
+    Rails.logger.debug("#{task} marked as started")
     slot.mark_as_running(current_task: task, container_id: container.id)
+    Rails.logger.debug("#{slot} marked as running")
 
     task
   rescue StandardError, Excon::Error => e

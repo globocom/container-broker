@@ -10,7 +10,7 @@ class UpdateNodeStatusJob < DockerConnectionJob
   private
 
   def update_node_status(node)
-    Rails.logger.debug("Start updating node status for #{node.inspect}")
+    Rails.logger.debug("Start updating node status for #{node}")
 
     containers = Docker::Container.all({all: true}, node.docker_connection)
 
@@ -19,13 +19,13 @@ class UpdateNodeStatusJob < DockerConnectionJob
     containers.each do |container|
       slot = node.slots.where(container_id: container.id).first
       if slot
-        Rails.logger.debug "Slot found for container #{container.id}: #{slot.inspect}"
+        Rails.logger.debug "Slot found for container #{container.id}: #{slot}"
 
         if container.info["State"] == "exited"
           Rails.logger.debug "Container #{container.id} exited"
           if slot.status == "running"
             slot.releasing!
-            Rails.logger.debug "Slot was running. Marked as releasing."
+            Rails.logger.debug "Slot was running. Marked as releasing. slot: #{slot} current_task: #{slot.current_task}"
             ReleaseSlotJob.perform_later(slot: MongoidSerializableModel.new(slot))
           else
             Rails.logger.debug "Slot was not running (it was #{slot.status}). Ignoring."
