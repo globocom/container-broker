@@ -6,7 +6,7 @@ RSpec.describe Slot, type: :model do
     subject { Fabricate(:slot, execution_type: execution_type) }
 
     context "with a valid execution type" do
-      let(:execution_type) { "io" }
+      let(:execution_type) { "io1" }
 
       it "is valid" do
         expect(subject).to be_valid

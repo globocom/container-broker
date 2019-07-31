@@ -34,9 +34,11 @@ class Task
     AddTaskTagsJob.perform_later(task: self)
   end
 
-  validates :name, :image, :cmd, presence: true
-  validates :execution_type, format: { with: /\A([a-z])+(\-[a-z]+)*\z/,
-             message: "only allows lowercase letters and hyphen symbol" }
+  validates :name, :image, :cmd, :execution_type, presence: true
+  validates :execution_type, format: {
+    with: Constants::REGEX_TO_VALIDATE_EXECUTION_TYPE,
+    message: "only allows lowercase letters, numbers and hyphen symbol"
+  }
 
 
   def set_logs(logs)

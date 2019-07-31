@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Task, type: :model do
   let(:now) { Time.zone.now }
-  let(:execution_type) { "test-type" }
+  let(:execution_type) { "test-type1" }
   subject { Fabricate(:task, execution_type: execution_type) }
 
   context "for new tasks" do

@@ -13,8 +13,11 @@ class Slot
 
   belongs_to :node, optional: true
 
-  validates :execution_type, format: { with: /\A([a-z])+(\-[a-z]+)*\z/,
-             message: "only allows lowercase letters and hyphen symbol" }
+  validates :execution_type, presence: true
+  validates :execution_type, format: {
+    with: Constants::REGEX_TO_VALIDATE_EXECUTION_TYPE,
+    message: "only allows lowercase letters, numbers and hyphen symbol"
+  }
 
   scope :working, -> { where(:status.in => %w[attaching running releasing]) }
 
