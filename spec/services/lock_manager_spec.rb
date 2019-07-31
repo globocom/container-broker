@@ -47,8 +47,8 @@ RSpec.describe LockManager do
     let(:wait) { false }
 
     context "and it is locked" do
-      before { described_class.new(**args).lock! }
-      after { described_class.new(**args).lock! }
+      before { described_class.new(**lock_args).lock! }
+      after { described_class.new(**lock_args).lock! }
 
       context "with a block" do
         it "does not yield when lock acquired" do

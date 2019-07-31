@@ -8,7 +8,7 @@ RSpec.describe UpdateTaskStatusJob, type: :job do
   let(:task_status) { "running" }
   let(:docker_connection) { double("Docker::Connection") }
   let(:container_id) { "11223344" }
-  let(:container) { double("Docker::Container", info: container_info) }
+  let(:container) { double("Docker::Container", id: container_id, info: container_info) }
   let(:container_status) { "exited" }
   let(:container_exit_code) { 0 }
   let(:container_error) { ""}
@@ -98,25 +98,6 @@ RSpec.describe UpdateTaskStatusJob, type: :job do
       it "persist container logs to Task" do
         expect(task).to receive(:set_logs).with(logs)
         perform
-      end
-    end
-  end
-
-  context "when container stills running" do
-    let(:container_status) { "running" }
-
-    context "and task was running" do
-      let(:task_status) { "running" }
-      it "throws an exception" do
-        expect{ perform }.to raise_error(StandardError)
-      end
-    end
-
-    context "and task was not running" do
-      let(:task_status) { "started" }
-
-      it "throws an exception" do
-        expect{ perform }.to raise_error(StandardError)
       end
     end
   end
