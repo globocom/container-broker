@@ -11,7 +11,7 @@ class UpdateTaskStatusJob < DockerConnectionJob
 
     container_state = container.info["State"]
 
-    Rails.logger.debug "Got container #{container.id} with state #{container_state}"
+    Rails.logger.debug("Got container #{container.id} with state #{container_state}")
 
     container_status = container_state["Status"]
     exit_code = container_state["ExitCode"]
@@ -19,17 +19,17 @@ class UpdateTaskStatusJob < DockerConnectionJob
     task.started_at = container_state["StartedAt"]
 
     if container_status == "exited"
-      Rails.logger.debug "Container is in status #{container_status} and exit code #{exit_code}"
+      Rails.logger.debug("Container is in status #{container_status} and exit code #{exit_code}")
 
       task.exit_code = exit_code
       task.finished_at = container_state["FinishedAt"]
 
       if exit_code.zero?
-        Rails.logger.debug "Marking task as completed and no errors"
+        Rails.logger.debug("Marking task as completed and no errors")
         task.completed!
         task.error = nil
       else
-        Rails.logger.debug "Marked task for retry and set error as #{container_state["Error"]}"
+        Rails.logger.debug("Marked task for retry and set error as #{container_state["Error"]}")
         task.error = container_state["Error"]
         task.retry
       end
