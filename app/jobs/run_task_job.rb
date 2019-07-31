@@ -28,7 +28,7 @@ class RunTaskJob < ApplicationJob
     end
 
     slot.release
-    task.update(error: message)
+    task.update!(error: message)
     task.retry
   end
 

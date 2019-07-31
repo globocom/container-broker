@@ -2,8 +2,9 @@ class UpdateTaskStatusJob < DockerConnectionJob
   queue_as :default
 
   def perform(task)
-    @node = task.slot.node
+    raise "Task is nil" unless task
 
+    @node = task.slot.node
     container = GetTaskContainer.new.call(task: task)
 
     status = container.info["State"]["Status"]
@@ -23,19 +24,19 @@ class UpdateTaskStatusJob < DockerConnectionJob
         task.retry
       end
     else
-      task.running!
+      raise "Task status should be exited (current status: #{status})"
     end
 
     # make sure we persist last state prior to persisting logs
-    task.save
+    task.save!
 
-    if task.persist_logs and status == 'exited'
+    if task.persist_logs && status == 'exited'
       # streaming_logs avoids some encoding issues and should be safe since container status = exited
       # (see https://github.com/swipely/docker-api/issues/290 for reference)
       container_logs = container.streaming_logs(stdout: true, stderr: true, tail: 100)
 
       task.set_logs(container_logs)
-      task.save
+      task.save!
     end
   end
 end

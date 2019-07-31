@@ -25,6 +25,8 @@ class UpdateNodeStatusJob < DockerConnectionJob
             slot.releasing!
             ReleaseSlotJob.perform_later(slot: MongoidSerializableModel.new(slot))
           end
+        elsif started_with_error?(container: container, docker_connection: node.docker_connection)
+          container.start
         end
       else
         container_names = container.info["Names"].map{|name| name.gsub(/\A\//, "") }
@@ -48,5 +50,9 @@ class UpdateNodeStatusJob < DockerConnectionJob
 
   def get_node_system_time(node:)
     @node_system_time ||= Time.parse(Docker.info(node.docker_connection)["SystemTime"])
+  end
+
+  def started_with_error?(container:, docker_connection:)
+    container.info["State"] == "created" && Docker::Container.get(container.id, docker_connection).info["State"]["ExitCode"].positive?
   end
 end

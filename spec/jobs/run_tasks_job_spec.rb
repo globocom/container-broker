@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe RunTasksJob, type: :service do
   let!(:task) { Fabricate(:task, execution_type: "cpu") }
 
-  let!(:slot) { Fabricate(:slot, execution_type: "cpu") }
+  let!(:slot) { Fabricate(:slot_idle, execution_type: "cpu") }
 
   context "with no available nodes" do
     before do
@@ -11,16 +11,18 @@ RSpec.describe RunTasksJob, type: :service do
     end
 
     it "does not check the tasks" do
-      expect(FetchTask).not_to receive(:all_pending)
+      expect_any_instance_of(FetchTask).to_not receive(:call)
 
       subject.perform
     end
   end
 
   context "with available nodes" do
+    let(:fetch_task_service) { double("FetchTask") }
     context "and no pending tasks" do
       before do
-        allow(FetchTask).to receive(:all_pending).and_return([])
+        allow(FetchTask).to receive(:new).with(execution_types: %w[cpu]).and_return(fetch_task_service)
+        allow(fetch_task_service).to receive(:call).and_return(nil)
       end
 
       it "does not check the slots" do
@@ -40,16 +42,6 @@ RSpec.describe RunTasksJob, type: :service do
           expect(RunTaskJob).to_not have_been_enqueued
 
           subject.perform
-        end
-
-        context "and no busy or available slots for execution type" do
-          before do
-            allow(Slot).to receive(:where).with(execution_type: "cpu").and_return([])
-          end
-
-          it "marks task as no execution type available" do
-            expect{subject.perform; task.reload}.to change(task, :no_execution_type?).from(false).to(true)
-          end
         end
       end
 

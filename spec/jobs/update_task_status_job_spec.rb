@@ -107,17 +107,16 @@ RSpec.describe UpdateTaskStatusJob, type: :job do
 
     context "and task was running" do
       let(:task_status) { "running" }
-      it "calls task running!" do
-        expect(task).to receive(:running!)
-        perform
+      it "throws an exception" do
+        expect{ perform }.to raise_error(StandardError)
       end
     end
 
     context "and task was not running" do
       let(:task_status) { "started" }
 
-      it "updates task status" do
-        expect{perform}.to change(task, :status).to("running")
+      it "throws an exception" do
+        expect{ perform }.to raise_error(StandardError)
       end
     end
   end
