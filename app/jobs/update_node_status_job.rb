@@ -14,12 +14,9 @@ class UpdateNodeStatusJob < DockerConnectionJob
 
     containers = Docker::Container.all({all: true}, node.docker_connection)
 
-    attached_slots = []
-
     containers.each do |container|
       slot = node.slots.where(container_id: container.id).first
       if slot
-        attached_slots << slot
         if container.info["State"] == "exited"
           if slot.status == "running"
             slot.releasing!
