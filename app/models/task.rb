@@ -92,4 +92,8 @@ class Task
   def normalize_tags
     tags.transform_values!(&:to_s)
   end
+
+  def inspect
+    "Task #{name} #{uuid}"
+  end
 end

@@ -2,6 +2,8 @@ Rails.application.config.active_job.queue_adapter = Rails.env.test? ? :test : :s
 
 Sidekiq.default_worker_options = { backtrace: true }
 
+Sidekiq::Logging.logger.level = Logger::DEBUG
+
 def redis_from_url(uri)
   if uri.start_with?("sentinel")
     m = uri.match("sentinel://:([^@]*)@([^/]*)/service_name:(.*)")

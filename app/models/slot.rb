@@ -39,4 +39,8 @@ class Slot
   def attach_to(task:)
     update!(status: "running", current_task: task, container_id: task.container_id)
   end
+
+  def inspect
+    "Slot #{name} #{uuid}"
+  end
 end
