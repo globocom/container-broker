@@ -4,7 +4,7 @@ class UpdateNodeStatusJob < DockerConnectionJob
   def perform(node:)
     Rails.logger.debug("Waiting for lock to update status of #{node}")
     updated = LockManager.new(type: "update-node-status", id: node.id, expire: 1.minute, wait: false).lock do
-      Rails.logger.debug("Lock aquired for update status of #{node}")
+      Rails.logger.debug("Lock acquired for update status of #{node}")
       update_node_status(node)
       Rails.logger.debug("Releasing lock for update status of #{node}")
     end

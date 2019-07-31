@@ -39,7 +39,7 @@ class LockManager
   end
 
   def keep_locked
-    raise "Lock not aquired" unless locked
+    raise "Lock not acquired" unless locked
 
     if redis_set(xx: true)
       puts "[LockManager] lock extended by #{expire}"

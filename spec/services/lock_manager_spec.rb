@@ -30,13 +30,13 @@ RSpec.describe LockManager do
       end
 
       context "with a block" do
-        it "yields when lock aquired" do
+        it "yields when lock acquired" do
           expect {|block| subject.lock &block }.to yield_control
         end
       end
 
       context "without a block" do
-        it "returns true when lock aquired" do
+        it "returns true when lock acquired" do
           expect(subject.lock!).to be_truthy
         end
       end
@@ -51,7 +51,7 @@ RSpec.describe LockManager do
       after { described_class.new(**args).lock! }
 
       context "with a block" do
-        it "does not yield when lock aquired" do
+        it "does not yield when lock acquired" do
           expect {|block| subject.lock &block }.to_not yield_control
         end
 
@@ -77,7 +77,7 @@ RSpec.describe LockManager do
         allow(subject).to receive(:locked).and_return(true)
       end
 
-      it "yields block when lock aquired" do
+      it "yields block when lock acquired" do
         expect {|block| subject.lock &block }.to yield_control
       end
     end
