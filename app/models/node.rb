@@ -16,14 +16,14 @@ class Node
 
   has_many :slots
 
-  def usage_per_execution_type
-    NodeUsagePercentagePerExecutionType.new(self).perform
-  end
+  scope :accepting_new_tasks, -> { where(accept_new_tasks: true) }
 
   validates :hostname, presence: true
   validates :slots_execution_types, presence: true
 
-  scope :accepting_new_tasks, -> { where(accept_new_tasks: true) }
+  def usage_per_execution_type
+    NodeUsagePercentagePerExecutionType.new(self).perform
+  end
 
   def available_slot_with_execution_type(execution_type)
     available_slots.find_by(execution_type: execution_type)
