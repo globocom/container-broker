@@ -7,6 +7,7 @@ RSpec.describe "Tasks", type: :request do
     let(:task_image) { "busybox:1.25" }
     let(:task_cmd) { "sleep 5" }
     let(:task_storage_mount) { "/var/log" }
+    let(:task_execution_type) { "test" }
     let(:task_tags) do
       {
         "api_id" => "123456",
@@ -23,6 +24,7 @@ RSpec.describe "Tasks", type: :request do
           cmd: task_cmd,
           storage_mount: task_storage_mount,
           tags: task_tags,
+          execution_type: task_execution_type,
         }
       }
     end

@@ -13,6 +13,9 @@ class Slot
 
   belongs_to :node, optional: true
 
+  validates :execution_type, format: { with: /\A([a-z])+(\-[a-z]+)*\z/,
+             message: "only allows lowercase letters and hyphen symbol" }
+
   def available?
     idle?
   end

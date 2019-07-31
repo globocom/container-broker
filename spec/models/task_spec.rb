@@ -2,7 +2,8 @@ require 'rails_helper'
 
 RSpec.describe Task, type: :model do
   let(:now) { Time.zone.now }
-  subject { Fabricate(:task) }
+  let(:execution_type) { "test-type" }
+  subject { Fabricate(:task, execution_type: execution_type) }
 
   context "for new tasks" do
     it "saves creation date" do
@@ -23,6 +24,13 @@ RSpec.describe Task, type: :model do
 
     it "calculates duration" do
       expect(subject.seconds_running).to be_nil
+    end
+  end
+
+  context "with an invalid execution type" do
+    let(:execution_type) { "invalid_type" }
+    it "raises validation error" do
+      expect{subject}.to raise_error(Mongoid::Errors::Validations)
     end
   end
 

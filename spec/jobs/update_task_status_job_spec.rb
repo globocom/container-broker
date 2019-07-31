@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe UpdateTaskStatusJob, type: :job do
   let(:node) { Node.create!(hostname: "local.test")}
-  let(:slot) { Slot.create!(node: node) }
+  let(:slot) { Slot.create!(node: node, execution_type: "test") }
   let(:task_persist_logs) { false }
   let(:task) { Fabricate(:task, slot: slot, container_id: container_id, status: task_status, persist_logs: task_persist_logs) }
   let(:task_status) { "running" }
