@@ -1,14 +1,11 @@
 class RunTasksJob < ApplicationJob
-  def perform
-    return unless executions_types_of_idle_slots.any?
-
-    while pending_task = get_and_alocate_task
-      slot = AllocateSlot.new(execution_type: pending_task.execution_type).call
-
-      if slot
-        RunTaskJob.perform_later(slot: slot, task: pending_task)
+  def perform(execution_type:)
+    while have_pending_tasks?(execution_type) && (slot = lock_slot(execution_type))
+      task = lock_task(execution_type)
+      if task
+        RunTaskJob.perform_later(slot: slot, task: task)
       else
-        pending_task.waiting!
+        slot.idle!
         break
       end
     end
@@ -16,15 +13,19 @@ class RunTasksJob < ApplicationJob
 
   private
 
-  def get_and_alocate_task
-    FetchTask.new(execution_types: executions_types_of_idle_slots).call
+  def lock_slot(execution_type)
+    AllocateSlot.new(execution_type: execution_type).call
   end
 
-  def executions_types_of_idle_slots
-    Slot
-      .where(node_id: { '$in': Node.available.pluck(:id) })
-      .idle
-      .pluck(:execution_type)
-      .uniq
+  def lock_task(execution_type)
+    fetch_task_service(execution_type).call
+  end
+
+  def have_pending_tasks?(execution_type)
+    fetch_task_service(execution_type).first_pending
+  end
+
+  def fetch_task_service(execution_type)
+    @fetch_task_service ||= FetchTask.new(execution_type: execution_type)
   end
 end

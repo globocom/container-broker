@@ -1,4 +1,6 @@
-class UpdateTaskStatusJob < DockerConnectionJob
+class UpdateTaskStatusJob < ApplicationJob
+  include DockerConnectionRescueError
+
   class InvalidContainerStatusError < StandardError; end
 
   queue_as :default
@@ -6,6 +8,8 @@ class UpdateTaskStatusJob < DockerConnectionJob
   def perform(task)
     Rails.logger.debug("Updating status for task #{task}")
     Rails.logger.debug("Task #{task} is running in slot #{task.slot}")
+
+    set_node_to_trace_docker_error(task.slot.node)
 
     container = FetchTaskContainer.new.call(task: task)
 

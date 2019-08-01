@@ -1,7 +1,10 @@
-class UpdateNodeStatusJob < DockerConnectionJob
+class UpdateNodeStatusJob < ApplicationJob
+  include DockerConnectionRescueError
   queue_as :default
 
   def perform(node:)
+    set_node_to_trace_docker_error(node)
+
     Rails.logger.debug("Waiting for lock to update status of #{node}")
     updated = LockManager.new(type: self.class.to_s, id: node.id, expire: 1.minute, wait: false).lock do
       Rails.logger.debug("Lock acquired for update status of #{node}")

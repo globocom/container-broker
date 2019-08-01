@@ -7,7 +7,7 @@ class NodeTaskAcceptance
 
   def accept!
     @node.update!(accept_new_tasks: true)
-    RunTasksJob.perform_later
+    RunTasksForAllExecutionTypesJob.perform_later
   end
 
   def reject!

@@ -33,7 +33,7 @@ class Slot
   def release
     update!(container_id: nil, current_task: nil)
     idle!
-    RunTasksJob.perform_later
+    RunTasksJob.perform_later(execution_type: execution_type)
   end
 
   def attach_to(task:)

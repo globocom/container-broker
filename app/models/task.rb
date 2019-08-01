@@ -31,7 +31,7 @@ class Task
   before_validation :normalize_tags
   before_create { |task| task.created_at = Time.zone.now }
   after_create do
-    RunTasksJob.perform_later
+    RunTasksJob.perform_later(execution_type: execution_type)
     AddTaskTagsJob.perform_later(task: self)
   end
 
@@ -64,7 +64,7 @@ class Task
     if self.try_count < Settings.task_retry_count
       update(try_count: self.try_count + 1)
       retry!
-      RunTasksJob.perform_later
+      RunTasksJob.perform_later(execution_type: execution_type)
     else
       error!
     end
@@ -87,7 +87,7 @@ class Task
   def force_retry!
     update(try_count: 0)
     waiting!
-    RunTasksJob.perform_later
+    RunTasksJob.perform_later(execution_type: execution_type)
   end
 
   def normalize_tags

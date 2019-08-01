@@ -16,7 +16,7 @@ RSpec.describe NodeTaskAcceptance do
     it "calls RunTasksJob" do
       subject.accept!
 
-      expect(RunTasksJob).to have_been_enqueued
+      expect(RunTasksForAllExecutionTypesJob).to have_been_enqueued
     end
   end
 

@@ -15,7 +15,6 @@ class ReleaseSlotJob < ApplicationJob
     else
       slot.release
       Rails.logger.debug("Slot released (#{slot.status})")
-      RunTasksJob.perform_later
     end
   end
 end

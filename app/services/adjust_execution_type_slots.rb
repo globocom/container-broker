@@ -37,7 +37,7 @@ class AdjustExecutionTypeSlots
   def increment_slots
     node.slots.create!(execution_type: execution_type) while increment?
 
-    RunTasksJob.perform_later
+    RunTasksJob.perform_later(execution_type: execution_type)
   end
 
   def decrement_slots
