@@ -3,11 +3,9 @@ require 'rails_helper'
 RSpec.describe DeleteNode, type: :service do
   let(:node) { Fabricate(:node) }
 
-  before do
-    Fabricate(:slot_idle, node: node)
-  end
-
   subject { described_class.new(node: node) }
+
+  before { Fabricate(:slot_idle, node: node) }
 
   context "when node is not accepting tasks" do
     let(:node) { Fabricate(:node, accept_new_tasks: false)}

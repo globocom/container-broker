@@ -10,11 +10,11 @@ class DeleteNode
   def perform
     if node.accept_new_tasks
       was_accepting_new_tasks = true
-      NodeAcceptTasksService.new(node: node).reject!
+      NodeTaskAcceptance.new(node: node).reject!
     end
 
     if node.slots.working.any?
-      NodeAcceptTasksService.new(node: node).accept! if was_accepting_new_tasks
+      NodeTaskAcceptance.new(node: node).accept! if was_accepting_new_tasks
       raise NodeWithRunningSlotsError
     else
       node.destroy!

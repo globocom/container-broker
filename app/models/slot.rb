@@ -15,8 +15,8 @@ class Slot
 
   validates :execution_type, presence: true
   validates :execution_type, format: {
-    with: Constants::REGEX_TO_VALIDATE_EXECUTION_TYPE,
-    message: "only allows lowercase letters, numbers and hyphen symbol"
+    with: Constants::ExecutionTypeValidation::REGEX,
+    message: Constants::ExecutionTypeValidation::MESSAGE
   }
 
   scope :working, -> { where(:status.in => %w[attaching running releasing]) }

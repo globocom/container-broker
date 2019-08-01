@@ -26,7 +26,9 @@ RSpec.describe UpdateTaskStatusJob, type: :job do
     }
   end
 
-  let(:perform) { subject.perform(task) }
+  def perform
+    subject.perform(task)
+  end
 
   before do
     allow(Docker::Container).to receive(:get).with(container_id, {all: true}, docker_connection).and_return(container)
@@ -99,6 +101,14 @@ RSpec.describe UpdateTaskStatusJob, type: :job do
         expect(task).to receive(:set_logs).with(logs)
         perform
       end
+    end
+  end
+
+  context "when container is running" do
+    let(:container_status) { "running" }
+
+    it "throws an exception" do
+      expect { perform }.to raise_error(described_class::InvalidContainerStatusError)
     end
   end
 end

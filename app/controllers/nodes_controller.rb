@@ -31,13 +31,13 @@ class NodesController < ApplicationController
   end
 
   def reject_new_tasks
-    NodeAcceptTasksService.new(node: @node).reject!
+    NodeTaskAcceptance.new(node: @node).reject!
 
     head :ok
   end
 
   def accept_new_tasks
-    NodeAcceptTasksService.new(node: @node).accept!
+    NodeTaskAcceptance.new(node: @node).accept!
 
     head :ok
   end

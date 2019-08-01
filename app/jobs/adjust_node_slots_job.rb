@@ -22,6 +22,6 @@ class AdjustNodeSlotsJob < ApplicationJob
   end
 
   def lock_manager_instance(node)
-    LockManager.new(type: "AdjustExecutionTypeSlots", id: node.id, wait: true, expire: 1.minute)
+    LockManager.new(type: self.class.to_s, id: node.id, wait: true, expire: 1.minute)
   end
 end

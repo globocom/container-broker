@@ -10,7 +10,7 @@ class Task
   field :execution_type, type: String
   field :cmd, type: String
   field :storage_mount, type: String
-  enumerable :status, %w(waiting starting started running retry error completed no_execution_type)
+  enumerable :status, %w[waiting starting started running retry error completed no_execution_type]
   field :exit_code, type: Integer
   field :error, type: String
   field :logs, type: BSON::Binary
@@ -20,15 +20,16 @@ class Task
   field :progress, type: String
   field :try_count, type: Integer, default: 0
   field :persist_logs, type: Boolean, default: false
-  field :tags, type: Hash, default: Hash.new
+  field :tags, type: Hash, default: {}
 
   belongs_to :slot, optional: true
 
-  index({created_at: 1}, {expire_after_seconds: 1.month})
-  index({tags: 1})
+  index({ created_at: 1 }, expire_after_seconds: 1.month)
+  index(tags: 1)
+  index(status: 1)
 
   before_validation :normalize_tags
-  before_create {|task| task.created_at = Time.zone.now }
+  before_create { |task| task.created_at = Time.zone.now }
   after_create do
     RunTasksJob.perform_later
     AddTaskTagsJob.perform_later(task: self)
@@ -36,8 +37,8 @@ class Task
 
   validates :name, :image, :cmd, :execution_type, presence: true
   validates :execution_type, format: {
-    with: Constants::REGEX_TO_VALIDATE_EXECUTION_TYPE,
-    message: "only allows lowercase letters, numbers and hyphen symbol"
+    with: Constants::ExecutionTypeValidation::REGEX,
+    message: Constants::ExecutionTypeValidation::MESSAGE
   }
 
 
@@ -47,7 +48,7 @@ class Task
 
   def get_logs
     if started? || running?
-      GetTaskContainer.new.call(task: self).streaming_logs(stdout: true, stderr: true, tail: 1_000)
+      FetchTaskContainer.new.call(task: self).streaming_logs(stdout: true, stderr: true, tail: 1_000)
     else
       logs.try(:data)
     end

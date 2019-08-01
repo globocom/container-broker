@@ -9,15 +9,15 @@
 
 #### Add
   - `POST /nodes`
-  - Parameters: `{ "hostname": "", "slots_execution_types": {"cpu": 2, "network", 10} }`
+  - Parameters: `{ "hostname": "", "slots_execution_types": {"cpu": 2, "network": 10} }`
 
 #### Update
   - `PATCH /nodes/:uuid`
-  - Parameters: `{ "slots_execution_types": {"cpu": 2, "network", 10} }`
+  - Parameters: `{ "slots_execution_types": {"cpu": 2, "network": 10} }`
 
 #### Remove
   - `DELETE /nodes/:uuid`
-  - Parameters: `{ "slots_execution_types": {"cpu": 2, "network", 10} }`
+  - Parameters: `{ "slots_execution_types": {"cpu": 2, "network": 10} }`
 
 ### Tasks
 

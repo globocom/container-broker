@@ -1,11 +1,13 @@
 class UpdateTaskStatusJob < DockerConnectionJob
+  class InvalidContainerStatusError < StandardError; end
+
   queue_as :default
 
   def perform(task)
     Rails.logger.debug("Updating status for task #{task}")
     Rails.logger.debug("Task #{task} is running in slot #{task.slot}")
 
-    container = GetTaskContainer.new.call(task: task)
+    container = FetchTaskContainer.new.call(task: task)
 
     container_state = container.info["State"]
 
@@ -31,6 +33,8 @@ class UpdateTaskStatusJob < DockerConnectionJob
         task.error = container_state["Error"]
         task.retry
       end
+    else
+      raise InvalidContainerStatusError, "Container status should be exited (current status: #{container_status})"
     end
 
     task.save!
