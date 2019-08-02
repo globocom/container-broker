@@ -1,8 +1,11 @@
 class ReleaseSlotJob < ApplicationJob
+  include DockerConnectionRescueError
   queue_as :default
 
   def perform(slot:)
     Rails.logger.debug("ReleaseSlotJob for #{slot}")
+    set_node_to_trace_docker_error(slot.node)
+
     UpdateTaskStatusJob.perform_now(slot.current_task)
 
     Rails.logger.debug("Enqueueing container removal")
@@ -11,7 +14,7 @@ class ReleaseSlotJob < ApplicationJob
     check_for_slot_removal = CheckForSlotRemoval.new(slot: slot)
     check_for_slot_removal.perform
     if check_for_slot_removal.removed?
-      Rails.logger.debug("Slot removed and will not be released")
+      Rails.logger.debug("Slot removed and wont be released")
     else
       slot.release
       Rails.logger.debug("Slot released (#{slot.status})")

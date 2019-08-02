@@ -28,6 +28,30 @@ RSpec.describe ReleaseSlotJob, type: :job do
     expect(RemoveContainerJob).to have_been_enqueued.with(node: slot.node, container_id: container_id)
   end
 
+  context "when update task status raises and error" do
+    before do
+      allow(UpdateTaskStatusJob).to receive(:perform_now).and_raise(Excon::Error)
+    end
+
+    it "raises the error" do
+      expect { subject.perform(slot: slot) }.to raise_error(Excon::Error)
+    end
+
+    it "does not release the slot" do
+      expect do
+        subject.perform(slot: slot) rescue nil
+        slot.reload
+      end.to_not change(slot, :status)
+    end
+
+    it "persists the error in node" do
+      expect do
+        subject.perform(slot: slot)
+        node.reload
+      end.to change(node, :last_error)
+    end
+  end
+
   context "when slot doesn't need to be removed" do
     let(:slot_removed) { false }
 
