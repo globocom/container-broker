@@ -42,7 +42,7 @@ class AdjustExecutionTypeSlots
 
   def decrement_slots
     while decrement?
-      slot = AllocateSlot.new(execution_type: execution_type, node: node).call
+      slot = LockSlot.new(execution_type: execution_type, node: node).perform
       break unless slot
       slot.destroy!
     end

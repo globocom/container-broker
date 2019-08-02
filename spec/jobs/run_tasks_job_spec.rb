@@ -28,7 +28,7 @@ RSpec.describe RunTasksJob, type: :service do
       end
 
       it "does not check the slots" do
-        expect(AllocateSlot).not_to receive(:new)
+        expect(LockSlot).not_to receive(:new)
 
         subject.perform(execution_type: execution_type)
       end
@@ -41,7 +41,7 @@ RSpec.describe RunTasksJob, type: :service do
 
       context "and no available slots for execution type" do
         before do
-          allow_any_instance_of(AllocateSlot).to receive(:call).and_return(nil)
+          allow_any_instance_of(LockSlot).to receive(:perform).and_return(nil)
         end
 
         it "does not run task job" do

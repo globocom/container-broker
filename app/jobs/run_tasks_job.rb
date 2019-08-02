@@ -15,7 +15,7 @@ class RunTasksJob < ApplicationJob
   private
 
   def lock_slot(execution_type)
-    AllocateSlot.new(execution_type: execution_type).call
+    LockSlot.new(execution_type: execution_type).perform
   end
 
   def lock_task(execution_type)
