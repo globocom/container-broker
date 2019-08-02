@@ -22,11 +22,5 @@ module ContainerBroker
     # -- all .rb files in that directory are automatically loaded.
 
     config.eager_load_paths << Rails.root.join("lib")
-
-    # enable cors
-    config.action_dispatch.default_headers = {
-      'Access-Control-Allow-Origin' => '*',
-      'Access-Control-Request-Method' => 'GET, PATCH, PUT, POST, OPTIONS, DELETE',
-    }
   end
 end
