@@ -1,22 +1,23 @@
 require "measures"
 
 class Metrics
-  attr_reader :client
+  attr_reader :client, :metric
 
-  def initialize
+  def initialize(metric)
+    @metric = metric
     @transport = Measures::Transports::UDP.new(Settings.measures.host, Settings.measures.port)
     @client = Measures::Client.new(@transport, Settings.measures.index, Settings.measures.owner)
   end
 
-  def count(metric, data={})
+  def count(data={})
     client.count(metric, data) if enabled?
   end
 
-  def time(metric, data={}, &block)
+  def duration(data={}, &block)
     if enabled?
-      client.time(metric, data) { yield if block_given? }
+      client.time(metric, data) { yield data if block_given? }
     else
-      yield if block_given?
+      yield data if block_given?
     end
   end
 
