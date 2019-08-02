@@ -3,6 +3,7 @@ class RunTasksJob < ApplicationJob
     while have_pending_tasks?(execution_type) && (slot = lock_slot(execution_type))
       task = lock_task(execution_type)
       if task
+        Rails.logger.debug "Perform_later RunTaskJob for #{slot} #{task}"
         RunTaskJob.perform_later(slot: slot, task: task)
       else
         slot.idle!

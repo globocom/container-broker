@@ -36,10 +36,6 @@ class Slot
     RunTasksJob.perform_later(execution_type: execution_type)
   end
 
-  def attach_to(task:)
-    update!(status: "running", current_task: task, container_id: task.container_id)
-  end
-
   def to_s
     "Slot #{name} #{uuid} (#{status})"
   end
