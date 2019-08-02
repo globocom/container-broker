@@ -11,18 +11,18 @@ RSpec.describe RunTasksJob, type: :service do
     end
 
     it "does not fetch pending tasks" do
-      expect_any_instance_of(FetchTask).to_not receive(:call)
+      expect_any_instance_of(LockTask).to_not receive(:call)
 
       subject.perform(execution_type: execution_type)
     end
   end
 
   context "with available nodes" do
-    let(:fetch_task_service) { double("FetchTask") }
+    let(:fetch_task_service) { double("LockTask") }
 
     context "and no pending tasks" do
       before do
-        allow(FetchTask).to receive(:new).with(execution_type: execution_type).and_return(fetch_task_service)
+        allow(LockTask).to receive(:new).with(execution_type: execution_type).and_return(fetch_task_service)
         allow(fetch_task_service).to receive(:call).and_return(nil)
         allow(fetch_task_service).to receive(:first_pending).and_return(nil)
       end

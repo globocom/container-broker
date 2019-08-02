@@ -19,14 +19,14 @@ class RunTasksJob < ApplicationJob
   end
 
   def lock_task(execution_type)
-    fetch_task_service(execution_type).call
+    lock_task_service(execution_type).call
   end
 
   def have_pending_tasks?(execution_type)
-    fetch_task_service(execution_type).first_pending
+    lock_task_service(execution_type).first_pending
   end
 
-  def fetch_task_service(execution_type)
-    @fetch_task_service ||= FetchTask.new(execution_type: execution_type)
+  def lock_task_service(execution_type)
+    @lock_task_service ||= LockTask.new(execution_type: execution_type)
   end
 end
