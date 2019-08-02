@@ -43,13 +43,6 @@ RSpec.describe ReleaseSlotJob, type: :job do
         slot.reload
       end.to_not change(slot, :status)
     end
-
-    it "persists the error in node" do
-      expect do
-        subject.perform(slot: slot)
-        node.reload
-      end.to change(node, :last_error)
-    end
   end
 
   context "when slot doesn't need to be removed" do
