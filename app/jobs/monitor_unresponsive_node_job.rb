@@ -8,6 +8,6 @@ class MonitorUnresponsiveNodeJob < ApplicationJob
     RunTasksForAllExecutionTypesJob.perform_later
   rescue StandardError => e
     node.register_error(e.message)
-    Rails.logger.info("Node #{node} still unresponsive")
+    Rails.logger.info("#{node} still unresponsive")
   end
 end
