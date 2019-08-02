@@ -92,4 +92,34 @@ RSpec.describe "Tasks", type: :request do
       expect(response).to be_success
     end
   end
+
+  describe "GET /tasks/healthcheck" do
+    let(:task) { Fabricate(:task) }
+    let(:perform) { get "/tasks/healthcheck"}
+
+    describe "with all tasks succeeding" do
+      it "gets working status" do
+        perform
+        expect(JSON.parse(response.body)).to match({
+          "status" => "WORKING",
+          "failed_tasks" => [],
+        })
+      end
+    end
+
+    describe "with invalid tasks" do
+    let!(:task1) { Fabricate(:task, status: "error") }
+    let!(:task2) { Fabricate(:task) }
+
+      it "gets failing status" do
+        perform
+        expect(JSON.parse(response.body)).to match({
+          "status" => "FAILING",
+          "failed_tasks" => [
+            hash_including("uuid" => task1.uuid)
+          ],
+        })
+      end
+    end
+  end
 end

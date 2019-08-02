@@ -142,4 +142,36 @@ RSpec.describe "Nodes", type: :request do
       post kill_containers_node_path(node.uuid)
     end
   end
+
+  describe "GET /nodes/healthcheck" do
+    describe "and all nodes are available" do
+      let!(:node1) { Fabricate(:node, hostname: "node1.test")}
+      let!(:node2) { Fabricate(:node, hostname: "node2.test")}
+
+      it "gets working status" do
+        get healthcheck_nodes_path
+
+        expect(json_response).to eq(
+          "status" => "WORKING",
+          "failed_nodes" => []
+        )
+      end
+    end
+
+    describe "and there are nodes failing" do
+      let!(:node1) { Fabricate(:node, hostname: "node1.test", status: "unavailable")}
+      let!(:node2) { Fabricate(:node, hostname: "node2.test")}
+
+      it "gets failing status" do
+        get healthcheck_nodes_path
+
+        expect(json_response).to match(hash_including(
+          "status" => "FAILING",
+          "failed_nodes" => [
+            hash_including("uuid" => node1.uuid)
+          ]
+        ))
+      end
+    end
+  end
 end
