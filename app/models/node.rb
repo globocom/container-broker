@@ -44,12 +44,17 @@ class Node
 
   def register_error(error)
     update!(last_error: error)
-    if last_success_at && last_success_at < Settings.node_unavailable_after_seconds.seconds.ago
+
+    if unstable? && unstable_period_expired?
       unavailable!
       MigrateTasksFromDeadNodeJob.perform_later(node: self)
     else
       unstable!
     end
+  end
+
+  def unstable_period_expired?
+    last_success_at && last_success_at < Settings.node_unavailable_after_seconds.seconds.ago
   end
 
   def update_last_success
