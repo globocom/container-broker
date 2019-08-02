@@ -122,6 +122,8 @@ GEM
     fabrication (2.20.1)
     faraday (0.15.2)
       multipart-post (>= 1.2, < 3)
+    faraday_middleware (0.13.1)
+      faraday (>= 0.7.4, < 1.0)
     ffi (1.9.23)
     formatador (0.2.5)
     fugit (1.2.1)
@@ -167,6 +169,9 @@ GEM
       systemu (~> 2.6.2)
     mail (2.7.0)
       mini_mime (>= 0.1.1)
+    measures (4.0.0)
+      faraday
+      faraday_middleware
     method_source (0.9.0)
     mini_mime (1.0.0)
     mini_portile2 (2.3.0)
@@ -365,6 +370,7 @@ DEPENDENCIES
   jbuilder (~> 2.5)
   jquery-rails
   listen (>= 3.0.5, < 3.2)
+  measures (~> 4.0)
   mini_racer
   mongoid
   mongoid-uuid
