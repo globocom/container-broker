@@ -25,6 +25,11 @@ class TasksController < ApplicationController
     render json: { logs: @task.get_logs }
   end
 
+  def clear_failed
+    Task.error.delete
+    head :ok
+  end
+
   private
     def set_task
       @task = Task.find_by!(uuid: params[:uuid])

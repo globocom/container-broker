@@ -14,6 +14,7 @@ Rails.application.routes.draw do
     get :logs, on: :member
 
     collection do
+      delete :failed, controller: :tasks, action: :clear_failed
       get :healthcheck, controller: :tasks_healthcheck, action: :index
     end
   end

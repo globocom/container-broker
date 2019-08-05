@@ -6,7 +6,7 @@ class TasksHealthcheckController < ApplicationController
 
     render json: {
       status: status,
-      failed_tasks: invalid_tasks.map{ |task| TaskHealthcheckSerializer.new(task) }
+      failed_tasks: invalid_tasks.map{ |task| TaskHealthcheckSerializer.new(task) },
     }
   end
 

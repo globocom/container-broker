@@ -93,6 +93,25 @@ RSpec.describe "Tasks", type: :request do
     end
   end
 
+  describe "DELETE /tasks/failed" do
+    let(:perform) { delete "/tasks/failed"}
+    let!(:task1) { Fabricate(:task) }
+    let!(:task2) { Fabricate(:task, status: "error") }
+    let!(:task3) { Fabricate(:task, status: "error") }
+
+    describe "with error tasks" do
+      it "clears all failed tasks" do
+        perform
+
+        expect(Task.find(task1)).to match(task1)
+        expect(Task.find(task2)).to be_nil
+        expect(Task.find(task3)).to be_nil
+
+        expect(response).to be_success
+      end
+    end
+  end
+
   describe "GET /tasks/healthcheck" do
     let(:task) { Fabricate(:task) }
     let(:perform) { get "/tasks/healthcheck"}
