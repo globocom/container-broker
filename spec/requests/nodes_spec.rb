@@ -158,7 +158,7 @@ RSpec.describe "Nodes", type: :request do
       end
     end
 
-    describe "and there are nodes failing" do
+    describe "and there are unavailable nodes" do
       let!(:node1) { Fabricate(:node, hostname: "node1.test", status: "unavailable")}
       let!(:node2) { Fabricate(:node, hostname: "node2.test")}
 
@@ -171,6 +171,20 @@ RSpec.describe "Nodes", type: :request do
             hash_including("uuid" => node1.uuid)
           ]
         ))
+      end
+    end
+
+    describe "and there are unstable nodes" do
+      let!(:node1) { Fabricate(:node, hostname: "node1.test", status: "unstable")}
+      let!(:node2) { Fabricate(:node, hostname: "node2.test")}
+
+      it "gets failing status" do
+        get healthcheck_nodes_path
+
+        expect(json_response).to eq(
+          "status" => "WORKING",
+          "failed_nodes" => []
+        )
       end
     end
   end

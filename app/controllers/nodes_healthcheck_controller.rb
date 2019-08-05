@@ -9,7 +9,7 @@ class NodesHealthcheckController < ApplicationController
   private
 
   def failed_nodes
-    @failed_nodes ||= Node.not.available
+    @failed_nodes ||= Node.unavailable
   end
 
   def nodes_failed?
