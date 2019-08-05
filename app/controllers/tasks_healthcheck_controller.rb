@@ -1,6 +1,4 @@
 class TasksHealthcheckController < ApplicationController
-  before_action only: %i[index]
-
   def index
     render json: {
       status: status,
