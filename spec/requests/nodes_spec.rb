@@ -49,6 +49,28 @@ RSpec.describe "Nodes", type: :request do
     end
   end
 
+  describe "GET /node/:uuid" do
+    let!(:node1) { Fabricate(:node, hostname: "node1.test") }
+
+    it "gets a node" do
+      get node_path(node1.uuid)
+      expect(json_response).to include(
+        "uuid" => node1.uuid,
+        "hostname" => node1.hostname,
+        "accept_new_tasks" => node1.accept_new_tasks,
+        "status" => node1.status,
+        "slots_execution_types" => hash_including(
+          "io" => 10,
+          "cpu" => 5
+        )
+      )
+    end
+
+    it "raise an error" do
+      expect{ get node_path("WRONG") }.to raise_error(Mongoid::Errors::DocumentNotFound)
+    end
+  end
+
   describe "PATCH /nodes/:uuid" do
     let!(:node) { Fabricate(:node, hostname: "node1.test") }
     let(:new_hostname) { "node2.test" }

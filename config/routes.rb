@@ -23,7 +23,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :nodes, only: [:index, :create, :update, :destroy], param: :uuid do
+  resources :nodes, except: %i[edit], param: :uuid do
     member do
       post :accept_new_tasks, :reject_new_tasks, :kill_containers
     end

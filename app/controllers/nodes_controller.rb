@@ -1,8 +1,8 @@
 class NodesController < ApplicationController
-  before_action :load_node, only: %i[update destroy accept_new_tasks reject_new_tasks kill_containers]
+  before_action :load_node, only: %i[update show destroy accept_new_tasks reject_new_tasks kill_containers]
 
   def index
-    render json: Node.all, each_serializer: NodeSerializer
+    render json: Node.all
   end
 
   def create
@@ -11,14 +11,18 @@ class NodesController < ApplicationController
     FriendlyNameNodes.new.perform
     AdjustNodeSlotsJob.perform_later(node: @node)
 
-    render json: @node, status: :created, serializer: NodeSerializer
+    render json: @node, status: :created
+  end
+
+  def show
+    render json: @node
   end
 
   def update
     @node.update!(node_params.slice(:slots_execution_types))
     AdjustNodeSlotsJob.perform_later(node: @node)
 
-    head :ok
+    render json: @node
   end
 
   def destroy
@@ -51,7 +55,7 @@ class NodesController < ApplicationController
   private
 
   def load_node
-    @node = Node.find_by(uuid: params[:uuid])
+    @node = Node.find_by!(uuid: params[:uuid])
   end
 
   def node_params
