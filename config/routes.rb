@@ -14,9 +14,13 @@ Rails.application.routes.draw do
     get :logs, on: :member
   end
 
-  # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
+  resources :nodes, only: [:index, :create, :update, :destroy], param: :uuid do
+    member do
+      post :accept_new_tasks, :reject_new_tasks, :kill_containers
+    end
+  end
 
-  post "/handshake", controller: "handshake", action: "create"
+  # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 
   root to: "status#index"
 

@@ -9,6 +9,18 @@ class LockManager
   end
 
   def lock
+    if lock!
+      begin
+        yield(self)
+      ensure
+        unlock!
+      end
+    else
+      false
+    end
+  end
+
+  def lock!
     try_lock
 
     if wait
@@ -18,17 +30,16 @@ class LockManager
       end
     end
 
-    if locked
-      return yield(self)
-    else
-      false
-    end
-  ensure
+    locked
+  end
+
+  def unlock!
     redis_client.del(key)
+    @locked = false
   end
 
   def keep_locked
-    raise "Lock not aquired" unless locked
+    raise "Lock not acquired" unless locked
 
     if redis_set(xx: true)
       puts "[LockManager] lock extended by #{expire}"

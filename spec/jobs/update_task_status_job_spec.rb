@@ -1,14 +1,14 @@
 require 'rails_helper'
 
 RSpec.describe UpdateTaskStatusJob, type: :job do
-  let(:node) { Node.create!(hostname: "local.test")}
-  let(:slot) { Slot.create!(node: node, execution_type: "test") }
+  let(:node) { Fabricate(:node) }
+  let(:slot) { Fabricate(:slot_idle, node: node, execution_type: "test") }
   let(:task_persist_logs) { false }
   let(:task) { Fabricate(:task, slot: slot, container_id: container_id, status: task_status, persist_logs: task_persist_logs) }
   let(:task_status) { "running" }
   let(:docker_connection) { double("Docker::Connection") }
   let(:container_id) { "11223344" }
-  let(:container) { double("Docker::Container", info: container_info) }
+  let(:container) { double("Docker::Container", id: container_id, info: container_info) }
   let(:container_status) { "exited" }
   let(:container_exit_code) { 0 }
   let(:container_error) { ""}
@@ -26,7 +26,9 @@ RSpec.describe UpdateTaskStatusJob, type: :job do
     }
   end
 
-  let(:perform) { subject.perform(task) }
+  def perform
+    subject.perform(task)
+  end
 
   before do
     allow(Docker::Container).to receive(:get).with(container_id, {all: true}, docker_connection).and_return(container)
@@ -102,23 +104,11 @@ RSpec.describe UpdateTaskStatusJob, type: :job do
     end
   end
 
-  context "when container stills running" do
+  context "when container is running" do
     let(:container_status) { "running" }
 
-    context "and task was running" do
-      let(:task_status) { "running" }
-      it "calls task running!" do
-        expect(task).to receive(:running!)
-        perform
-      end
-    end
-
-    context "and task was not running" do
-      let(:task_status) { "started" }
-
-      it "updates task status" do
-        expect{perform}.to change(task, :status).to("running")
-      end
+    it "throws an exception" do
+      expect { perform }.to raise_error(described_class::InvalidContainerStatusError)
     end
   end
 end

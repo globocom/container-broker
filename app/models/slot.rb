@@ -13,8 +13,13 @@ class Slot
 
   belongs_to :node, optional: true
 
-  validates :execution_type, format: { with: /\A([a-z])+(\-[a-z]+)*\z/,
-             message: "only allows lowercase letters and hyphen symbol" }
+  validates :execution_type, presence: true
+  validates :execution_type, format: {
+    with: Constants::ExecutionTypeValidation::REGEX,
+    message: Constants::ExecutionTypeValidation::MESSAGE
+  }
+
+  scope :working, -> { where(:status.in => %w[attaching running releasing]) }
 
   def available?
     idle?
@@ -28,10 +33,10 @@ class Slot
   def release
     update!(container_id: nil, current_task: nil)
     idle!
-    RunTasksJob.perform_later
+    RunTasksJob.perform_later(execution_type: execution_type)
   end
 
-  def attach_to(task:)
-    update!(status: "running", current_task: task, container_id: task.container_id)
+  def to_s
+    "Slot #{name} #{uuid} (#{status})"
   end
 end

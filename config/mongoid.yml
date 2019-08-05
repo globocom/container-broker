@@ -4,6 +4,9 @@ development:
       database: container-broker_development
       hosts:
         - <%= ENV["CONTAINER_BROKER_MONGODB_HOST"] || "localhost" %>:27017
+      options:
+        max_pool_size: 50
+
 test:
   clients:
     default:
@@ -18,8 +21,12 @@ dev:
   clients:
     default:
       uri: <%= ENV["DBAAS_MONGODB_ENDPOINT"] %>
+      options:
+        max_pool_size: 50
 
 production:
   clients:
     default:
       uri: <%= ENV["DBAAS_MONGODB_ENDPOINT"] %>
+      options:
+        max_pool_size: 50

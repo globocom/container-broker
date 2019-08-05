@@ -8,20 +8,26 @@ RSpec.describe UpdateAllNodesStatusJob, type: :job do
 
   let!(:nodes) { [node_available_1, node_unstable, node_available_2] }
 
-  before { subject.perform }
 
   it "schedule UpdateNodeStatusJob for every available node" do
+    subject.perform
+
     expect(UpdateNodeStatusJob).to have_been_enqueued.with(node: node_available_1)
     expect(UpdateNodeStatusJob).to have_been_enqueued.with(node: node_available_2)
   end
 
   context "does not schedule UpdateNodeStatusJob" do
     it "for unavailable nodes" do
+      subject.perform
+
       expect(UpdateNodeStatusJob).to_not have_been_enqueued.with(node: node_unstable)
     end
 
     it "for unstable nodes" do
+      subject.perform
+
       expect(UpdateNodeStatusJob).to_not have_been_enqueued.with(node: node_unavailable)
     end
   end
+
 end

@@ -9,9 +9,17 @@ class Node
   field :available, type: Boolean, default: true
   field :last_error, type: String
   field :last_success_at, type: DateTime
+  field :accept_new_tasks, type: Boolean, default: true
+  field :slots_execution_types, type: Hash, default: {}
+
   enumerable :status, %w(available unstable unavailable), default: "unavailable", after_change: :status_change
 
   has_many :slots
+
+  scope :accepting_new_tasks, -> { where(accept_new_tasks: true) }
+
+  validates :hostname, presence: true
+  validates :slots_execution_types, presence: true
 
   def usage_per_execution_type
     NodeUsagePercentagePerExecutionType.new(self).perform
@@ -25,18 +33,6 @@ class Node
     slots.idle
   end
 
-  def populate(slot_execution_type_groups)
-    destroy_slots if slots
-
-    slot_execution_type_groups.each do |slot_execution_type_group|
-      slot_execution_type_group[:amount].times do
-        slots.create!(execution_type: slot_execution_type_group[:execution_type])
-      end
-    end
-
-    FriendlyNameNodes.new.call
-  end
-
   def destroy_slots
     slots.destroy_all
   end
@@ -48,7 +44,8 @@ class Node
 
   def register_error(error)
     update!(last_error: error)
-    if last_success_at && last_success_at < Settings.node_unavailable_after_seconds.seconds.ago
+
+    if unstable? && unstable_period_expired?
       unavailable!
       MigrateTasksFromDeadNodeJob.perform_later(node: self)
     else
@@ -56,7 +53,15 @@ class Node
     end
   end
 
+  def unstable_period_expired?
+    last_success_at && last_success_at < Settings.node_unavailable_after_seconds.seconds.ago
+  end
+
   def update_last_success
     update!(last_success_at: Time.zone.now)
+  end
+
+  def to_s
+    "Node #{name} #{uuid}"
   end
 end

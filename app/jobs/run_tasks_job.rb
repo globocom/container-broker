@@ -1,29 +1,32 @@
 class RunTasksJob < ApplicationJob
-  def perform
-    return unless Node.available.any?
-
-    pending_tasks.each do |pending_task|
-      slot = AllocateSlot.new(execution_type: pending_task.execution_type).call
-
-      if slot
-        RunTaskJob.perform_later(slot: slot, task: pending_task)
-      elsif Slot.where(execution_type: pending_task.execution_type).none?
-        pending_task.no_execution_type!
+  def perform(execution_type:)
+    while have_pending_tasks?(execution_type) && (slot = lock_slot(execution_type))
+      task = lock_task(execution_type)
+      if task
+        Rails.logger.debug "Perform_later RunTaskJob for #{slot} #{task}"
+        RunTaskJob.perform_later(slot: slot, task: task)
       else
-        pending_task.waiting!
+        slot.idle!
+        break
       end
     end
   end
 
   private
 
-  def pending_tasks
-    pending_tasks = []
+  def lock_slot(execution_type)
+    LockSlot.new(execution_type: execution_type).perform
+  end
 
-    while pending_task = FetchTask.new.call do
-      pending_tasks << pending_task
-    end
+  def lock_task(execution_type)
+    lock_task_service(execution_type).call
+  end
 
-    pending_tasks
+  def have_pending_tasks?(execution_type)
+    lock_task_service(execution_type).first_pending
+  end
+
+  def lock_task_service(execution_type)
+    @lock_task_service ||= LockTask.new(execution_type: execution_type)
   end
 end

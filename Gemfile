@@ -24,6 +24,7 @@ gem 'uglifier', '>= 1.3.0'
 # gem 'therubyracer', platforms: :ruby
 gem 'webpacker'
 gem 'react-rails'
+gem "rack-cors"
 
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 4.2'
@@ -56,6 +57,7 @@ group :test do
   gem 'database_cleaner'
   gem "rspec-nc"
   gem "rspec-collection_matchers"
+  gem "rspec-json_expectations"
   gem 'mini_racer'
 end
 
