@@ -108,15 +108,17 @@ RSpec.describe "Tasks", type: :request do
     end
 
     describe "with invalid tasks" do
-    let!(:task1) { Fabricate(:task, status: "error") }
-    let!(:task2) { Fabricate(:task) }
+      let!(:slot) { Fabricate(:slot) }
+      let!(:task) { Fabricate(:task, slot: slot, status: "error") }
 
       it "gets failing status" do
         perform
         expect(JSON.parse(response.body)).to match({
           "status" => "FAILING",
           "failed_tasks" => [
-            hash_including("uuid" => task1.uuid)
+            hash_including(
+              "uuid" => task.uuid,
+              "node_name" => slot.node.name)
           ],
         })
       end

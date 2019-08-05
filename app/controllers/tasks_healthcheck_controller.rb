@@ -11,7 +11,7 @@ class TasksHealthcheckController < ApplicationController
   end
 
   def invalid_tasks
-    @invalid_tasks ||= Task.where(:status => "error")
+    @invalid_tasks ||= Task.error
   end
 
   def tasks_invalid?
