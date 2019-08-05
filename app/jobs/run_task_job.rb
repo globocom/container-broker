@@ -19,6 +19,7 @@ class RunTaskJob < ApplicationJob
     slot.mark_as_running(current_task: task, container_id: container.id)
     Rails.logger.debug("#{slot} marked as running")
 
+    add_metric(task)
     task
   rescue StandardError, Excon::Error => e
     Rails.logger.error("Error in RunTaskJob: #{e}")
@@ -35,7 +36,21 @@ class RunTaskJob < ApplicationJob
 
     slot.release
     task.update!(error: message)
+
+    add_metric(task)
     task.retry
+  end
+
+  def add_metric(task)
+    Metrics.new("tasks").count(
+      id: task.id,
+      name: task&.name,
+      slot: task&.slot&.name,
+      node: task&.slot&.node&.name,
+      started_at: task.started_at,
+      error: task.error,
+      status: task.status,
+    )
   end
 
   def pull_image(task:, slot:)

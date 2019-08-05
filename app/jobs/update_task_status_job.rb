@@ -39,6 +39,7 @@ class UpdateTaskStatusJob < ApplicationJob
       raise InvalidContainerStatusError, "Container status should be exited (current status: #{container_status})"
     end
 
+    add_metric(task)
     task.save!
 
     if task.persist_logs && container_status == 'exited'
@@ -50,5 +51,19 @@ class UpdateTaskStatusJob < ApplicationJob
       task.set_logs(container_logs)
       task.save!
     end
+  end
+
+  def add_metric(task)
+    Metrics.new("tasks").count(
+      id: task.id,
+      name: task&.name,
+      slot: task&.slot&.name,
+      node: task&.slot&.node&.name,
+      started_at: task.started_at,
+      finished_at: task.finished_at,
+      duration: task.seconds_running,
+      error: task.error,
+      status: task.status,
+    )
   end
 end
