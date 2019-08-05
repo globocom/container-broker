@@ -83,3 +83,5 @@ gem "mongoid-uuid"
 gem "active_model_serializers"
 gem "sentry-raven"
 
+
+gem "measures", "~> 4.0"
