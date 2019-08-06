@@ -2,18 +2,18 @@ class TasksHealthcheckController < ApplicationController
   def index
     render json: {
       status: status,
-      failed_tasks: failed_tasks.map{ |task| TaskHealthcheckSerializer.new(task) },
+      failed_tasks_count: failed_tasks_count,
     }
   end
 
   private
 
-  def failed_tasks
-    @failed_tasks ||= Task.error
+  def failed_tasks_count
+    @failed_tasks_count ||= Task.error.count
   end
 
   def tasks_failed?
-    failed_tasks.to_a.any?
+    failed_tasks_count > 0
   end
 
   def status
