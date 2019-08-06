@@ -135,9 +135,7 @@ RSpec.describe "Tasks", type: :request do
         expect(JSON.parse(response.body)).to match({
           "status" => "FAILING",
           "failed_tasks" => [
-            hash_including(
-              "uuid" => task.uuid,
-              "node_name" => slot.node.name)
+            hash_including("uuid" => task.uuid)
           ],
         })
       end
