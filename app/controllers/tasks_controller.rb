@@ -25,8 +25,8 @@ class TasksController < ApplicationController
     render json: { logs: @task.get_logs }
   end
 
-  def clear_failed
-    Task.error.delete
+  def clear_resolved
+    Task.resolved.delete
     head :ok
   end
 
