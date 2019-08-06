@@ -17,7 +17,7 @@ class StatusController < ApplicationController
       .batch_size(LIMIT_TASKS)
       .limit(LIMIT_TASKS)
 
-    @tasks = @tasks.where(status: params[:status]) if params[:status]
+    @tasks = @tasks.where(status: params[:status]) if params[:status].present?
     if params[:tags]
       params.require(:tags).each do |tag, value|
         @tasks = @tasks.where("tags.#{tag}" => value.to_s)
