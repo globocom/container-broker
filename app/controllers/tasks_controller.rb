@@ -1,5 +1,5 @@
 class TasksController < ApplicationController
-  before_action :set_task, only: [:show, :logs]
+  before_action :set_task, only: [:show, :logs, :mark_as_resolved]
 
   def create
     @task = Task.new(task_params)
@@ -28,6 +28,10 @@ class TasksController < ApplicationController
   def clear_failed
     Task.error.delete
     head :ok
+  end
+
+  def mark_as_resolved
+    @task.resolved!
   end
 
   private

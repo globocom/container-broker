@@ -13,6 +13,10 @@ Rails.application.routes.draw do
   resources :tasks, only: [:create, :show], param: :uuid do
     get :logs, on: :member
 
+    member do
+      put :mark_as_resolved
+    end
+
     collection do
       delete :failed, controller: :tasks, action: :clear_failed
       get :healthcheck, controller: :tasks_healthcheck, action: :index
