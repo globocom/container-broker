@@ -5,6 +5,12 @@ class TasksController < ApplicationController
     @task = Task.new(task_params)
 
     if @task.save
+      Metrics.new("tasks").count(
+        id: task.id,
+        name: task&.name,
+        status: task.status,
+      )
+
       render json: @task
     else
       render json: @task.errors, status: :unprocessable_entity

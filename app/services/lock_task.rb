@@ -11,6 +11,12 @@ class LockTask
       LockManager.new(type: "get_free_task", id: "", expire: 30.seconds, wait: true).lock do
         task = first_pending
         task.starting! if task
+
+        Metrics.new("tasks").count(
+          id: task.id,
+          name: task&.name,
+          status: task.status,
+        )
       end
 
       task

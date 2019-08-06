@@ -45,6 +45,7 @@ class RunTaskJob < ApplicationJob
     Metrics.new("tasks").count(
       id: task.id,
       name: task&.name,
+      type: task&.execution_type,
       slot: task&.slot&.name,
       node: task&.slot&.node&.name,
       started_at: task.started_at,
