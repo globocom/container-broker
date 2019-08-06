@@ -18,7 +18,7 @@ Rails.application.routes.draw do
     end
 
     collection do
-      delete :resolved, controller: :tasks, action: :clear_resolved
+      delete :resolved, action: :clear_resolved
       get :healthcheck, controller: :tasks_healthcheck, action: :index
     end
   end
