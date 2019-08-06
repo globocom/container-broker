@@ -45,11 +45,11 @@ class Node
   def register_error(error)
     update!(last_error: error)
 
-    if unstable? && unstable_period_expired?
+    if available?
+      unstable!
+    elsif unstable? && unstable_period_expired?
       unavailable!
       MigrateTasksFromDeadNodeJob.perform_later(node: self)
-    else
-      unstable!
     end
   end
 

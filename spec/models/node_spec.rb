@@ -38,5 +38,13 @@ RSpec.describe Node, type: :model do
         end
       end
     end
+
+    context "when node was unavailable" do
+      subject { Fabricate.build(:node, status: "unavailable", last_error: nil) }
+
+      it "keeps node as unavailable" do
+        expect { subject.register_error("generic error") }.to_not change(subject, :status).from("unavailable")
+      end
+    end
   end
 end
