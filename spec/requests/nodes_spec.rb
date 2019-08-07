@@ -2,34 +2,63 @@ require 'rails_helper'
 
 RSpec.describe "Nodes", type: :request do
   describe "POST /node" do
-    let(:params) do
-      {
-        node: {
-          hostname: "host1.test",
-          slots_execution_types: {
-            cpu: 1,
-            network: 3
+    context "when valid params" do
+      let(:params) do
+        {
+          node: {
+            hostname: "host1.test",
+            slots_execution_types: {
+              cpu: 1,
+              network: 3
+            }
           }
         }
-      }
+      end
+
+      it "creates a new node" do
+        post nodes_path, params: params
+        expect(response).to be_created
+      end
+
+      it "returns the newly created node" do
+        post nodes_path, params: params
+
+        expect(json_response).to include_json(hostname: "host1.test")
+        expect(json_response).to match(hash_including("uuid"))
+        expect(json_response).to match(hash_including(
+          "slots_execution_types" => {
+            "cpu" => "1",
+            "network" => "3"
+          }
+        ))
+      end
     end
 
-    it "creates a new node" do
-      post nodes_path, params: params
-      expect(response).to be_created
-    end
-
-    it "returns the newly created node" do
-      post nodes_path, params: params
-
-      expect(json_response).to include_json(hostname: "host1.test")
-      expect(json_response).to match(hash_including("uuid"))
-      expect(json_response).to match(hash_including(
-        "slots_execution_types" => {
-          "cpu" => "1",
-          "network" => "3"
+    context "when invalid params" do
+      let(:params) do
+        {
+          node: {
+            hostname: "host1.test",
+            slots_execution_types: {
+              cpu_: 1
+            }
+          }
         }
-      ))
+      end
+
+      it "returns bad_request" do
+        post nodes_path, params: params
+
+        expect(response).to be_bad_request
+      end
+
+      it "returns error message" do
+        post nodes_path, params: params
+
+        expect(json_response).to eq({
+          "slots_execution_types" => ["only allows lowercase letters, numbers and hyphen symbol"]
+        })
+      end
     end
   end
 
@@ -73,27 +102,47 @@ RSpec.describe "Nodes", type: :request do
 
   describe "PATCH /nodes/:uuid" do
     let!(:node) { Fabricate(:node, hostname: "node1.test") }
-    let(:new_hostname) { "node2.test" }
-    let(:new_slots_execution_type) { { "cpu" => "3", "network" => "8" } }
+    context "when valid params" do
+      let(:new_hostname) { "node2.test" }
+      let(:new_slots_execution_type) { { "cpu" => "3", "network" => "8" } }
 
-    it "returns ok" do
-      patch node_path(node.uuid), params: {node: {hostname: new_hostname}}
+      it "returns ok" do
+        patch node_path(node.uuid), params: {node: {hostname: new_hostname}}
 
-      expect(response).to be_ok
-    end
+        expect(response).to be_ok
+      end
 
-    it "updates the slots_execution_types" do
-      patch node_path(node.uuid), params: {node: {hostname: new_hostname, slots_execution_types: new_slots_execution_type}}
+      it "updates the slots_execution_types" do
+        patch node_path(node.uuid), params: {node: {hostname: new_hostname, slots_execution_types: new_slots_execution_type}}
 
-      node.reload
-      expect(node.slots_execution_types).to eq(new_slots_execution_type)
-    end
-
-    it "does not update the hostname" do
-      expect do
-        patch node_path(node.uuid), params: {node: {hostname: new_hostname}, slots_execution_types: new_slots_execution_type}
         node.reload
-      end.to_not change(node, :hostname)
+        expect(node.slots_execution_types).to eq(new_slots_execution_type)
+      end
+
+      it "does not update the hostname" do
+        expect do
+          patch node_path(node.uuid), params: {node: {hostname: new_hostname}, slots_execution_types: new_slots_execution_type}
+          node.reload
+        end.to_not change(node, :hostname)
+      end
+    end
+
+    context "when invalid params" do
+      let(:new_slots_execution_type) { { "cpu" => "3", "network_" => "8" } }
+
+      it "returns bad_request" do
+        patch node_path(node.uuid), params: {node: {slots_execution_types: new_slots_execution_type}}
+
+        expect(response).to be_bad_request
+      end
+
+      it "returns error message" do
+        patch node_path(node.uuid), params: {node: {slots_execution_types: new_slots_execution_type}}
+
+        expect(json_response).to eq({
+          "slots_execution_types" => ["only allows lowercase letters, numbers and hyphen symbol"]
+        })
+      end
     end
   end
 

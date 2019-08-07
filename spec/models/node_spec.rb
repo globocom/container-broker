@@ -47,4 +47,20 @@ RSpec.describe Node, type: :model do
       end
     end
   end
+
+  context "validate slots execution types" do
+    context "when valid" do
+      it "returns valid" do
+        expect(subject.valid?).to be_truthy
+      end
+    end
+
+    context "when invalid" do
+      subject{ Fabricate.build(:node, slots_execution_types: { io: 10, cpu_: 2 }) }
+
+      it "returns invalid" do
+        expect(subject.valid?).to be_falsey
+      end
+    end
+  end
 end
