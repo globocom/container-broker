@@ -36,7 +36,7 @@ Rails.application.routes.draw do
   end
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 
-  root to: "status#index"
+  root to: redirect(Settings.backstage_admin.url)
 
   get "/healthcheck" => "healthcheck#index"
 

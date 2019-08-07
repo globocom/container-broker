@@ -68,13 +68,3 @@
 
 ### Tsuru
 Command: `tsuru app-deploy -a container-broker-dev`
-
-
-
-
-
-
-
-
-
-

@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
 class StatusController < ApplicationController
-  layout proc { false if request.xhr? }
   LIMIT_TASKS = 200
-
-  def index
-  end
 
   def nodes
     render json: Node.includes(:slots), each_serializer: StatusPanelNodeSerializer
