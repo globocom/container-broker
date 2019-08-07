@@ -132,7 +132,7 @@ RSpec.describe "Tasks", type: :request do
     describe "with all tasks succeeding" do
       it "gets working status" do
         perform
-        expect(JSON.parse(response.body)).to match({
+        expect(json_response).to eq({
           "status" => "WORKING",
           "failed_tasks_count" => 0,
         })
@@ -145,7 +145,7 @@ RSpec.describe "Tasks", type: :request do
 
       it "gets failing status" do
         perform
-        expect(JSON.parse(response.body)).to match({
+        expect(json_response).to eq({
           "status" => "FAILING",
           "failed_tasks_count" => 1,
         })

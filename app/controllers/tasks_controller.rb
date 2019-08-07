@@ -26,7 +26,7 @@ class TasksController < ApplicationController
   end
 
   def clear_resolved
-    Task.resolved.delete
+    Task.resolved.destroy
     head :ok
   end
 
