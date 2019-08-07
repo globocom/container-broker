@@ -6,7 +6,7 @@ class TasksController < ApplicationController
 
     if @task.save
       Metrics.new("tasks").count(
-        id: @task.id,
+        task_id: task.id,
         name: @task&.name,
         status: @task.status,
       )

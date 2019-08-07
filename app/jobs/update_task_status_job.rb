@@ -55,7 +55,7 @@ class UpdateTaskStatusJob < ApplicationJob
 
   def add_metric(task)
     Metrics.new("tasks").count(
-      id: task.id,
+      task_id: task.id,
       name: task&.name,
       slot: task&.slot&.name,
       node: task&.slot&.node&.name,

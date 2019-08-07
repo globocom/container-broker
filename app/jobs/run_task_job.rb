@@ -43,7 +43,7 @@ class RunTaskJob < ApplicationJob
 
   def add_metric(task)
     Metrics.new("tasks").count(
-      id: task.id,
+      task_id: task.id,
       name: task&.name,
       type: task&.execution_type,
       slot: task&.slot&.name,
