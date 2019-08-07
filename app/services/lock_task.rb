@@ -10,13 +10,15 @@ class LockTask
       task = nil
       LockManager.new(type: "get_free_task", id: "", expire: 30.seconds, wait: true).lock do
         task = first_pending
-        task.starting! if task
+        if task
+          task.starting!
 
-        Metrics.new("tasks").count(
-          task_id: task.id,
-          name: task&.name,
-          status: task.status,
-        )
+          Metrics.new("tasks").count(
+            task_id: task.id,
+            name: task&.name,
+            status: task.status,
+          )
+        end
       end
 
       task
