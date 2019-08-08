@@ -12,14 +12,26 @@ Rails.application.routes.draw do
 
   resources :tasks, only: [:create, :show], param: :uuid do
     get :logs, on: :member
+
+    member do
+      put :mark_as_resolved
+    end
+
+    collection do
+      delete :resolved, action: :clear_resolved
+      get :healthcheck, controller: :tasks_healthcheck, action: :index
+    end
   end
 
   resources :nodes, only: [:index, :create, :update, :destroy], param: :uuid do
     member do
       post :accept_new_tasks, :reject_new_tasks, :kill_containers
     end
-  end
 
+    collection do
+      get :healthcheck, controller: :nodes_healthcheck, action: :index
+    end
+  end
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 
   root to: "status#index"

@@ -92,4 +92,64 @@ RSpec.describe "Tasks", type: :request do
       expect(response).to be_success
     end
   end
+
+
+
+  describe "PUT /tasks/:id/mark_as_resolved" do
+    let(:task) { Fabricate(:task) }
+    let(:perform) { put "/tasks/#{task.uuid}/mark_as_resolved"}
+
+    it "sets the task status to resolved" do
+      perform
+
+      expect(Task.find(task).status).to eq("resolved")
+
+      expect(response).to be_success
+    end
+  end
+
+  describe "DELETE /tasks/resolved" do
+    let(:perform) { delete "/tasks/resolved"}
+    let!(:task1) { Fabricate(:task) }
+    let!(:task2) { Fabricate(:task, status: "resolved") }
+    let!(:task3) { Fabricate(:task, status: "resolved") }
+
+    it "clears all resolved tasks" do
+      perform
+
+      expect(Task.find(task1)).to match(task1)
+      expect(Task.find(task2)).to be_nil
+      expect(Task.find(task3)).to be_nil
+
+      expect(response).to be_success
+    end
+  end
+
+  describe "GET /tasks/healthcheck" do
+    let(:task) { Fabricate(:task) }
+    let(:perform) { get "/tasks/healthcheck"}
+
+    describe "with all tasks succeeding" do
+      it "gets working status" do
+        perform
+        expect(json_response).to eq({
+          "status" => "WORKING",
+          "failed_tasks_count" => 0,
+        })
+      end
+    end
+
+    describe "with invalid tasks" do
+      let!(:slot) { Fabricate(:slot) }
+      let!(:task) { Fabricate(:task, slot: slot, status: "error") }
+
+      it "gets failing status" do
+        perform
+        expect(json_response).to eq({
+          "status" => "FAILING",
+          "failed_tasks_count" => 1,
+        })
+      end
+    end
+  end
 end

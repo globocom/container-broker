@@ -5,6 +5,7 @@ Fabricator(:task) do
   cmd "sleep 5"
   storage_mount "/tmp"
   status "waiting"
+  slot nil
   exit_code nil
   error nil
   logs nil

@@ -1,6 +1,7 @@
 class Node
   include Mongoid::Document
   include Mongoid::Uuid
+  include Mongoid::Timestamps
   include GlobalID::Identification
   include MongoidEnumerable
 
