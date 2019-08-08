@@ -6,3 +6,7 @@ ignore_containers:
   - elasticsearch
   - netdata
   - ef
+cors_origins:
+  - http://localhost:3000
+
+
