@@ -46,10 +46,10 @@ RSpec.describe "Nodes", type: :request do
         }
       end
 
-      it "returns bad_request" do
+      it "returns error" do
         post nodes_path, params: params
 
-        expect(response).to be_bad_request
+        expect(response).to be_unprocessable
       end
 
       it "returns error message" do
@@ -130,10 +130,10 @@ RSpec.describe "Nodes", type: :request do
     context "when invalid params" do
       let(:new_slots_execution_type) { { "cpu" => "3", "network_" => "8" } }
 
-      it "returns bad_request" do
+      it "returns error" do
         patch node_path(node.uuid), params: {node: {slots_execution_types: new_slots_execution_type}}
 
-        expect(response).to be_bad_request
+        expect(response).to be_unprocessable
       end
 
       it "returns error message" do
