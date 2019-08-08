@@ -78,6 +78,14 @@ class Task
     end
   end
 
+  def milliseconds_running
+    if completed? || error?
+      calculate_millisecond_span(started_at, finished_at)
+    elsif started? || running?
+      calculate_millisecond_span(started_at, Time.zone.now.to_datetime)
+    end
+  end
+
   def seconds_running
     if completed? || error?
       calculate_second_span(started_at, finished_at)

@@ -40,6 +40,7 @@ class UpdateTaskStatusJob < ApplicationJob
     end
 
     add_metric(task)
+
     task.save!
 
     if task.persist_logs && container_status == 'exited'
@@ -62,7 +63,7 @@ class UpdateTaskStatusJob < ApplicationJob
       node: task&.slot&.node&.name,
       started_at: task.started_at,
       finished_at: task.finished_at,
-      duration: task.seconds_running,
+      duration: task.milliseconds_running,
       error: task.error,
       status: task.status,
     )
