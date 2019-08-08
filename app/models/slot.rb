@@ -15,8 +15,8 @@ class Slot
 
   validates :execution_type, presence: true
   validates :execution_type, format: {
-    with: Constants::ExecutionType::REGEX,
-    message: Constants::ExecutionType::MESSAGE
+    with: Constants::ExecutionType::FORMAT,
+    message: Constants::ExecutionType::INVALID_FORMAT_MESSAGE
   }
 
   scope :working, -> { where(:status.in => %w[attaching running releasing]) }

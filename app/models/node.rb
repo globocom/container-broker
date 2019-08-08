@@ -72,8 +72,8 @@ class Node
   def execution_types_format
     valid = slots_execution_types
       .keys
-      .all?{ |execution_type| execution_type.match?(Constants::ExecutionType::REGEX) }
+      .all?{ |execution_type| execution_type.match?(Constants::ExecutionType::FORMAT) }
 
-    errors.add(:slots_execution_types, Constants::ExecutionType::MESSAGE) unless valid
+    errors.add(:slots_execution_types, Constants::ExecutionType::INVALID_FORMAT_MESSAGE) unless valid
   end
 end
