@@ -37,8 +37,8 @@ class Task
 
   validates :name, :image, :cmd, :execution_type, presence: true
   validates :execution_type, format: {
-    with: Constants::ExecutionTypeValidation::REGEX,
-    message: Constants::ExecutionTypeValidation::MESSAGE
+    with: Constants::ExecutionType::REGEX,
+    message: Constants::ExecutionType::MESSAGE
   }
 
 

@@ -21,7 +21,7 @@ class Node
 
   validates :hostname, presence: true
   validates :slots_execution_types, presence: true
-  validate :validate_slots_execution_types
+  validate :execution_types_format
 
   def usage_per_execution_type
     NodeUsagePercentagePerExecutionType.new(self).perform
@@ -69,11 +69,11 @@ class Node
 
   private
 
-  def validate_slots_execution_types
+  def execution_types_format
     valid = slots_execution_types
       .keys
-      .all?{ |execution_type| execution_type.match?(Constants::ExecutionTypeValidation::REGEX) }
+      .all?{ |execution_type| execution_type.match?(Constants::ExecutionType::REGEX) }
 
-    errors.add(:slots_execution_types, Constants::ExecutionTypeValidation::MESSAGE) unless valid
+    errors.add(:slots_execution_types, Constants::ExecutionType::MESSAGE) unless valid
   end
 end
