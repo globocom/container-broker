@@ -70,6 +70,14 @@ class Task
     end
   end
 
+  def seconds_waiting
+    if started?
+      calculate_second_span(created_at, started_at)
+    else
+      calculate_second_span(created_at, Time.zone.now.to_datetime)
+    end
+  end
+
   def seconds_running
     if completed? || error?
       calculate_second_span(started_at, finished_at)
