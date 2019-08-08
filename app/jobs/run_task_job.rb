@@ -49,7 +49,7 @@ class RunTaskJob < ApplicationJob
       slot: task&.slot&.name,
       node: task&.slot&.node&.name,
       started_at: task.started_at,
-      duration: task.seconds_waiting,
+      duration: task.milliseconds_waiting,
       error: task.error,
       status: task.status,
     )

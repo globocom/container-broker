@@ -70,11 +70,11 @@ class Task
     end
   end
 
-  def seconds_waiting
-    if started?
-      calculate_second_span(created_at, started_at)
+  def milliseconds_waiting
+    if started? || completed? || error?
+      calculate_millisecond_span(created_at, started_at)
     else
-      calculate_second_span(created_at, Time.zone.now.to_datetime)
+      calculate_millisecond_span(created_at, Time.zone.now.to_datetime)
     end
   end
 
@@ -88,7 +88,13 @@ class Task
 
   def calculate_second_span(start, finish)
     if finish.present? && start.present?
-      ((finish - start) * 1.day.seconds).to_f
+      ((finish - start) * 1.day.seconds).to_i
+    end
+  end
+
+  def calculate_millisecond_span(start, finish)
+    if finish.present? && start.present?
+      ((finish - start) * 1.day.in_milliseconds).to_i
     end
   end
 
