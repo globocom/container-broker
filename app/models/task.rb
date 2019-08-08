@@ -88,7 +88,7 @@ class Task
 
   def calculate_second_span(start, finish)
     if finish.present? && start.present?
-      ((finish - start) * 1.day.seconds).to_i
+      ((finish - start) * 1.day.seconds).to_f
     end
   end
 
