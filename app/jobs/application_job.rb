@@ -7,7 +7,7 @@ class ApplicationJob < ActiveJob::Base
       metric[:job_class] = job.class.to_s
       metric[:executions] = job.executions
       metric[:queue_name] = job.queue_name
-      metric[:hostname] = `hostname`.strip
+      metric[:hostname] = `hostname`&.strip
 
       block.call
     end
