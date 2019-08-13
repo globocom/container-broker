@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class LockManager
   attr_reader :expire, :wait, :locked, :key
   KEY_PREFIX = "lockmanager"

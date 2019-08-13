@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class NodesController < ApplicationController
   before_action :load_node, only: %i[update show destroy accept_new_tasks reject_new_tasks kill_containers]
 

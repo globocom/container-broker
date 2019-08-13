@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Rails.application.config.active_job.queue_adapter = Rails.env.test? ? :test : :sidekiq
 
 Sidekiq.default_worker_options = { backtrace: true }

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Fabricator(:slot) do
   node
   status "idle"

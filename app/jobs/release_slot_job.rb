@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ReleaseSlotJob < ApplicationJob
   include DockerConnectionRescueError
   queue_as :default

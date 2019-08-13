@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TaskTag
   include Mongoid::Document
   include Mongoid::Uuid

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Task
   include GlobalID::Identification
   include Mongoid::Document

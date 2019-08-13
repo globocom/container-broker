@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Slot
   include Mongoid::Document
   include Mongoid::Uuid

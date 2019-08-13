@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RunTasksJob < ApplicationJob
   def perform(execution_type:)
     while have_pending_tasks?(execution_type) && (slot = lock_slot(execution_type))

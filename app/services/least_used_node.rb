@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class LeastUsedNode
   def initialize(execution_type:)
     @execution_type = execution_type

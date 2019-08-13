@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TasksController < ApplicationController
   before_action :set_task, only: [:show, :logs, :mark_as_resolved]
 

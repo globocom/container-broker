@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class LockTask
   attr_reader :execution_type
 

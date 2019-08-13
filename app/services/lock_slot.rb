@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class LockSlot
   attr_reader :execution_type, :node
 

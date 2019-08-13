@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TasksHealthcheckController < ApplicationController
   def index
     render json: {

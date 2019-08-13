@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MongoidSerializableModel
   attr_reader :model
   include GlobalID::Identification

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MigrateTasksFromDeadNodeJob < ApplicationJob
   queue_as :default
 

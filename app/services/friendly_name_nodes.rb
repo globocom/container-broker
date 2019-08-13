@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class FriendlyNameNodes
   def perform
     Node.all.to_a.each_with_index do |node, index|

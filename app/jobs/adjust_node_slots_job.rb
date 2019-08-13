@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AdjustNodeSlotsJob < ApplicationJob
   queue_as :default
 

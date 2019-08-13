@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SlotsUsagePercentage
   def initialize(slots)
     @slots = slots

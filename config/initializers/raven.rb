@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 if Settings.sentry.enabled
   require 'raven'
 

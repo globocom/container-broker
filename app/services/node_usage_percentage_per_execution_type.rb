@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class NodeUsagePercentagePerExecutionType
   def initialize(node)
     @node = node

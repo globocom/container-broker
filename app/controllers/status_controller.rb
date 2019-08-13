@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class StatusController < ApplicationController
   layout proc { false if request.xhr? }
   LIMIT_TASKS = 200

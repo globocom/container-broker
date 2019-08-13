@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RunTaskJob < ApplicationJob
   queue_as :default
 
@@ -26,7 +28,7 @@ class RunTaskJob < ApplicationJob
     case e
     when Excon::Error, Docker::Error::TimeoutError then
       message = "Docker connection error: #{e.message}"
-      message << "\n#{e.response.body}" if e.respond_to?(:response)
+      message += "\n#{e.response.body}" if e.respond_to?(:response)
       slot.node.register_error(message)
     when Docker::Error::NotFoundError then
       message = "Docker image not found: #{e.message}"

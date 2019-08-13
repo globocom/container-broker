@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UpdateTaskStatusJob < ApplicationJob
 
   class InvalidContainerStatusError < StandardError; end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UpdateNodeStatusJob < ApplicationJob
   include DockerConnectionRescueError
   queue_as :default

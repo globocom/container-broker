@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :task do
   desc "Generate random tasks for testing"
   task :random_generate, %i[amount max_sleep] => [:environment] do |_task, args|

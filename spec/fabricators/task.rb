@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Fabricator(:task) do
   name "task-name"
   container_id { SecureRandom.hex(32) }
