@@ -1,19 +1,18 @@
 # frozen_string_literal: true
 
 class UpdateNodeStatusJob < ApplicationJob
-  include DockerConnectionRescueError
   queue_as :default
 
   def perform(node:)
-    set_node_to_trace_docker_error(node)
-
     Rails.logger.debug("Waiting for lock to update status of #{node}")
+
     updated = LockManager.new(type: self.class.to_s, id: node.id, expire: 1.minute, wait: false).lock do
       Rails.logger.debug("Lock acquired for update status of #{node}")
       update_node_status(node)
       Rails.logger.debug("Releasing lock for update status of #{node}")
       true
     end
+
     if updated
       Rails.logger.debug("Lock released for update status of #{node}")
     else
@@ -72,6 +71,8 @@ class UpdateNodeStatusJob < ApplicationJob
     end
 
     node.update_last_success
+  rescue Excon::Error, Docker::Error::DockerError => e
+    node.register_error(e.message)
   end
 
   def get_node_system_time(node:)
