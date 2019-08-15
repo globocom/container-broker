@@ -42,7 +42,6 @@ class Node
   end
 
   def docker_connection
-    Docker.logger = Logger.new(STDOUT)
     Docker::Connection.new(hostname, {connect_timeout: 10, read_timeout: 10, write_timeout: 10})
   end
 
