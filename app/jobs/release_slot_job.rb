@@ -1,12 +1,10 @@
 # frozen_string_literal: true
 
 class ReleaseSlotJob < ApplicationJob
-  include DockerConnectionRescueError
   queue_as :default
 
   def perform(slot:)
     Rails.logger.debug("ReleaseSlotJob for #{slot}")
-    set_node_to_trace_docker_error(slot.node)
 
     UpdateTaskStatusJob.perform_now(slot.current_task)
 
@@ -21,5 +19,8 @@ class ReleaseSlotJob < ApplicationJob
       slot.release
       Rails.logger.debug("Slot released (#{slot.status})")
     end
+  rescue Excon::Error => e
+    slot.node.register_error(e.message)
+    raise
   end
 end

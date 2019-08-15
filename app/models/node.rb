@@ -46,6 +46,8 @@ class Node
   end
 
   def register_error(error)
+    Rails.logger.info("Error connecting to node #{self.name}: #{error}")
+
     update!(last_error: error)
 
     if available?
