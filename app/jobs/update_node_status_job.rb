@@ -75,7 +75,7 @@ class UpdateNodeStatusJob < ApplicationJob
   end
 
   def get_node_system_time(node:)
-    @node_system_time ||= Time.parse(Docker.info(node.docker_connection)["SystemTime"])
+    Time.parse(Docker.info(node.docker_connection)["SystemTime"])
   end
 
   def started_with_error?(container:, docker_connection:)
