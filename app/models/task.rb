@@ -12,7 +12,7 @@ class Task
   field :execution_type, type: String
   field :cmd, type: String
   field :storage_mount, type: String
-  enumerable :status, %w[waiting starting started running retry error completed no_execution_type unrecoverable_error]
+  enumerable :status, %w[waiting starting started retry error completed unrecoverable_error]
   field :exit_code, type: Integer
   field :error, type: String
   field :logs, type: BSON::Binary
@@ -49,7 +49,7 @@ class Task
   end
 
   def get_logs
-    if started? || running?
+    if started?
       FetchTaskContainer.new.call(task: self).streaming_logs(stdout: true, stderr: true, tail: 1_000)
     else
       logs.try(:data)
@@ -83,7 +83,7 @@ class Task
   def milliseconds_running
     if completed? || error?
       calculate_millisecond_span(started_at, finished_at)
-    elsif started? || running?
+    elsif started?
       calculate_millisecond_span(started_at, Time.zone.now.to_datetime)
     end
   end
@@ -91,7 +91,7 @@ class Task
   def seconds_running
     if completed? || error?
       calculate_second_span(started_at, finished_at)
-    elsif started? || running?
+    elsif started?
       calculate_second_span(started_at, Time.zone.now.to_datetime)
     end
   end
