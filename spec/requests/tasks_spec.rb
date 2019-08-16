@@ -95,18 +95,38 @@ RSpec.describe "Tasks", type: :request do
     end
   end
 
-
-
   describe "PUT /tasks/:id/mark_as_error" do
-    let(:task) { Fabricate(:task) }
+    let(:task) { Fabricate(:task, status: status) }
     let(:perform) { put "/tasks/#{task.uuid}/mark_as_error"}
 
-    it "sets the task status to error" do
-      perform
+    context "when task is marked as failed" do
+      let(:status) { "failed" }
 
-      expect(Task.find(task).status).to eq("error")
+      it "sets the task status to error" do
+        perform
 
-      expect(response).to be_success
+        task.reload
+        expect(task).to be_error
+
+        expect(response).to be_success
+      end
+    end
+
+    context "when task is not marked as failed" do
+      let(:status) { "waiting" }
+
+      it "does not allow task to be set as error" do
+        perform
+
+        task.reload
+        expect(task).not_to be_error
+
+        expect(response).to be_unprocessable
+
+        expect(JSON.parse(response.body)).to match(
+          "message" => "Task must have failed status to be marked as error"
+        )
+      end
     end
   end
 

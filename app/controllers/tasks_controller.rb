@@ -33,8 +33,13 @@ class TasksController < ApplicationController
   end
 
   def mark_as_error
-    @task.error!
-    head :ok
+    if @task.failed?
+      @task.error!
+
+      head :ok
+    else
+      render json: { message: "Task must have failed status to be marked as error" }, status: :unprocessable_entity
+    end
   end
 
   private
