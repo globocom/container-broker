@@ -12,7 +12,7 @@ class Task
   field :execution_type, type: String
   field :cmd, type: String
   field :storage_mount, type: String
-  enumerable :status, %w[waiting starting started retry error completed unrecoverable_error]
+  enumerable :status, %w[waiting starting started retry failed completed unrecoverable_error]
   field :exit_code, type: Integer
   field :error, type: String
   field :logs, type: BSON::Binary
@@ -68,12 +68,12 @@ class Task
       retry!
       RunTasksJob.perform_later(execution_type: execution_type)
     else
-      error!
+      failed!
     end
   end
 
   def milliseconds_waiting
-    if started? || completed? || error?
+    if started? || completed? || failed?
       calculate_millisecond_span(created_at, started_at)
     else
       calculate_millisecond_span(created_at, Time.zone.now.to_datetime)
@@ -81,7 +81,7 @@ class Task
   end
 
   def milliseconds_running
-    if completed? || error?
+    if completed? || failed?
       calculate_millisecond_span(started_at, finished_at)
     elsif started?
       calculate_millisecond_span(started_at, Time.zone.now.to_datetime)
@@ -89,7 +89,7 @@ class Task
   end
 
   def seconds_running
-    if completed? || error?
+    if completed? || failed?
       calculate_second_span(started_at, finished_at)
     elsif started?
       calculate_second_span(started_at, Time.zone.now.to_datetime)

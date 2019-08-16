@@ -61,10 +61,10 @@ RSpec.describe Task, type: :model do
     end
   end
 
-  context "for errored tasks" do
+  context "for failing tasks" do
     context "with start and finish timestamps" do
       subject do
-        Fabricate(:task, started_at: "2018-01-25 15:32:10", finished_at: "2018-01-25 15:32:32", status: "error")
+        Fabricate(:task, started_at: "2018-01-25 15:32:10", finished_at: "2018-01-25 15:32:32", status: "failed")
       end
 
       it "calculates duration" do
@@ -74,7 +74,7 @@ RSpec.describe Task, type: :model do
 
     context "without start and finish timestamps" do
       subject do
-        Fabricate(:task, started_at: nil, finished_at: nil, status: "error")
+        Fabricate(:task, started_at: nil, finished_at: nil, status: "failed")
       end
 
       it "does not calculate duration" do

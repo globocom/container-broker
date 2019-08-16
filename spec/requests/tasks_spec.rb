@@ -143,7 +143,7 @@ RSpec.describe "Tasks", type: :request do
 
     describe "with invalid tasks" do
       let!(:slot) { Fabricate(:slot) }
-      let!(:task) { Fabricate(:task, slot: slot, status: "error") }
+      let!(:task) { Fabricate(:task, slot: slot, status: "failed") }
 
       it "gets failing status" do
         perform
