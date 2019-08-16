@@ -34,6 +34,7 @@ class TasksController < ApplicationController
 
   def mark_as_error
     @task.error!
+    head :ok
   end
 
   private
