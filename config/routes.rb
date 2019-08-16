@@ -16,11 +16,11 @@ Rails.application.routes.draw do
     get :logs, on: :member
 
     member do
-      put :mark_as_unrecoverable_error
+      put :mark_as_error
     end
 
     collection do
-      delete :unrecoverable_errors, action: :clear_unrecoverable_errors
+      delete :errors, action: :clear_errors
       get :healthcheck, controller: :tasks_healthcheck, action: :index
     end
   end

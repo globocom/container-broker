@@ -97,26 +97,26 @@ RSpec.describe "Tasks", type: :request do
 
 
 
-  describe "PUT /tasks/:id/mark_as_unrecoverable_error" do
+  describe "PUT /tasks/:id/mark_as_error" do
     let(:task) { Fabricate(:task) }
-    let(:perform) { put "/tasks/#{task.uuid}/mark_as_unrecoverable_error"}
+    let(:perform) { put "/tasks/#{task.uuid}/mark_as_error"}
 
-    it "sets the task status to unrecoverable_error" do
+    it "sets the task status to error" do
       perform
 
-      expect(Task.find(task).status).to eq("unrecoverable_error")
+      expect(Task.find(task).status).to eq("error")
 
       expect(response).to be_success
     end
   end
 
-  describe "DELETE /tasks/unrecoverable_errors" do
-    let(:perform) { delete "/tasks/unrecoverable_errors"}
+  describe "DELETE /tasks/errors" do
+    let(:perform) { delete "/tasks/errors"}
     let!(:task1) { Fabricate(:task) }
-    let!(:task2) { Fabricate(:task, status: "unrecoverable_error") }
-    let!(:task3) { Fabricate(:task, status: "unrecoverable_error") }
+    let!(:task2) { Fabricate(:task, status: "error") }
+    let!(:task3) { Fabricate(:task, status: "error") }
 
-    it "clears all unrecoverable_error tasks" do
+    it "clears all error tasks" do
       perform
 
       expect(Task.find(task1)).to match(task1)

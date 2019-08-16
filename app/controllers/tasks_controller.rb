@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class TasksController < ApplicationController
-  before_action :set_task, only: [:show, :logs, :mark_as_unrecoverable_error]
+  before_action :set_task, only: [:show, :logs, :mark_as_error]
 
   def create
     @task = Task.new(task_params)
@@ -27,13 +27,13 @@ class TasksController < ApplicationController
     render json: { logs: @task.get_logs }
   end
 
-  def clear_unrecoverable_errors
-    Task.unrecoverable_error.destroy
+  def clear_errors
+    Task.error.destroy
     head :ok
   end
 
-  def mark_as_unrecoverable_error
-    @task.unrecoverable_error!
+  def mark_as_error
+    @task.error!
   end
 
   private
