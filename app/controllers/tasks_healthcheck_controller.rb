@@ -11,7 +11,7 @@ class TasksHealthcheckController < ApplicationController
   private
 
   def failed_tasks_count
-    @failed_tasks_count ||= Task.error.count
+    @failed_tasks_count ||= Task.failed.count
   end
 
   def tasks_failed?

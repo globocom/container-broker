@@ -38,19 +38,6 @@ RSpec.describe MigrateTasksFromDeadNodeJob, type: :job do
     end
   end
 
-  context "for running tasks" do
-    let(:task_status) { "running" }
-
-    it "changes task status to retry" do
-      expect{ perform }.to change(task, :status).to "retry"
-    end
-
-    it "try to run new tasks" do
-      perform
-      expect(RunTasksJob).to have_been_enqueued.at_least(1).times
-    end
-  end
-
   it "releases slot" do
     expect{perform}.to change(slot, :status).to("idle")
   end

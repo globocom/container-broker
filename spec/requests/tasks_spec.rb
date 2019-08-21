@@ -95,28 +95,48 @@ RSpec.describe "Tasks", type: :request do
     end
   end
 
+  describe "PUT /tasks/:id/mark_as_error" do
+    let(:task) { Fabricate(:task, status: status) }
+    let(:perform) { put "/tasks/#{task.uuid}/mark_as_error"}
 
+    context "when task is marked as failed" do
+      let(:status) { "failed" }
 
-  describe "PUT /tasks/:id/mark_as_resolved" do
-    let(:task) { Fabricate(:task) }
-    let(:perform) { put "/tasks/#{task.uuid}/mark_as_resolved"}
+      it "sets the task status to error" do
+        perform
 
-    it "sets the task status to resolved" do
-      perform
+        task.reload
+        expect(task).to be_error
 
-      expect(Task.find(task).status).to eq("resolved")
+        expect(response).to be_success
+      end
+    end
 
-      expect(response).to be_success
+    context "when task is not marked as failed" do
+      let(:status) { "waiting" }
+
+      it "does not allow task to be set as error" do
+        perform
+
+        task.reload
+        expect(task).not_to be_error
+
+        expect(response).to be_unprocessable
+
+        expect(JSON.parse(response.body)).to match(
+          "message" => "Task must have failed status to be marked as error"
+        )
+      end
     end
   end
 
-  describe "DELETE /tasks/resolved" do
-    let(:perform) { delete "/tasks/resolved"}
+  describe "DELETE /tasks/errors" do
+    let(:perform) { delete "/tasks/errors"}
     let!(:task1) { Fabricate(:task) }
-    let!(:task2) { Fabricate(:task, status: "resolved") }
-    let!(:task3) { Fabricate(:task, status: "resolved") }
+    let!(:task2) { Fabricate(:task, status: "error") }
+    let!(:task3) { Fabricate(:task, status: "error") }
 
-    it "clears all resolved tasks" do
+    it "clears all error tasks" do
       perform
 
       expect(Task.find(task1)).to match(task1)
@@ -143,7 +163,7 @@ RSpec.describe "Tasks", type: :request do
 
     describe "with invalid tasks" do
       let!(:slot) { Fabricate(:slot) }
-      let!(:task) { Fabricate(:task, slot: slot, status: "error") }
+      let!(:task) { Fabricate(:task, slot: slot, status: "failed") }
 
       it "gets failing status" do
         perform

@@ -16,11 +16,11 @@ Rails.application.routes.draw do
     get :logs, on: :member
 
     member do
-      put :mark_as_resolved
+      put :mark_as_error
     end
 
     collection do
-      delete :resolved, action: :clear_resolved
+      delete :errors, action: :clear_errors
       get :healthcheck, controller: :tasks_healthcheck, action: :index
     end
   end

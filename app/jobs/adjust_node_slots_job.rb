@@ -12,8 +12,6 @@ class AdjustNodeSlotsJob < ApplicationJob
           execution_type: execution_type
           ).perform
       end
-
-      Task.no_execution_type.each(&:waiting!)
     end
   end
 
