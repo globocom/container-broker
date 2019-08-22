@@ -18,10 +18,7 @@ class RemoveUnusedTagsJob < ApplicationJob
   end
 
   def remove_unreferenced_tag_values(task_tag)
-    remaining_values = task_tag.values.select do |value|
-      any_task_referencing_tag_value?(task_tag, value)
-    end
-
+    remaining_values = Task.distinct(tag_expression(task_tag))
     task_tag.update!(values: remaining_values)
   end
 
@@ -31,9 +28,5 @@ class RemoveUnusedTagsJob < ApplicationJob
 
   def any_task_referencing_tag?(task_tag)
     Task.where(tag_expression(task_tag).exists => true).exists?
-  end
-
-  def any_task_referencing_tag_value?(task_tag, value)
-    Task.where(tag_expression(task_tag) => value).exists?
   end
 end
