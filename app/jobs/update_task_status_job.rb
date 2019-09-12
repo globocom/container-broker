@@ -64,6 +64,7 @@ class UpdateTaskStatusJob < ApplicationJob
       started_at: task.started_at,
       finished_at: task.finished_at,
       duration: task.milliseconds_running,
+      processing_time: task.seconds_running.to_i,
       error: task.error,
       status: task.status
     )
