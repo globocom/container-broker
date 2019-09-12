@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe "Nodes", type: :request do
   describe "POST /node" do
@@ -28,11 +28,11 @@ RSpec.describe "Nodes", type: :request do
         expect(json_response).to include_json(hostname: "host1.test")
         expect(json_response).to match(hash_including("uuid"))
         expect(json_response).to match(hash_including(
-          "slots_execution_types" => {
-            "cpu" => "1",
-            "network" => "3"
-          }
-        ))
+                                         "slots_execution_types" => {
+                                           "cpu" => "1",
+                                           "network" => "3"
+                                         }
+                                       ))
       end
     end
 
@@ -57,9 +57,9 @@ RSpec.describe "Nodes", type: :request do
       it "returns error message" do
         post nodes_path, params: params
 
-        expect(json_response).to eq({
+        expect(json_response).to eq(
           "slots_execution_types" => ["only allows lowercase letters, numbers and hyphen symbol"]
-        })
+        )
       end
     end
   end
@@ -98,7 +98,7 @@ RSpec.describe "Nodes", type: :request do
     end
 
     it "raise an error" do
-      expect{ get node_path("WRONG") }.to raise_error(Mongoid::Errors::DocumentNotFound)
+      expect { get node_path("WRONG") }.to raise_error(Mongoid::Errors::DocumentNotFound)
     end
   end
 
@@ -109,13 +109,13 @@ RSpec.describe "Nodes", type: :request do
       let(:new_slots_execution_type) { { "cpu" => "3", "network" => "8" } }
 
       it "returns ok" do
-        patch node_path(node.uuid), params: {node: {hostname: new_hostname}}
+        patch node_path(node.uuid), params: { node: { hostname: new_hostname } }
 
         expect(response).to be_ok
       end
 
       it "updates the slots_execution_types" do
-        patch node_path(node.uuid), params: {node: {hostname: new_hostname, slots_execution_types: new_slots_execution_type}}
+        patch node_path(node.uuid), params: { node: { hostname: new_hostname, slots_execution_types: new_slots_execution_type } }
 
         node.reload
         expect(node.slots_execution_types).to eq(new_slots_execution_type)
@@ -123,7 +123,7 @@ RSpec.describe "Nodes", type: :request do
 
       it "does not update the hostname" do
         expect do
-          patch node_path(node.uuid), params: {node: {hostname: new_hostname}, slots_execution_types: new_slots_execution_type}
+          patch node_path(node.uuid), params: { node: { hostname: new_hostname }, slots_execution_types: new_slots_execution_type }
           node.reload
         end.to_not change(node, :hostname)
       end
@@ -133,17 +133,17 @@ RSpec.describe "Nodes", type: :request do
       let(:new_slots_execution_type) { { "cpu" => "3", "network_" => "8" } }
 
       it "returns error" do
-        patch node_path(node.uuid), params: {node: {slots_execution_types: new_slots_execution_type}}
+        patch node_path(node.uuid), params: { node: { slots_execution_types: new_slots_execution_type } }
 
         expect(response).to be_unprocessable
       end
 
       it "returns error message" do
-        patch node_path(node.uuid), params: {node: {slots_execution_types: new_slots_execution_type}}
+        patch node_path(node.uuid), params: { node: { slots_execution_types: new_slots_execution_type } }
 
-        expect(json_response).to eq({
+        expect(json_response).to eq(
           "slots_execution_types" => ["only allows lowercase letters, numbers and hyphen symbol"]
-        })
+        )
       end
     end
   end
@@ -218,8 +218,8 @@ RSpec.describe "Nodes", type: :request do
 
   describe "GET /nodes/healthcheck" do
     describe "and all nodes are available" do
-      let!(:node1) { Fabricate(:node, hostname: "node1.test")}
-      let!(:node2) { Fabricate(:node, hostname: "node2.test")}
+      let!(:node1) { Fabricate(:node, hostname: "node1.test") }
+      let!(:node2) { Fabricate(:node, hostname: "node2.test") }
 
       it "gets working status" do
         get healthcheck_nodes_path
@@ -232,24 +232,24 @@ RSpec.describe "Nodes", type: :request do
     end
 
     describe "and there are unavailable nodes" do
-      let!(:node1) { Fabricate(:node, hostname: "node1.test", status: "unavailable")}
-      let!(:node2) { Fabricate(:node, hostname: "node2.test")}
+      let!(:node1) { Fabricate(:node, hostname: "node1.test", status: "unavailable") }
+      let!(:node2) { Fabricate(:node, hostname: "node2.test") }
 
       it "gets failing status" do
         get healthcheck_nodes_path
 
         expect(json_response).to match(hash_including(
-          "status" => "FAILING",
-          "failed_nodes" => [
-            hash_including("uuid" => node1.uuid)
-          ]
-        ))
+                                         "status" => "FAILING",
+                                         "failed_nodes" => [
+                                           hash_including("uuid" => node1.uuid)
+                                         ]
+                                       ))
       end
     end
 
     describe "and there are unstable nodes" do
-      let!(:node1) { Fabricate(:node, hostname: "node1.test", status: "unstable")}
-      let!(:node2) { Fabricate(:node, hostname: "node2.test")}
+      let!(:node1) { Fabricate(:node, hostname: "node1.test", status: "unstable") }
+      let!(:node2) { Fabricate(:node, hostname: "node2.test") }
 
       it "gets failing status" do
         get healthcheck_nodes_path

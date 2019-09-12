@@ -25,7 +25,7 @@ class UpdateNodeStatusJob < ApplicationJob
   def update_node_status(node)
     Rails.logger.debug("Start updating node status for #{node}")
 
-    containers = Docker::Container.all({all: true}, node.docker_connection)
+    containers = Docker::Container.all({ all: true }, node.docker_connection)
 
     Rails.logger.debug("Got #{containers.count} containers")
 
@@ -49,9 +49,9 @@ class UpdateNodeStatusJob < ApplicationJob
       else
         Rails.logger.debug("Slot not found for container #{container.id}")
 
-        container_names = container.info["Names"].map{|name| name.gsub(/\A\//, "") }
+        container_names = container.info["Names"].map { |name| name.gsub(%r{\A/}, "") }
 
-        if Settings.ignore_containers.none? { |name| container_names.any?{ |container_name| container_name.include?(name) } }
+        if Settings.ignore_containers.none? { |name| container_names.any? { |container_name| container_name.include?(name) } }
           Rails.logger.debug("Container #{container.id} #{container_names} is not ignored for removal")
 
           # Here we remove lost containers, like those unknown to container-broker or by some cause

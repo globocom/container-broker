@@ -9,7 +9,7 @@ class FriendlyNameSlots
 
   def perform
     node.slots.each_with_index do |slot, index|
-      slot.update(name: "#{node.name}-s#{"%02d" % (index + 1)}-#{slot.execution_type}")
+      slot.update(name: "#{node.name}-s#{format("%02d", (index + 1))}-#{slot.execution_type}")
     end
   end
 end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe UpdateTaskStatusJob, type: :job do
   let(:node) { Fabricate(:node) }
@@ -13,7 +13,7 @@ RSpec.describe UpdateTaskStatusJob, type: :job do
   let(:container) { double("Docker::Container", id: container_id, info: container_info) }
   let(:container_status) { "exited" }
   let(:container_exit_code) { 0 }
-  let(:container_error) { ""}
+  let(:container_error) { "" }
   let(:container_started_at) { "2018-04-23T10:12:37.4534537Z" }
   let(:container_finished_at) { "0001-01-01T00:00:00.0000000Z" }
   let(:container_info) do
@@ -23,7 +23,7 @@ RSpec.describe UpdateTaskStatusJob, type: :job do
         "ExitCode" => container_exit_code,
         "Error" => container_error,
         "StartedAt" => container_started_at,
-        "FinishedAt" => container_finished_at,
+        "FinishedAt" => container_finished_at
       }
     }
   end
@@ -33,7 +33,7 @@ RSpec.describe UpdateTaskStatusJob, type: :job do
   end
 
   before do
-    allow(Docker::Container).to receive(:get).with(container_id, {all: true}, docker_connection).and_return(container)
+    allow(Docker::Container).to receive(:get).with(container_id, { all: true }, docker_connection).and_return(container)
     allow(node).to receive(:docker_connection).and_return(docker_connection)
   end
 
@@ -57,11 +57,11 @@ RSpec.describe UpdateTaskStatusJob, type: :job do
       end
 
       it "sets task start time" do
-        expect{perform}.to change(task, :started_at).to(Time.parse(container_started_at))
+        expect { perform }.to change(task, :started_at).to(Time.parse(container_started_at))
       end
 
       it "sets task finish time" do
-        expect{perform}.to change(task, :finished_at).to(Time.parse(container_finished_at))
+        expect { perform }.to change(task, :finished_at).to(Time.parse(container_finished_at))
       end
     end
 
@@ -83,11 +83,11 @@ RSpec.describe UpdateTaskStatusJob, type: :job do
       end
 
       it "sets task start time" do
-        expect{perform}.to change(task, :started_at).to(Time.parse(container_started_at))
+        expect { perform }.to change(task, :started_at).to(Time.parse(container_started_at))
       end
 
       it "sets task finish time" do
-        expect{perform}.to change(task, :finished_at).to(Time.parse(container_finished_at))
+        expect { perform }.to change(task, :finished_at).to(Time.parse(container_finished_at))
       end
     end
 

@@ -10,7 +10,7 @@ class AdjustNodeSlotsJob < ApplicationJob
         AdjustExecutionTypeSlots.new(
           node: node,
           execution_type: execution_type
-          ).perform
+        ).perform
       end
     end
   end

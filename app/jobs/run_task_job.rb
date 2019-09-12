@@ -30,7 +30,7 @@ class RunTaskJob < ApplicationJob
       message = "Docker connection error: #{e.message}"
       message += "\n#{e.response.body}" if e.respond_to?(:response)
       slot.node.register_error(message)
-    when Docker::Error::NotFoundError then
+    when Docker::Error::NotFoundError
       message = "Docker image not found: #{e.message}"
     else
       message = e.message
@@ -53,14 +53,14 @@ class RunTaskJob < ApplicationJob
       started_at: task.started_at,
       duration: task.milliseconds_waiting,
       error: task.error,
-      status: task.status,
+      status: task.status
     )
   end
 
   def pull_image(task:, slot:)
     unless Docker::Image.exist?(task.image, {}, slot.node.docker_connection)
       image_name, image_tag = task.image.split(":")
-      Docker::Image.create({"fromImage" => image_name, "tag" => image_tag}, nil, slot.node.docker_connection)
+      Docker::Image.create({ "fromImage" => image_name, "tag" => image_tag }, nil, slot.node.docker_connection)
     end
   end
 

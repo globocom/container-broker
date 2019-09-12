@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe AddTaskTagsJob, type: :job do
   let(:task) { Fabricate(:task, tags: task_tags_hash) }
   let(:perform) { subject.perform(task: task) }
 
   before do
-    Fabricate(:task_tag, name: "pass", values: ["1", "2"])
-    Fabricate(:task_tag, name: "media_type", values: ["video", "audio"])
+    Fabricate(:task_tag, name: "pass", values: %w[1 2])
+    Fabricate(:task_tag, name: "media_type", values: %w[video audio])
     Fabricate(:task_tag, name: "slug", values: ["task-slug"])
   end
 
@@ -21,7 +21,7 @@ RSpec.describe AddTaskTagsJob, type: :job do
     end
 
     it "does not create new tags" do
-      expect{ perform }.to_not change(TaskTag, :count)
+      expect { perform }.to_not change(TaskTag, :count)
     end
 
     context "and value is not present in tag" do

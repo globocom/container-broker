@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe LockSlot, type: :service do
-
   let(:execution_type) { "cpu" }
 
   let(:node1) { Fabricate(:node) }

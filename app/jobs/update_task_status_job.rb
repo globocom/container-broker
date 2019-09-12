@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class UpdateTaskStatusJob < ApplicationJob
-
   class InvalidContainerStatusError < StandardError; end
 
   queue_as :default
@@ -9,7 +8,6 @@ class UpdateTaskStatusJob < ApplicationJob
   def perform(task)
     Rails.logger.debug("Updating status for task #{task}")
     Rails.logger.debug("Task #{task} is running in slot #{task.slot}")
-
 
     container = FetchTaskContainer.new.call(task: task)
 
@@ -45,7 +43,7 @@ class UpdateTaskStatusJob < ApplicationJob
 
     task.save!
 
-    if task.persist_logs && container_status == 'exited'
+    if task.persist_logs && container_status == "exited"
       Rails.logger.debug("Persisting logs for #{task}")
       # streaming_logs avoids some encoding issues and should be safe since container status = exited
       # (see https://github.com/swipely/docker-api/issues/290 for reference)
@@ -67,7 +65,7 @@ class UpdateTaskStatusJob < ApplicationJob
       finished_at: task.finished_at,
       duration: task.milliseconds_running,
       error: task.error,
-      status: task.status,
+      status: task.status
     )
   end
 end

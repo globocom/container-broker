@@ -43,7 +43,6 @@ class Task
     message: Constants::ExecutionType::INVALID_FORMAT_MESSAGE
   }
 
-
   def set_logs(logs)
     self.logs = BSON::Binary.new(logs, :generic)
   end
@@ -63,8 +62,8 @@ class Task
   end
 
   def retry
-    if self.try_count < Settings.task_retry_count
-      update(try_count: self.try_count + 1)
+    if try_count < Settings.task_retry_count
+      update(try_count: try_count + 1)
       retry!
       RunTasksJob.perform_later(execution_type: execution_type)
     else
@@ -97,15 +96,11 @@ class Task
   end
 
   def calculate_second_span(start, finish)
-    if finish.present? && start.present?
-      ((finish - start) * 1.day.seconds).to_i
-    end
+    ((finish - start) * 1.day.seconds).to_i if finish.present? && start.present?
   end
 
   def calculate_millisecond_span(start, finish)
-    if finish.present? && start.present?
-      ((finish - start) * 1.day.in_milliseconds).to_i
-    end
+    ((finish - start) * 1.day.in_milliseconds).to_i if finish.present? && start.present?
   end
 
   def force_retry!

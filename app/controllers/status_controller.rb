@@ -9,11 +9,11 @@ class StatusController < ApplicationController
 
   def tasks
     @tasks = Task
-      .only(Task.attribute_names - %w[logs])
-      .includes(:slot)
-      .order_by("created_at" => "desc")
-      .batch_size(LIMIT_TASKS)
-      .limit(LIMIT_TASKS)
+             .only(Task.attribute_names - %w[logs])
+             .includes(:slot)
+             .order_by("created_at" => "desc")
+             .batch_size(LIMIT_TASKS)
+             .limit(LIMIT_TASKS)
 
     @tasks = @tasks.where(status: params[:status]) if params[:status].present?
     if params[:tags]

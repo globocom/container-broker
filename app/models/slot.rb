@@ -6,7 +6,7 @@ class Slot
   include GlobalID::Identification
   include MongoidEnumerable
 
-  enumerable :status, %w(idle attaching running releasing)
+  enumerable :status, %w[idle attaching running releasing]
 
   field :name, type: String
   field :execution_type, type: String

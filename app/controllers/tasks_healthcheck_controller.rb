@@ -4,7 +4,7 @@ class TasksHealthcheckController < ApplicationController
   def index
     render json: {
       status: status,
-      failed_tasks_count: failed_tasks_count,
+      failed_tasks_count: failed_tasks_count
     }
   end
 

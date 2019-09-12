@@ -44,6 +44,7 @@ class AdjustExecutionTypeSlots
     while decrement?
       slot = LockSlot.new(execution_type: execution_type, node: node).perform
       break unless slot
+
       slot.destroy!
     end
   end

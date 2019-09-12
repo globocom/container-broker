@@ -20,13 +20,13 @@ RSpec.describe AdjustExecutionTypeSlots, type: :service do
     it "increments io slots to desired number" do
       expect do
         described_class.new(node: node, execution_type: "io").perform
-      end.to change{ node.slots.count }.by(2)
+      end.to change { node.slots.count }.by(2)
     end
 
     it "increments cpu slots to desired number" do
       expect do
         described_class.new(node: node, execution_type: "cpu").perform
-      end.to change{ node.slots.count }.by(3)
+      end.to change { node.slots.count }.by(3)
     end
 
     it "calls node naming" do
@@ -44,7 +44,7 @@ RSpec.describe AdjustExecutionTypeSlots, type: :service do
       it "decrements slots to desired number" do
         expect do
           described_class.new(node: node, execution_type: "io").perform
-        end.to change{ node.slots.count }.by(-2)
+        end.to change { node.slots.count }.by(-2)
       end
     end
 
@@ -59,7 +59,7 @@ RSpec.describe AdjustExecutionTypeSlots, type: :service do
         it "does not decrement slots to desired number" do
           expect do
             described_class.new(node: node, execution_type: "io").perform
-          end.to_not change{ node.slots.count }
+          end.to_not change { node.slots.count }
         end
       end
 
@@ -72,7 +72,7 @@ RSpec.describe AdjustExecutionTypeSlots, type: :service do
         it "does not decrement slots to desired number" do
           expect do
             described_class.new(node: node, execution_type: "io").perform
-          end.to change{ node.slots.count }.by(-1)
+          end.to change { node.slots.count }.by(-1)
         end
       end
     end

@@ -17,13 +17,13 @@ class LeastUsedNode
 
   def nodes_by_usage
     @nodes_by_usage ||= Node
-      .accepting_new_tasks
-      .includes(:slots)
-      .available
-      .select{ |node| node.available_slot_with_execution_type(@execution_type).present? }
-      .group_by do |node|
-        slots = node.slots.where(execution_type: @execution_type)
-        SlotsUsagePercentage.new(slots).perform
-      end
+                        .accepting_new_tasks
+                        .includes(:slots)
+                        .available
+                        .select { |node| node.available_slot_with_execution_type(@execution_type).present? }
+                        .group_by do |node|
+      slots = node.slots.where(execution_type: @execution_type)
+      SlotsUsagePercentage.new(slots).perform
+    end
   end
 end

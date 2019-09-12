@@ -18,7 +18,7 @@ class LockTask
           Metrics.new("tasks").count(
             task_id: task.id,
             name: task&.name,
-            status: task.status,
+            status: task.status
           )
         end
       end

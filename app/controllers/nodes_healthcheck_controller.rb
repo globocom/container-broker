@@ -4,7 +4,7 @@ class NodesHealthcheckController < ApplicationController
   def index
     render json: {
       status: status,
-      failed_nodes: failed_nodes.map{ |node| NodeHealthcheckSerializer.new(node) }
+      failed_nodes: failed_nodes.map { |node| NodeHealthcheckSerializer.new(node) }
     }
   end
 

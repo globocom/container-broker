@@ -3,7 +3,7 @@
 class RemoveUnusedTagsJob < ApplicationJob
   queue_as :default
 
-  def perform(*args)
+  def perform(*_args)
     remove_unreferenced_tags
   end
 

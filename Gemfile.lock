@@ -46,6 +46,7 @@ GEM
     addressable (2.5.2)
       public_suffix (>= 2.0.2, < 4.0)
     arel (8.0.0)
+    ast (2.4.0)
     awesome_print (1.6.1)
     bindex (0.5.0)
     bson (4.3.0)
@@ -136,6 +137,7 @@ GEM
     i18n (1.0.1)
       concurrent-ruby (~> 1.0)
     inflecto (0.0.2)
+    jaro_winkler (1.5.3)
     jbuilder (2.7.0)
       activesupport (>= 4.2.0)
       multi_json (>= 1.2)
@@ -182,6 +184,9 @@ GEM
     notiffany (0.1.1)
       nenv (~> 0.1)
       shellany (~> 0.0)
+    parallel (1.17.0)
+    parser (2.6.4.1)
+      ast (~> 2.4.0)
     pry (0.11.3)
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
@@ -217,6 +222,7 @@ GEM
       method_source
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
+    rainbow (3.0.0)
     rake (12.3.1)
     rb-fsevent (0.10.3)
     rb-inotify (0.9.10)
@@ -251,6 +257,14 @@ GEM
       rspec-mocks (~> 3.7.0)
       rspec-support (~> 3.7.0)
     rspec-support (3.7.1)
+    rubocop (0.74.0)
+      jaro_winkler (~> 1.5.1)
+      parallel (~> 1.10)
+      parser (>= 2.6)
+      rainbow (>= 2.2.2, < 4.0)
+      ruby-progressbar (~> 1.7)
+      unicode-display_width (>= 1.4.0, < 1.7)
+    ruby-progressbar (1.10.1)
     ruby_dep (1.5.0)
     rubyzip (1.2.1)
     rufus-scheduler (3.6.0)
@@ -296,6 +310,7 @@ GEM
     tilt (2.0.9)
     tzinfo (1.2.5)
       thread_safe (~> 0.1)
+    unicode-display_width (1.6.0)
     uuid (2.3.9)
       macaddr (~> 1.0)
     web-console (3.5.1)
@@ -337,6 +352,7 @@ DEPENDENCIES
   rspec-json_expectations
   rspec-nc
   rspec-rails
+  rubocop (~> 0.74.0)
   selenium-webdriver
   sentry-raven
   sidekiq

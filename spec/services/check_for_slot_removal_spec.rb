@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe CheckForSlotRemoval, type: :service do
   let(:adjust_execution_type_slots_service) { double(AdjustExecutionTypeSlots) }
   let(:slot) { Fabricate(:slot) }
-  let(:decrement) { '<defined-in-each-context>' }
+  let(:decrement) { "<defined-in-each-context>" }
 
   subject { CheckForSlotRemoval.new(slot: slot) }
 
@@ -21,7 +21,7 @@ RSpec.describe CheckForSlotRemoval, type: :service do
     let(:decrement) { true }
 
     it "removes the slot" do
-      expect { subject.perform }.to change{ Slot.find(slot.id) }.from(slot).to(nil)
+      expect { subject.perform }.to change { Slot.find(slot.id) }.from(slot).to(nil)
     end
 
     it "can check if is removed" do
@@ -34,7 +34,7 @@ RSpec.describe CheckForSlotRemoval, type: :service do
     let(:decrement) { false }
 
     it "doesn't remove the slot" do
-      expect { subject.perform }.to_not change{ Slot.count }
+      expect { subject.perform }.to_not change { Slot.count }
     end
 
     it "can check if is removed" do
@@ -42,5 +42,4 @@ RSpec.describe CheckForSlotRemoval, type: :service do
       expect(subject).to_not be_removed
     end
   end
-
 end

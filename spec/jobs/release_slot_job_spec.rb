@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe ReleaseSlotJob, type: :job do
   let(:container_id) { "11223344" }
   let(:node) { Fabricate(:node) }
   let(:slot) { Fabricate(:slot_releasing, node: node, current_task: task, container_id: container_id, execution_type: "test") }
   let(:task) { Fabricate(:task) }
-  let(:check_for_slot_removal_service) { double('CheckForSlotRemoval') }
+  let(:check_for_slot_removal_service) { double("CheckForSlotRemoval") }
   let(:slot_removed) { "<defined-in-each-context>" }
 
   before do
@@ -41,7 +41,11 @@ RSpec.describe ReleaseSlotJob, type: :job do
 
     it "does not release the slot" do
       expect do
-        subject.perform(slot: slot) rescue nil
+        begin
+          subject.perform(slot: slot)
+        rescue StandardError
+          nil
+        end
         slot.reload
       end.to_not change(slot, :status)
     end
@@ -51,7 +55,7 @@ RSpec.describe ReleaseSlotJob, type: :job do
     let(:slot_removed) { false }
 
     it "releases the slot" do
-      expect{subject.perform(slot: slot)}.to change(slot, :status).to("idle")
+      expect { subject.perform(slot: slot) }.to change(slot, :status).to("idle")
     end
 
     it "enqueues new tasks" do
@@ -64,12 +68,12 @@ RSpec.describe ReleaseSlotJob, type: :job do
     let(:slot_removed) { true }
 
     it "doesn't change the status" do
-      expect{subject.perform(slot: slot)}.to_not change(slot, :status)
+      expect { subject.perform(slot: slot) }.to_not change(slot, :status)
     end
 
     it "doesn't enqueue new tasks" do
       subject.perform(slot: slot)
-      expect{ subject.perform(slot: slot) }.to_not have_enqueued_job(RunTasksJob)
+      expect { subject.perform(slot: slot) }.to_not have_enqueued_job(RunTasksJob)
     end
   end
 end

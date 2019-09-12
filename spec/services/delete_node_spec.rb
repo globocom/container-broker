@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe DeleteNode, type: :service do
   let(:node) { Fabricate(:node) }
@@ -10,7 +10,7 @@ RSpec.describe DeleteNode, type: :service do
   before { Fabricate(:slot_idle, node: node) }
 
   context "when node is not accepting tasks" do
-    let(:node) { Fabricate(:node, accept_new_tasks: false)}
+    let(:node) { Fabricate(:node, accept_new_tasks: false) }
 
     context "and there is no slots running" do
       it "deletes the node" do
@@ -30,7 +30,9 @@ RSpec.describe DeleteNode, type: :service do
 
       it "does not delete the node" do
         expect do
-          subject.perform rescue nil
+          subject.perform
+        rescue StandardError
+          nil
         end.to_not change { Node.find(node.id) }
       end
 
@@ -49,7 +51,7 @@ RSpec.describe DeleteNode, type: :service do
 
       it "deletes the node" do
         expect { subject.perform }
-        .to change { Node.find(node.id) }.from(node).to(nil)
+          .to change { Node.find(node.id) }.from(node).to(nil)
       end
 
       it "does not raises error" do
@@ -64,7 +66,9 @@ RSpec.describe DeleteNode, type: :service do
 
       it "does not delete the node" do
         expect do
-          subject.perform rescue nil
+          subject.perform
+        rescue StandardError
+          nil
         end.to_not change { Node.find(node.id) }
       end
 

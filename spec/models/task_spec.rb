@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe Task, type: :model do
   let(:now) { Time.zone.now }
@@ -18,7 +18,7 @@ RSpec.describe Task, type: :model do
     end
 
     it "convert all tags values to string" do
-      task = Fabricate(:task, tags: {api_id: 12345})
+      task = Fabricate(:task, tags: { api_id: 12_345 })
       task.reload
 
       expect(task.tags["api_id"]).to eq("12345")
@@ -32,7 +32,7 @@ RSpec.describe Task, type: :model do
   context "with an invalid execution type" do
     let(:execution_type) { "invalid_type" }
     it "raises validation error" do
-      expect{subject}.to raise_error(Mongoid::Errors::Validations)
+      expect { subject }.to raise_error(Mongoid::Errors::Validations)
     end
   end
 
@@ -48,7 +48,6 @@ RSpec.describe Task, type: :model do
     it "calculates duration" do
       expect(subject.seconds_running).to eq(50)
     end
-
   end
 
   context "for completed tasks" do

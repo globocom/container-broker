@@ -17,7 +17,7 @@ def redis_from_url(uri)
       host, port = sentinel_uri.split(":")
       {
         host: host,
-        port: port,
+        port: port
       }
     end
     Redis.new(url: url, sentinels: sentinels)

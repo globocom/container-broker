@@ -1,14 +1,13 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe LockManager do
   let(:lock_args) do
     { type: "test-lock",
       id: 2,
       expire: expire_time,
-      wait: wait
-    }
+      wait: wait }
   end
   let(:original_lock_duration) { 1 }
   let(:expire_time) { 5 }
@@ -33,7 +32,7 @@ RSpec.describe LockManager do
 
       context "with a block" do
         it "yields when lock acquired" do
-          expect {|block| subject.lock &block }.to yield_control
+          expect { |block| subject.lock &block }.to yield_control
         end
       end
 
@@ -54,15 +53,15 @@ RSpec.describe LockManager do
 
       context "with a block" do
         it "does not yield when lock acquired" do
-          expect {|block| subject.lock &block }.to_not yield_control
+          expect { |block| subject.lock &block }.to_not yield_control
         end
 
         it "returns false" do
-          expect(subject.lock{}).to be_falsey
+          expect(subject.lock {}).to be_falsey
         end
 
         it "does not release the lock" do
-          subject.lock{}
+          subject.lock {}
           expect(subject.locked).to be_falsey
         end
       end
@@ -80,7 +79,7 @@ RSpec.describe LockManager do
       end
 
       it "yields block when lock acquired" do
-        expect {|block| subject.lock &block }.to yield_control
+        expect { |block| subject.lock &block }.to yield_control
       end
     end
   end
@@ -102,7 +101,7 @@ RSpec.describe LockManager do
     let(:expire_time) { 5 }
 
     it "when not locked" do
-      expect_any_instance_of(Redis).to receive(:set).with("lockmanager-test-lock-2", 1, {nx: true, ex: 5})
+      expect_any_instance_of(Redis).to receive(:set).with("lockmanager-test-lock-2", 1, nx: true, ex: 5)
 
       subject.try_lock
     end

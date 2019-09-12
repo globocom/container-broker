@@ -13,7 +13,7 @@ class LockSlot
 
     LockManager.new(type: self.class.to_s, id: "", expire: 10.seconds, wait: true).lock do
       first_available.tap do |slot|
-        slot.attaching! if slot
+        slot&.attaching!
       end
     end
   end

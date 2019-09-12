@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe Node, type: :model do
   subject { Fabricate.build(:node) }
@@ -58,7 +58,7 @@ RSpec.describe Node, type: :model do
     end
 
     context "when invalid" do
-      subject{ Fabricate.build(:node, slots_execution_types: { io: 10, cpu_: 2 }) }
+      subject { Fabricate.build(:node, slots_execution_types: { io: 10, cpu_: 2 }) }
 
       it "returns invalid" do
         expect(subject.valid?).to be_falsey

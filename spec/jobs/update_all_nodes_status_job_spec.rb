@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe UpdateAllNodesStatusJob, type: :job do
   let(:node_available_1) { Fabricate(:node, status: "available") }
@@ -9,7 +9,6 @@ RSpec.describe UpdateAllNodesStatusJob, type: :job do
   let(:node_unavailable) { Fabricate(:node, status: "unavailable") }
 
   let!(:nodes) { [node_available_1, node_unstable, node_available_2] }
-
 
   it "schedule UpdateNodeStatusJob for every available node" do
     subject.perform
@@ -31,5 +30,4 @@ RSpec.describe UpdateAllNodesStatusJob, type: :job do
       expect(UpdateNodeStatusJob).to_not have_been_enqueued.with(node: node_unavailable)
     end
   end
-
 end

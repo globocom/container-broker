@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe MigrateTasksFromDeadNodeJob, type: :job do
   let(:node) { Fabricate(:node) }
-  let(:slot) { Fabricate(:slot, node: node, status: "running", execution_type: "test")}
+  let(:slot) { Fabricate(:slot, node: node, status: "running", execution_type: "test") }
   let(:task) { Fabricate(:task, slot: slot, status: task_status) }
   let(:task_status) { "waiting" }
 
@@ -16,7 +16,7 @@ RSpec.describe MigrateTasksFromDeadNodeJob, type: :job do
     let(:task_status) { "started" }
 
     it "changes task status to retry" do
-      expect{ perform }.to change(task, :status).to "retry"
+      expect { perform }.to change(task, :status).to "retry"
     end
 
     it "try to run new tasks" do
@@ -29,7 +29,7 @@ RSpec.describe MigrateTasksFromDeadNodeJob, type: :job do
     let(:task_status) { "starting" }
 
     it "changes task status to retry" do
-      expect{ perform }.to change(task, :status).to "retry"
+      expect { perform }.to change(task, :status).to "retry"
     end
 
     it "try to run new tasks" do
@@ -39,6 +39,6 @@ RSpec.describe MigrateTasksFromDeadNodeJob, type: :job do
   end
 
   it "releases slot" do
-    expect{perform}.to change(slot, :status).to("idle")
+    expect { perform }.to change(slot, :status).to("idle")
   end
 end

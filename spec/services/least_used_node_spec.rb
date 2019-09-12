@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe LeastUsedNode, type: :service do
   subject { described_class.new(execution_type: execution_type).call }
@@ -76,4 +76,3 @@ RSpec.describe LeastUsedNode, type: :service do
     end
   end
 end
-

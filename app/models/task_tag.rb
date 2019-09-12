@@ -7,5 +7,5 @@ class TaskTag
   field :name, type: String
   field :values, type: Array, default: []
 
-  index({ name: 1 }, { unique: true })
+  index({ name: 1 }, unique: true)
 end

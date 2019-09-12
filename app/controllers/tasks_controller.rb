@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class TasksController < ApplicationController
-  before_action :set_task, only: [:show, :logs, :mark_as_error]
+  before_action :set_task, only: %i[show logs mark_as_error]
 
   def create
     @task = Task.new(task_params)
@@ -10,7 +10,7 @@ class TasksController < ApplicationController
       Metrics.new("tasks").count(
         task_id: @task.id,
         name: @task&.name,
-        status: @task.status,
+        status: @task.status
       )
 
       render json: @task
@@ -43,11 +43,12 @@ class TasksController < ApplicationController
   end
 
   private
-    def set_task
-      @task = Task.find_by!(uuid: params[:uuid])
-    end
 
-    def task_params
-      params.require(:task).permit(:name, :image, :cmd, :storage_mount, :persist_logs, :execution_type, tags: {})
-    end
+  def set_task
+    @task = Task.find_by!(uuid: params[:uuid])
+  end
+
+  def task_params
+    params.require(:task).permit(:name, :image, :cmd, :storage_mount, :persist_logs, :execution_type, tags: {})
+  end
 end

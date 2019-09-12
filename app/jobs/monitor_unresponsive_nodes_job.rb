@@ -4,7 +4,7 @@ class MonitorUnresponsiveNodesJob
   include Sidekiq::Worker
 
   def perform
-    Node.where(:status.in => ["unstable", "unavailable"]).each do |node|
+    Node.where(:status.in => %w[unstable unavailable]).each do |node|
       MonitorUnresponsiveNodeJob.perform_later(node: node)
     end
   end

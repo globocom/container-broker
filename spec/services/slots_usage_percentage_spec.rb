@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe SlotsUsagePercentage, type: :service do
   let(:idle_slot1) { Fabricate(:slot, name: "slot1") }
@@ -23,7 +23,6 @@ RSpec.describe SlotsUsagePercentage, type: :service do
       it "returns the usage percentage" do
         expect(described_class.new(slots).perform).to eq(50)
       end
-
     end
   end
 

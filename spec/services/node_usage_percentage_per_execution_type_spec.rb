@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe NodeUsagePercentagePerExecutionType, type: :service do
   let(:node1) { Fabricate(:node, name: "node1") }
@@ -22,7 +22,7 @@ RSpec.describe NodeUsagePercentagePerExecutionType, type: :service do
       expect(described_class.new(node1).perform).to contain_exactly(
         { execution_type: "cpu", usage_percent: 20 },
         { execution_type: "io", usage_percent: 0 },
-        { execution_type: "network", usage_percent: 50 }
+        execution_type: "network", usage_percent: 50
       )
     end
   end

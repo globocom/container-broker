@@ -1,0 +1,33 @@
+inherit_from: .rubocop_todo.yml
+
+AllCops:
+  Include:
+    - app/**/*.rb
+    - config/**/*.rb
+    - lib/**/*.rb
+    - features/**/*.rb
+    - spec/**/*.rb
+    - Gemfile
+  Exclude:
+    - bin/**/*
+
+# Configuration parameters: EnforcedStyle, ConsistentQuotesInMultiline.
+# SupportedStyles: single_quotes, double_quotes
+Style/StringLiterals:
+  Enabled: true
+  EnforcedStyle: double_quotes
+
+# Configuration parameters: EnforcedStyle.
+# SupportedStyles: single_quotes, double_quotes
+Style/StringLiteralsInInterpolation:
+  EnforcedStyle: double_quotes
+
+Metrics/BlockLength:
+  Exclude:
+    - spec/**/*.rb
+
+Metrics/LineLength:
+  Max: 200
+
+Style/Documentation:
+  Enabled: false

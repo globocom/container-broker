@@ -17,6 +17,6 @@ class NodeUsagePercentagePerExecutionType
   private
 
   def execution_type_groups
-    @node.slots.group_by{ |slot| slot.execution_type }
+    @node.slots.group_by(&:execution_type)
   end
 end

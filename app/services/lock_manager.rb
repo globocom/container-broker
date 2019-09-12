@@ -26,7 +26,7 @@ class LockManager
     try_lock
 
     if wait
-      while !locked do
+      until locked
         sleep 0.1
         try_lock
       end
@@ -51,9 +51,8 @@ class LockManager
   end
 
   def self.active_locks
-    redis_client.keys("#{KEY_PREFIX}*").inject(Hash.new) do |result, key|
+    redis_client.keys("#{KEY_PREFIX}*").each_with_object({}) do |key, result|
       result[key] = redis_client.ttl(key)
-      result
     end
   end
 

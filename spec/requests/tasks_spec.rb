@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe "Tasks", type: :request do
   describe "POST /tasks" do
@@ -14,7 +14,7 @@ RSpec.describe "Tasks", type: :request do
       {
         "api_id" => "123456",
         "media_id" => "6c4cf8d6-36a3-4c0d-8799-0ae79fffa9ce",
-        "slug" => "tag1",
+        "slug" => "tag1"
       }
     end
 
@@ -26,7 +26,7 @@ RSpec.describe "Tasks", type: :request do
           cmd: task_cmd,
           storage_mount: task_storage_mount,
           tags: task_tags,
-          execution_type: task_execution_type,
+          execution_type: task_execution_type
         }
       }
     end
@@ -38,7 +38,7 @@ RSpec.describe "Tasks", type: :request do
       end
 
       it "creates a task" do
-        expect{perform}.to change(Task, :count).by(1)
+        expect { perform }.to change(Task, :count).by(1)
       end
 
       it "with valid parameters" do
@@ -48,18 +48,19 @@ RSpec.describe "Tasks", type: :request do
           image: task_image,
           cmd: task_cmd,
           storage_mount: task_storage_mount,
-          tags: task_tags)
+          tags: task_tags
+        )
       end
     end
 
     context "with invalid data" do
-      let(:data) {
+      let(:data) do
         {
           task: {
             name: ""
           }
         }
-      }
+      end
 
       it "responds with " do
         perform
@@ -70,11 +71,11 @@ RSpec.describe "Tasks", type: :request do
 
   describe "GET /tasks/:id" do
     let(:task) { Fabricate(:task) }
-    let(:perform) { get "/tasks/#{task.uuid}"}
+    let(:perform) { get "/tasks/#{task.uuid}" }
 
     it "returns the task" do
       perform
-      expect(JSON.parse(response.body)).to match({
+      expect(JSON.parse(response.body)).to match(
         "uuid" => task.uuid,
         "created_at" => task.created_at.iso8601(3),
         "error" => task.error,
@@ -85,8 +86,8 @@ RSpec.describe "Tasks", type: :request do
         "started_at" => task.started_at.iso8601(3),
         "status" => task.status,
         "execution_type" => task.execution_type,
-        "try_count" => task.try_count,
-      })
+        "try_count" => task.try_count
+      )
     end
 
     it "responds with success" do
@@ -97,7 +98,7 @@ RSpec.describe "Tasks", type: :request do
 
   describe "PUT /tasks/:id/mark_as_error" do
     let(:task) { Fabricate(:task, status: status) }
-    let(:perform) { put "/tasks/#{task.uuid}/mark_as_error"}
+    let(:perform) { put "/tasks/#{task.uuid}/mark_as_error" }
 
     context "when task is marked as failed" do
       let(:status) { "failed" }
@@ -131,7 +132,7 @@ RSpec.describe "Tasks", type: :request do
   end
 
   describe "DELETE /tasks/errors" do
-    let(:perform) { delete "/tasks/errors"}
+    let(:perform) { delete "/tasks/errors" }
     let!(:task1) { Fabricate(:task) }
     let!(:task2) { Fabricate(:task, status: "error") }
     let!(:task3) { Fabricate(:task, status: "error") }
@@ -149,15 +150,15 @@ RSpec.describe "Tasks", type: :request do
 
   describe "GET /tasks/healthcheck" do
     let(:task) { Fabricate(:task) }
-    let(:perform) { get "/tasks/healthcheck"}
+    let(:perform) { get "/tasks/healthcheck" }
 
     describe "with all tasks succeeding" do
       it "gets working status" do
         perform
-        expect(json_response).to eq({
+        expect(json_response).to eq(
           "status" => "WORKING",
-          "failed_tasks_count" => 0,
-        })
+          "failed_tasks_count" => 0
+        )
       end
     end
 
@@ -167,10 +168,10 @@ RSpec.describe "Tasks", type: :request do
 
       it "gets failing status" do
         perform
-        expect(json_response).to eq({
+        expect(json_response).to eq(
           "status" => "FAILING",
-          "failed_tasks_count" => 1,
-        })
+          "failed_tasks_count" => 1
+        )
       end
     end
   end

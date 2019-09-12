@@ -12,7 +12,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :tasks, only: [:create, :show], param: :uuid do
+  resources :tasks, only: %i[create show], param: :uuid do
     get :logs, on: :member
 
     member do
@@ -41,6 +41,6 @@ Rails.application.routes.draw do
   get "/healthcheck" => "healthcheck#index"
 
   require "sidekiq/pro/web"
-  require 'sidekiq-scheduler/web'
-  mount Sidekiq::Web => '/jobs'
+  require "sidekiq-scheduler/web"
+  mount Sidekiq::Web => "/jobs"
 end

@@ -15,7 +15,7 @@ class Node
   field :accept_new_tasks, type: Boolean, default: true
   field :slots_execution_types, type: Hash, default: {}
 
-  enumerable :status, %w(available unstable unavailable), default: "unavailable", after_change: :status_change
+  enumerable :status, %w[available unstable unavailable], default: "unavailable", after_change: :status_change
 
   has_many :slots
 
@@ -42,11 +42,11 @@ class Node
   end
 
   def docker_connection
-    Docker::Connection.new(hostname, {connect_timeout: 10, read_timeout: 10, write_timeout: 10})
+    Docker::Connection.new(hostname, connect_timeout: 10, read_timeout: 10, write_timeout: 10)
   end
 
   def register_error(error)
-    Rails.logger.info("Error connecting to node #{self.name}: #{error}")
+    Rails.logger.info("Error connecting to node #{name}: #{error}")
 
     update!(last_error: error)
 
@@ -74,8 +74,8 @@ class Node
 
   def execution_types_format
     valid = slots_execution_types
-      .keys
-      .all?{ |execution_type| execution_type.match?(Constants::ExecutionType::FORMAT) }
+            .keys
+            .all? { |execution_type| execution_type.match?(Constants::ExecutionType::FORMAT) }
 
     errors.add(:slots_execution_types, Constants::ExecutionType::INVALID_FORMAT_MESSAGE) unless valid
   end

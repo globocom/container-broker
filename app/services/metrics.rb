@@ -11,11 +11,11 @@ class Metrics
     @client = Measures::Client.new(@transport, Settings.measures.index, Settings.measures.owner)
   end
 
-  def count(data={})
+  def count(data = {})
     client.count(metric, data) if enabled?
   end
 
-  def duration(data={}, &block)
+  def duration(data = {})
     if enabled?
       client.time(metric, data) { yield data if block_given? }
     else

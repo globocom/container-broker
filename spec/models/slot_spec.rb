@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe Slot, type: :model do
   context "when creating slots" do
@@ -19,7 +19,7 @@ RSpec.describe Slot, type: :model do
       let(:execution_type) { "invalid_symbol" }
 
       it "raises validation error" do
-        expect{subject}.to raise_error(Mongoid::Errors::Validations)
+        expect { subject }.to raise_error(Mongoid::Errors::Validations)
       end
     end
   end

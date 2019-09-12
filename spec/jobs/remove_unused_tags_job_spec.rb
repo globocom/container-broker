@@ -1,20 +1,20 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe RemoveUnusedTagsJob, type: :job do
   let(:task) { Fabricate(:task, tags: task_tags_hash) }
   let(:perform) { subject.perform }
 
   before do
-    Fabricate(:task_tag, name: "pass", values: ["1", "2"])
-    Fabricate(:task_tag, name: "media_type", values: ["video", "audio", "subtitle"])
-    Fabricate(:task_tag, name: "slug", values: ["task-slug", "slug4788h", "slug8552h"])
+    Fabricate(:task_tag, name: "pass", values: %w[1 2])
+    Fabricate(:task_tag, name: "media_type", values: %w[video audio subtitle])
+    Fabricate(:task_tag, name: "slug", values: %w[task-slug slug4788h slug8552h])
   end
 
   context "when there are tags not referenced by tasks" do
     before do
-      Fabricate(:task, tags: {pass: 1, media_type: "video"})
+      Fabricate(:task, tags: { pass: 1, media_type: "video" })
     end
 
     it "removes the tag" do
@@ -30,7 +30,7 @@ RSpec.describe RemoveUnusedTagsJob, type: :job do
 
   context "when there are values not referenced by tasks" do
     before do
-      Fabricate(:task, tags: {pass: "1", media_type: "video"})
+      Fabricate(:task, tags: { pass: "1", media_type: "video" })
     end
 
     it "removes values not referenced" do
