@@ -9,6 +9,7 @@ RSpec.describe "Tasks", type: :request do
     let(:task_image) { "busybox:1.25" }
     let(:task_cmd) { "sleep 5" }
     let(:task_storage_mount) { "/var/log" }
+    let(:task_ingest_storage_mount) { "/ingest" }
     let(:task_execution_type) { "test" }
     let(:task_tags) do
       {
@@ -25,6 +26,7 @@ RSpec.describe "Tasks", type: :request do
           image: task_image,
           cmd: task_cmd,
           storage_mount: task_storage_mount,
+          ingest_storage_mount: task_ingest_storage_mount,
           tags: task_tags,
           execution_type: task_execution_type
         }
@@ -48,6 +50,7 @@ RSpec.describe "Tasks", type: :request do
           image: task_image,
           cmd: task_cmd,
           storage_mount: task_storage_mount,
+          ingest_storage_mount: task_ingest_storage_mount,
           tags: task_tags
         )
       end
