@@ -6,6 +6,7 @@ ignore_containers:
   - elasticsearch
   - netdata
   - ef
+  - sftp
 cors_origins:
   - http://localhost:3000
 
