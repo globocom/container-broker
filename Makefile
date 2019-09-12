@@ -18,3 +18,13 @@ $(CONTEXTS_HELP):
 	@$(MAKE) $(@F) -C build/$(@D)/
 
 help: $(CONTEXTS_HELP)
+
+.PHONY: lint_ruby lint_ruby_autocorrect
+FILES := app config lib features spec Gemfile
+RUBOCOP := bundle exec rubocop
+
+lint_ruby:
+		${RUBOCOP} ${FILES}
+
+lint_ruby_autocorrect:
+		${RUBOCOP} ${FILES} --auto-correct
