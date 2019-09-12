@@ -57,6 +57,8 @@ class UpdateTaskStatusJob < ApplicationJob
   def add_metric(task)
     Metrics.new("tasks").count(
       task_id: task.id,
+      event_id: task&.tags&.dig("event_id"),
+      api_id: task&.tags&.dig("api_id").to_i,
       name: task&.name,
       type: task&.execution_type,
       slot: task&.slot&.name,
@@ -66,7 +68,8 @@ class UpdateTaskStatusJob < ApplicationJob
       duration: task.milliseconds_running,
       processing_time: task.seconds_running.to_i,
       error: task.error,
-      status: task.status
+      status: task.status,
+      origin: "container-broker"
     )
   end
 end
