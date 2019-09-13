@@ -70,6 +70,10 @@ class UpdateNodeStatusJob < ApplicationJob
       end
     end
 
+    RescheduleTasksForMissingContainers
+      .new(containers: containers, node: node)
+      .perform
+
     node.update_last_success
   rescue Excon::Error, Docker::Error::DockerError => e
     node.register_error(e.message)
