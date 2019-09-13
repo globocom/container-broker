@@ -66,9 +66,8 @@ class RunTaskJob < ApplicationJob
 
   def create_container(task:, slot:)
     binds = []
-
-    binds << [Settings.filer_dir_base, task.storage_mount].join(":") if task.storage_mount.present?
-    binds << [Settings.ingest_filer_dir_base, task.ingest_storage_mount].join(":") if task.ingest_storage_mount.present?
+    binds << Filer::Container.bind(task.storage_mount) if task.storage_mount.present?
+    binds << Filer::Ingest.bind(task.ingest_storage_mount) if task.ingest_storage_mount.present?
 
     Docker::Container.create(
       {
