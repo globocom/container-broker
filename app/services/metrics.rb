@@ -7,7 +7,7 @@ class Metrics
 
   def initialize(metric)
     @metric = metric
-    @transport = Measures::Transports::HTTP.new(Settings.measures.host, Settings.measures.port, "/proxy/logstash/")
+    @transport = Measures::Transports::HTTP.new(Settings.measures.host, Settings.measures.port, Settings.measures.url)
     @client = Measures::Client.new(@transport, Settings.measures.index, Settings.measures.owner)
   end
 
