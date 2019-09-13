@@ -15,7 +15,7 @@ RSpec.describe UpdateTaskStatusJob, type: :job do
   let(:container_exit_code) { 0 }
   let(:container_error) { "" }
   let(:container_started_at) { "2018-04-23T10:12:37.4534537Z" }
-  let(:container_finished_at) { "0001-01-01T00:00:00.0000000Z" }
+  let(:container_finished_at) { "2018-04-23T10:12:47.4534537Z" }
   let(:container_info) do
     {
       "State" => {
@@ -62,6 +62,20 @@ RSpec.describe UpdateTaskStatusJob, type: :job do
 
       it "sets task finish time" do
         expect { perform }.to change(task, :finished_at).to(Time.parse(container_finished_at))
+      end
+
+      context "generates metric" do
+        before { allow(Settings.measure).to receive(:enabled).and_return(true) }
+
+        let(:processing_time) { (container_finished_at.to_time - container_started_at.to_time).to_i }
+
+        it "with processing_time" do
+          expect_any_instance_of(Metrics).to receive(:count)
+            .with(
+              hash_including(processing_time: processing_time)
+            )
+          perform
+        end
       end
     end
 
