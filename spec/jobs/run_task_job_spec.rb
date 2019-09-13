@@ -10,9 +10,11 @@ RSpec.describe RunTaskJob, type: :job do
       image: "#{image}:#{image_tag}",
       cmd: "-i input.txt -metadata comment='Encoded by Globo.com' output.mp4",
       storage_mount: "/tmp/workdir",
+      ingest_storage_mount: "/ingest",
       execution_type: "test"
     )
   end
+
   let(:slot) { Fabricate(:slot_attaching, node: node, execution_type: "test") }
   let(:image) { "busybox" }
   let(:image_tag) { "3.1" }
@@ -102,7 +104,10 @@ RSpec.describe RunTaskJob, type: :job do
       {
         "Image" => "#{image}:#{image_tag}",
         "HostConfig" => {
-          "Binds" => ["/tmp/ef-shared:/tmp/workdir"],
+          "Binds" => [
+            "/tmp/ef-shared:/tmp/workdir",
+            "/opt/ef-shared:/ingest"
+          ],
           "NetworkMode" => ""
         },
         "Entrypoint" => [],

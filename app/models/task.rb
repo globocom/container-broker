@@ -12,6 +12,7 @@ class Task
   field :execution_type, type: String
   field :cmd, type: String
   field :storage_mount, type: String
+  field :ingest_storage_mount, type: String
   enumerable :status, %w[waiting starting started retry failed completed error]
   field :exit_code, type: Integer
   field :error, type: String
