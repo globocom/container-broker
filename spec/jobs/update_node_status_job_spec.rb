@@ -55,6 +55,21 @@ RSpec.describe UpdateNodeStatusJob, type: :job do
         end
       end
     end
+
+    context "reschedules tasks when container is missing" do
+      let(:reschedule_tasks_for_missing_containers_service) { double("RescheduleTasksForMissingContainers") }
+
+      before do
+        allow(RescheduleTasksForMissingContainers).to receive(:new)
+          .with(node: node, containers: containers)
+          .and_return(reschedule_tasks_for_missing_containers_service)
+      end
+
+      it "calls RescheduleTasksForMissingContainers perform" do
+        expect(reschedule_tasks_for_missing_containers_service).to receive(:perform)
+        subject.perform(node: node)
+      end
+    end
   end
 
   context "when UpdateNodeStatusJob is locked" do

@@ -52,23 +52,16 @@ class UpdateNodeStatusJob < ApplicationJob
         container_names = container.info["Names"].map { |name| name.gsub(%r{\A/}, "") }
 
         if Settings.ignore_containers.none? { |name| container_names.any? { |container_name| container_name.include?(name) } }
-          Rails.logger.debug("Container #{container.id} #{container_names} is not ignored for removal")
-
-          # Here we remove lost containers, like those unknown to container-broker or by some cause
-          # not linked here. But we need to take care to not remove those just created because
-          # there is a sligthly time between their creation and its slot link that cannot be locked
-          # so we remove only containers created at a minimum of 5 minutes
-          if get_node_system_time(node: node) - Time.at(container.info["Created"]) > 5.minutes
-            Rails.logger.debug("Container #{container.id} created before 5 minutes ago and is enqueued to be removed")
-            Rails.logger.info("Container #{container.id} not attached with any slot")
-
-            RemoveContainerJob.perform_later(node: node, container_id: container.id)
-          end
+          remove_container_if_expired(node: node, container: container)
         else
           Rails.logger.debug("Container #{container.id} #{container_names} is ignored for removal")
         end
       end
     end
+
+    RescheduleTasksForMissingContainers
+      .new(containers: containers, node: node)
+      .perform
 
     node.update_last_success
   rescue Excon::Error, Docker::Error::DockerError => e
@@ -81,5 +74,20 @@ class UpdateNodeStatusJob < ApplicationJob
 
   def started_with_error?(container:, docker_connection:)
     container.info["State"] == "created" && Docker::Container.get(container.id, docker_connection).info["State"]["ExitCode"].positive?
+  end
+
+  def remove_container_if_expired(node:, container:)
+    Rails.logger.debug("Container #{container.id} #{container_names} is not ignored for removal")
+
+    # Here we remove lost containers, like those unknown to container-broker or by some cause
+    # not linked here. But we need to take care to not remove those just created because
+    # there is a sligthly time between their creation and its slot link that cannot be locked
+    # so we remove only containers created at a minimum of 5 minutes
+    return if get_node_system_time(node: node) - Time.at(container.info["Created"]) < 5.minutes
+
+    Rails.logger.debug("Container #{container.id} created before 5 minutes ago and is enqueued to be removed")
+    Rails.logger.info("Container #{container.id} not attached with any slot")
+
+    RemoveContainerJob.perform_later(node: node, container_id: container.id)
   end
 end

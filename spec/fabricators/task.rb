@@ -19,3 +19,7 @@ Fabricator(:task) do
   tags { { "x" => "y" } }
   execution_type "io"
 end
+
+Fabricator(:running_task, from: :task) do
+  status :started
+end

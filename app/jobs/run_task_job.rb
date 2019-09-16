@@ -40,7 +40,7 @@ class RunTaskJob < ApplicationJob
     task.update!(error: message)
 
     add_metric(task)
-    task.retry
+    task.mark_as_retry
   end
 
   def add_metric(task)
