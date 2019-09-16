@@ -62,7 +62,7 @@ class Task
     started!
   end
 
-  def retry
+  def mark_as_retry
     if try_count < Settings.task_retry_count
       update(try_count: try_count + 1)
       retry!

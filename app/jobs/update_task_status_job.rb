@@ -33,7 +33,7 @@ class UpdateTaskStatusJob < ApplicationJob
       else
         Rails.logger.debug("Marked task for retry and set error as #{container_state["Error"]}")
         task.error = container_state["Error"]
-        task.retry
+        task.mark_as_retry
       end
     else
       raise InvalidContainerStatusError, "Container status should be exited (current status: #{container_status})"
