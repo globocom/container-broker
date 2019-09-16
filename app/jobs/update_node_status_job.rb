@@ -52,7 +52,7 @@ class UpdateNodeStatusJob < ApplicationJob
         container_names = container.info["Names"].map { |name| name.gsub(%r{\A/}, "") }
 
         if Settings.ignore_containers.none? { |name| container_names.any? { |container_name| container_name.include?(name) } }
-          remove_container_if_expired(node: node, container: container)
+          remove_container_if_expired(node: node, container: container, container_names: container_names)
         else
           Rails.logger.debug("Container #{container.id} #{container_names} is ignored for removal")
         end
@@ -76,7 +76,7 @@ class UpdateNodeStatusJob < ApplicationJob
     container.info["State"] == "created" && Docker::Container.get(container.id, docker_connection).info["State"]["ExitCode"].positive?
   end
 
-  def remove_container_if_expired(node:, container:)
+  def remove_container_if_expired(node:, container:, container_names:)
     Rails.logger.debug("Container #{container.id} #{container_names} is not ignored for removal")
 
     # Here we remove lost containers, like those unknown to container-broker or by some cause
