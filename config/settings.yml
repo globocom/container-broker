@@ -1,12 +1,12 @@
 ignore_containers:
   - fluentbit
-  - sftp-local
   - redis
   - mongo
   - elasticsearch
   - netdata
   - ef
   - sftp
+  - quit-container
 cors_origins:
   - http://localhost:3000
 
