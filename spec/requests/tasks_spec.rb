@@ -99,6 +99,29 @@ RSpec.describe "Tasks", type: :request do
     end
   end
 
+  describe "GET /tasks/:id/logs" do
+    let(:task) { Fabricate(:task) }
+    let(:perform) { get "/tasks/#{task.uuid}/logs" }
+
+    before do
+      logs = "Abc\xCCTeste"
+      task.set_logs(logs + "") # Create a unfreezed string because mongoid is incompatible
+      task.save
+    end
+
+    it "returns the logs with invalid chars replaced by question mark" do
+      perform
+      expect(JSON.parse(response.body)).to match(
+        "logs" => "Abc?Teste"
+      )
+    end
+
+    it "responds with success" do
+      perform
+      expect(response).to be_success
+    end
+  end
+
   describe "PUT /tasks/:id/mark_as_error" do
     let(:task) { Fabricate(:task, status: status) }
     let(:perform) { put "/tasks/#{task.uuid}/mark_as_error" }
