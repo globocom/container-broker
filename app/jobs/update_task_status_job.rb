@@ -18,10 +18,10 @@ class UpdateTaskStatusJob < ApplicationJob
     container_status = container_state["Status"]
     exit_code = container_state["ExitCode"]
 
-    successful_status = container_status == "exited"
-
-    raise InvalidContainerStatusError,
-      "Container status should be exited (current status: #{container_status})" unless successful_status
+    unless container_status == "exited"
+      raise InvalidContainerStatusError,
+            "Container status should be exited (current status: #{container_status})"
+    end
 
     Rails.logger.debug("Container is in status #{container_status} and exit code #{exit_code}")
 
