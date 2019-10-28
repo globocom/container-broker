@@ -13,6 +13,8 @@ class Metrics
 
   def count(data = {})
     client.count(metric, data) if enabled?
+  rescue StandardError => e
+    Rails.logger.warn("Error sending metrics to measures: #{e}")
   end
 
   def duration(data = {})
