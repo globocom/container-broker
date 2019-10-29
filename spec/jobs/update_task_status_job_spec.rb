@@ -65,7 +65,7 @@ RSpec.describe UpdateTaskStatusJob, type: :job do
       end
 
       context "generates metric" do
-        before { allow(Settings.measure).to receive(:enabled).and_return(true) }
+        before { allow(Settings.measures).to receive(:enabled).and_return(true) }
 
         let(:processing_time) { (container_finished_at.to_time - container_started_at.to_time).to_i }
 

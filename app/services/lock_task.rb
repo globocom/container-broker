@@ -12,16 +12,10 @@ class LockTask
       task = nil
       LockManager.new(type: "get_free_task", id: "", expire: 30.seconds, wait: true).lock do
         task = first_pending
-        if task
-          task.starting!
-
-          Metrics.new("tasks").count(
-            task_id: task.id,
-            name: task&.name,
-            status: task.status
-          )
-        end
+        task&.starting!
       end
+
+      persist_metrics(task) if task
 
       task
     end
@@ -37,5 +31,13 @@ class LockTask
     Task
       .where(execution_type: execution_type)
       .where(:status.in => %w[waiting retry])
+  end
+
+  def persist_metrics(task)
+    Metrics.new("tasks").count(
+      task_id: task.id,
+      name: task&.name,
+      status: task.status
+    )
   end
 end

@@ -4,14 +4,15 @@ class ApplicationJob < ActiveJob::Base
   JOB_METRIC = "jobs"
 
   around_perform do |job, block|
-    Metrics.new(JOB_METRIC).duration do |metric|
-      metric[:job_id] = job.job_id
-      metric[:job_class] = job.class.to_s
-      metric[:executions] = job.executions
-      metric[:queue_name] = job.queue_name
-      metric[:hostname] = Socket.gethostname
+    time = Benchmark.realtime { block.call }
 
-      block.call
-    end
+    Metrics.new(JOB_METRIC).count(
+      job_id: job.job_id,
+      job_class: job.class.to_s,
+      executions: job.executions,
+      queue_name: job.queue_name,
+      hostname: Socket.gethostname,
+      time: time
+    )
   end
 end
