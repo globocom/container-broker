@@ -24,7 +24,7 @@ class TasksController < ApplicationController
   end
 
   def logs
-    render json: { logs: @task.get_logs.encode("utf-8", undef: :replace, replace: "?") }
+    render json: { logs: @task.get_logs&.encode("utf-8", undef: :replace, replace: "?") }
   end
 
   def clear_errors
