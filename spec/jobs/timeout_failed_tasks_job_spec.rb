@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe TimeoutFailedTasksJob, type: :job do
   let(:task) { Fabricate(:task, status: "failed", finished_at: finished_at) }
   let(:finished_at) { "Defined in each context" }
-  let(:now_time) { "Thu, 05 Dec 2019 23:59:00 +0000 "}
+  let(:now_time) { "Thu, 05 Dec 2019 23:59:00 +0000 " }
   let(:perform) { subject.perform }
 
   before do

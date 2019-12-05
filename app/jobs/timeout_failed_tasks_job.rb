@@ -11,11 +11,11 @@ class TimeoutFailedTasksJob < ApplicationJob
     tasks = failed_tasks
 
     tasks.map do |task|
-      if task_live_time(task.finished_at) >= Settings.timeout_tasks_after_hours
-        Rails.logger.debug("Marking task as error due to timeout: #{task.uuid}")
+      next unless task_live_time(task.finished_at) >= Settings.timeout_tasks_after_hours
 
-        task.error!
-      end
+      Rails.logger.debug("Marking task as error due to timeout: #{task.uuid}")
+
+      task.error!
     end
   end
 
@@ -24,6 +24,6 @@ class TimeoutFailedTasksJob < ApplicationJob
   end
 
   def task_live_time(finished_at)
-    (Time.parse(Time.zone.now.to_datetime.to_s) - Time.parse(finished_at.to_s))/3_600
+    (Time.parse(Time.zone.now.to_datetime.to_s) - Time.parse(finished_at.to_s)) / 3_600
   end
 end
