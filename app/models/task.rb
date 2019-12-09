@@ -13,7 +13,6 @@ class Task
   field :cmd, type: String
   field :storage_mount, type: String
   field :ingest_storage_mount, type: String
-  enumerable :status, %w[waiting starting started retry failed completed error]
   field :exit_code, type: Integer
   field :error, type: String
   field :logs, type: BSON::Binary
@@ -24,6 +23,8 @@ class Task
   field :try_count, type: Integer, default: 0
   field :persist_logs, type: Boolean, default: false
   field :tags, type: Hash, default: {}
+
+  enumerable :status, %w[waiting starting started retry failed completed error]
 
   belongs_to :slot, optional: true
 
