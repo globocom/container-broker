@@ -26,7 +26,7 @@ class TimeoutFailedTasksJob < ApplicationJob
   def persist_logs(task)
     existent_logs = task.get_logs || ""
 
-    task.set_logs(existent_logs + "task was marked as error due to timeout: #{task.uuid}\n")
+    task.set_logs(existent_logs + "\nThis task was automatically marked as error due to timeout.\n")
 
     task.save!
   end

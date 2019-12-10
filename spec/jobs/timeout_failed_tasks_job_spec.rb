@@ -34,7 +34,7 @@ RSpec.describe TimeoutFailedTasksJob, type: :job do
 
       task.reload
 
-      expect(task.get_logs).to eq("task was marked as error due to timeout: #{task.uuid}\n")
+      expect(task.get_logs).to eq("\nThis task was automatically marked as error due to timeout.\n")
     end
   end
 end
