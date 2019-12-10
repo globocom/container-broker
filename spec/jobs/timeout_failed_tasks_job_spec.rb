@@ -28,5 +28,13 @@ RSpec.describe TimeoutFailedTasksJob, type: :job do
         .from("failed")
         .to("error")
     end
+
+    it "logs the timeout on task" do
+      perform
+
+      task.reload
+
+      expect(task.get_logs).to eq("task was marked as error due to timeout: #{task.uuid}\n")
+    end
   end
 end
