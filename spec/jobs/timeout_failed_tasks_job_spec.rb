@@ -29,12 +29,28 @@ RSpec.describe TimeoutFailedTasksJob, type: :job do
         .to("error")
     end
 
-    it "logs the timeout on task" do
-      perform
+    context "and task does not have logs" do
+      it "logs the timeout on task" do
+        perform
 
-      task.reload
+        task.reload
 
-      expect(task.get_logs).to eq("\nThis task was automatically marked as error due to timeout.\n")
+        expect(task.get_logs).to eq("\nThis task was automatically marked as error due to timeout.\n")
+      end
+    end
+
+    context "and task has logs already" do
+      it "concats logs all together" do
+        task.set_logs("previous log ".dup)
+
+        task.save!
+
+        perform
+
+        task.reload
+
+        expect(task.get_logs).to eq("previous log \nThis task was automatically marked as error due to timeout.\n")
+      end
     end
   end
 end
