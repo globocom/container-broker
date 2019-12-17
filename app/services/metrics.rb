@@ -12,7 +12,11 @@ class Metrics
   end
 
   def count(data = {})
-    client.count(metric, data) if enabled?
+    return unless enabled?
+
+    client.count(metric, data.merge(
+                           origin: "container-broker"
+                         ))
   rescue StandardError => e
     Rails.logger.warn("Error sending metrics to measures: #{e}")
   end

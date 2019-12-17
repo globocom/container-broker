@@ -71,8 +71,7 @@ class UpdateTaskStatusJob < ApplicationJob
       duration: task.milliseconds_running,
       processing_time: task.seconds_running.to_i,
       error: task.error,
-      status: task.status,
-      origin: "container-broker"
+      status: task.status
     )
   end
 end

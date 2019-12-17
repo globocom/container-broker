@@ -7,3 +7,7 @@ Fabricator(:node) do
   accept_new_tasks true
   slots_execution_types { { io: 10, cpu: 5 } }
 end
+
+Fabricator(:node_unstable, from: :slot) do
+  status "unstable"
+end
