@@ -11,20 +11,23 @@ class RunTaskJob < ApplicationJob
 
     container = create_container(task: task, slot: slot)
     Rails.logger.debug("Container #{container.id} created for #{task} #{slot}")
+
     task.update!(container_id: container.id, slot: slot)
     Rails.logger.debug("#{task} updated with #{container.id} #{slot}")
 
     container.start
     Rails.logger.debug("Container #{container.id} started")
+
     task.mark_as_started!
     Rails.logger.debug("#{task} marked as started")
+
     slot.mark_as_running(current_task: task, container_id: container.id)
     Rails.logger.debug("#{slot} marked as running")
 
     add_metric(task)
     task
   rescue StandardError, Excon::Error => e
-    Rails.logger.error("Error in RunTaskJob: #{e}")
+    Rails.logger.debug("Error in RunTaskJob: #{e}")
     case e
     when Excon::Error, Docker::Error::TimeoutError then
       message = "Docker connection error: #{e.message}"
@@ -37,10 +40,15 @@ class RunTaskJob < ApplicationJob
     end
 
     slot.release
+    Rails.logger.debug("#{slot} released")
+
     task.update!(error: message)
+    Rails.logger.debug("#{task} error updated with '#{message}'")
 
     add_metric(task)
+
     task.mark_as_retry
+    Rails.logger.debug("#{task} marked as retry")
   end
 
   def add_metric(task)

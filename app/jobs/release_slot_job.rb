@@ -19,7 +19,8 @@ class ReleaseSlotJob < ApplicationJob
       slot.release
       Rails.logger.debug("Slot released (#{slot.status})")
     end
-  rescue Excon::Error => e
+  rescue StandardError => e
+    Rails.logger.debug("Error in ReleaseSlotJob for #{slot}: #{e}")
     slot.node.register_error(e.message)
     raise
   end

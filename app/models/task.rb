@@ -67,7 +67,7 @@ class Task
 
   def mark_as_retry
     if try_count < Settings.task_retry_count
-      update(try_count: try_count + 1)
+      update(try_count: try_count + 1, slot: nil)
       retry!
       RunTasksJob.perform_later(execution_type: execution_type)
     else
