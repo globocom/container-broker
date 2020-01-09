@@ -39,7 +39,7 @@ class UpdateNodeStatusJob < ApplicationJob
           if slot.status == "running"
             slot.releasing!
             Rails.logger.debug("Slot was running. Marked as releasing. slot: #{slot} current_task: #{slot.current_task}")
-            ReleaseSlotJob.perform_later(slot: MongoidSerializableModel.new(slot))
+            ReleaseSlotJob.perform_later(slot: MongoidSerializableModel.new(slot), container_id: container.id)
           else
             Rails.logger.debug("Slot was not running (it was #{slot.status}). Ignoring.")
           end

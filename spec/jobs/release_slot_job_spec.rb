@@ -22,11 +22,16 @@ RSpec.describe ReleaseSlotJob, type: :job do
 
   it "updates task status" do
     expect(UpdateTaskStatusJob).to receive(:perform_now).with(task)
+    subject.perform(slot: slot, container_id: container_id)
+  end
+
+  it "even when the container_id is not given" do
+    expect(UpdateTaskStatusJob).to receive(:perform_now).with(task)
     subject.perform(slot: slot)
   end
 
   it "schedules container removal from docker" do
-    subject.perform(slot: slot)
+    subject.perform(slot: slot, container_id: container_id)
     expect(RemoveContainerJob).to have_been_enqueued.with(node: slot.node, container_id: container_id)
   end
 
@@ -36,13 +41,13 @@ RSpec.describe ReleaseSlotJob, type: :job do
     end
 
     it "raises the error" do
-      expect { subject.perform(slot: slot) }.to raise_error(Excon::Error)
+      expect { subject.perform(slot: slot, container_id: container_id) }.to raise_error(Excon::Error)
     end
 
     it "does not release the slot" do
       expect do
         begin
-          subject.perform(slot: slot)
+          subject.perform(slot: slot, container_id: container_id)
         rescue StandardError
           nil
         end
@@ -51,15 +56,33 @@ RSpec.describe ReleaseSlotJob, type: :job do
     end
   end
 
+  context "when the container id is different than the current on slot" do
+    it "raises an error" do
+      expect do
+        subject.perform(slot: slot, container_id: SecureRandom.uuid)
+      end.to raise_error(described_class::InvalidSlotContainerId)
+    end
+
+    it "does not call UpdateTaskStatusJob" do
+      expect(UpdateTaskStatusJob).to_not receive(:perform_now)
+
+      begin
+        subject.perform(slot: slot, container_id: SecureRandom.uuid)
+      rescue StandardError
+        described_class::InvalidSlotContainerId
+      end
+    end
+  end
+
   context "when slot doesn't need to be removed" do
     let(:slot_removed) { false }
 
     it "releases the slot" do
-      expect { subject.perform(slot: slot) }.to change(slot, :status).to("idle")
+      expect { subject.perform(slot: slot, container_id: container_id) }.to change(slot, :status).to("idle")
     end
 
     it "enqueues new tasks" do
-      subject.perform(slot: slot)
+      subject.perform(slot: slot, container_id: container_id)
       expect(RunTasksJob).to have_been_enqueued.at_least(1).times
     end
   end
@@ -68,12 +91,12 @@ RSpec.describe ReleaseSlotJob, type: :job do
     let(:slot_removed) { true }
 
     it "doesn't change the status" do
-      expect { subject.perform(slot: slot) }.to_not change(slot, :status)
+      expect { subject.perform(slot: slot, container_id: container_id) }.to_not change(slot, :status)
     end
 
     it "doesn't enqueue new tasks" do
-      subject.perform(slot: slot)
-      expect { subject.perform(slot: slot) }.to_not have_enqueued_job(RunTasksJob)
+      subject.perform(slot: slot, container_id: container_id)
+      expect { subject.perform(slot: slot, container_id: container_id) }.to_not have_enqueued_job(RunTasksJob)
     end
   end
 end

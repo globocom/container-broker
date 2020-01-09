@@ -34,7 +34,7 @@ RSpec.describe UpdateNodeStatusJob, type: :job do
 
           it "enqueues slot releasing job" do
             subject.perform(node: node)
-            expect(ReleaseSlotJob).to have_been_enqueued.with(slot: slot)
+            expect(ReleaseSlotJob).to have_been_enqueued.with(slot: slot, container_id: container_id)
           end
         end
       end
