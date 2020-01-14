@@ -25,6 +25,8 @@ class UpdateNodeStatusJob < ApplicationJob
   def update_node_status(node)
     Rails.logger.debug("Start updating node status for #{node}")
 
+    # Other tasks can be started at this time. Because of this it's necessary to load the tasks first and then the containers
+    started_tasks = Task.started.where(:slot.in => node.slots.pluck(:id)).to_a
     containers = Docker::Container.all({ all: true }, node.docker_connection)
 
     Rails.logger.debug("Got #{containers.count} containers")
@@ -60,7 +62,7 @@ class UpdateNodeStatusJob < ApplicationJob
     end
 
     RescheduleTasksForMissingContainers
-      .new(containers: containers, node: node)
+      .new(containers: containers, started_tasks: started_tasks)
       .perform
 
     node.update_last_success
