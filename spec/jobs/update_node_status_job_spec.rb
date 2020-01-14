@@ -58,10 +58,11 @@ RSpec.describe UpdateNodeStatusJob, type: :job do
 
     context "reschedules tasks when container is missing" do
       let(:reschedule_tasks_for_missing_containers_service) { double("RescheduleTasksForMissingContainers") }
+      let(:started_tasks) { [Fabricate(:running_task, slot: slot)] }
 
       before do
         allow(RescheduleTasksForMissingContainers).to receive(:new)
-          .with(node: node, containers: containers)
+          .with(started_tasks: started_tasks, containers: containers)
           .and_return(reschedule_tasks_for_missing_containers_service)
       end
 
