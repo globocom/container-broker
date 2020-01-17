@@ -8,12 +8,14 @@ module Runners
       kubernetes: {
         update_node_status: Runners::Kubernetes::UpdateNodeStatus,
         monitor_unresponsive_node: Runners::Kubernetes::MonitorUnresponsiveNode,
-        run_task: Runners::Kubernetes::RunTask
+        run_task: Runners::Kubernetes::RunTask,
+        kill_slot_container: Runners::Kubernetes::KillSlotContainer
       },
       docker: {
         update_node_status: Runners::Docker::UpdateNodeStatus,
         monitor_unresponsive_node: Runners::Docker::MonitorUnresponsiveNode,
-        run_task: Runners::Docker::RunTask
+        run_task: Runners::Docker::RunTask,
+        kill_slot_container: Runners::Docker::KillSlotContainer
       }
     }.freeze
 
