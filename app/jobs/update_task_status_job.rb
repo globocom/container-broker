@@ -9,7 +9,7 @@ class UpdateTaskStatusJob < ApplicationJob
     Rails.logger.debug("Updating status for task #{task}")
     Rails.logger.debug("Task #{task} is running in slot #{task.slot}")
 
-    container = FetchTaskContainer.new.call(task: task)
+    container = Runners::ServicesFactory.fabricate(runner: task.slot.node.runner, service: :fetch_task_container).perform(task: task)
 
     container_state = container.info["State"]
 
