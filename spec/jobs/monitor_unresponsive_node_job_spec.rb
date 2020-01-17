@@ -3,69 +3,18 @@
 require "rails_helper"
 
 RSpec.describe MonitorUnresponsiveNodeJob, type: :job do
-  context "when node is unavailable" do
-    let(:node) { Fabricate(:node, status: "unavailable", last_error: "connection error") }
+  let(:node) { Fabricate(:node) }
+  let(:docker_monitor_unresponsive_node_instance) { double(Runners::Docker::MonitorUnresponsiveNode) }
 
-    context "and it becomes available" do
-      before { allow(Docker).to receive(:info) { "ok" } }
-
-      it "marks node available again" do
-        expect { subject.perform(node: node) }.to change(node, :status).to("available")
-      end
-
-      it "tries to run new tasks" do
-        subject.perform(node: node)
-        expect(RunTasksForAllExecutionTypesJob).to have_been_enqueued
-      end
-
-      it "clears last error" do
-        expect { subject.perform(node: node) }.to change(node, :last_error).to(nil)
-      end
-    end
-
-    context "when node still unavailable" do
-      before { allow(Docker).to receive(:info).and_raise("error getting docker info") }
-
-      it "marks node as unavailable" do
-        expect { subject.perform(node: node) }.to_not change(node, :available?)
-      end
-
-      it "sets last error" do
-        expect { subject.perform(node: node) }.to change(node, :last_error).to("error getting docker info")
-      end
-    end
+  before do
+    allow(Runners::Fabricate).to receive(:monitor_unresponsive_node)
+      .with(node: node)
+      .and_return(docker_monitor_unresponsive_node_instance)
   end
 
-  context "when node is unstable" do
-    let(:node) { Fabricate(:node, status: "unstable", last_error: "connection error") }
+  it "performs docker monitor unresponsive node" do
+    expect(docker_monitor_unresponsive_node_instance).to receive(:perform)
 
-    context "and it becomes available" do
-      before { allow(Docker).to receive(:info) { "ok" } }
-
-      it "marks node available again" do
-        expect { subject.perform(node: node) }.to change(node, :status).to("available")
-      end
-
-      it "tries to run new tasks" do
-        subject.perform(node: node)
-        expect(RunTasksForAllExecutionTypesJob).to have_been_enqueued
-      end
-
-      it "clears last error" do
-        expect { subject.perform(node: node) }.to change(node, :last_error).to(nil)
-      end
-    end
-
-    context "when node still unavailable" do
-      before { allow(Docker).to receive(:info).and_raise("error getting docker info") }
-
-      it "marks node as unavailable" do
-        expect { subject.perform(node: node) }.to_not change(node, :available?)
-      end
-
-      it "sets last error" do
-        expect { subject.perform(node: node) }.to change(node, :last_error).to("error getting docker info")
-      end
-    end
+    subject.perform(node: node)
   end
 end
