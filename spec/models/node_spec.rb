@@ -5,6 +5,14 @@ require "rails_helper"
 RSpec.describe Node, type: :model do
   subject { Fabricate.build(:node) }
 
+  context "creating a node" do
+    subject { Fabricate.build(:node) }
+
+    it "has container runner set to docker as default" do
+      expect(subject.docker?).to eq(true)
+    end
+  end
+
   context "registering error" do
     context "when node was available" do
       subject { Fabricate.build(:node, status: "available", last_error: nil) }

@@ -16,6 +16,7 @@ class Node
   field :slots_execution_types, type: Hash, default: {}
 
   enumerable :status, %w[available unstable unavailable], default: "unavailable", after_change: :status_change
+  enumerable :runner, %w[docker kubernetes], default: :docker
 
   has_many :slots
 
@@ -67,7 +68,7 @@ class Node
   end
 
   def to_s
-    "Node #{name} #{uuid}"
+    "Node #{name} #{uuid} #{runner}"
   end
 
   private
