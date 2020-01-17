@@ -26,7 +26,7 @@ Lint/ParenthesesAsGroupedExpression:
 
 # Offense count: 8
 Metrics/AbcSize:
-  Max: 69
+  Max: 70
 
 # Offense count: 2
 # Configuration parameters: CountComments, ExcludedMethods.
@@ -58,13 +58,6 @@ Metrics/PerceivedComplexity:
 Naming/AccessorMethodName:
   Exclude:
     - 'app/models/task.rb'
-
-# Offense count: 1
-# Configuration parameters: EnforcedStyleForLeadingUnderscores.
-# SupportedStylesForLeadingUnderscores: disallowed, required, optional
-Naming/MemoizedInstanceVariableName:
-  Exclude:
-    - 'app/jobs/update_node_status_job.rb'
 
 # Offense count: 1
 # Configuration parameters: NamePrefix, NamePrefixBlacklist, NameWhitelist, MethodDefinitionMacros.
