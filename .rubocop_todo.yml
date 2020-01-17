@@ -74,8 +74,6 @@ Naming/PredicateName:
 # Configuration parameters: MinBodyLength.
 Style/GuardClause:
   Exclude:
-    - 'app/jobs/run_task_job.rb'
-    - 'app/jobs/update_task_status_job.rb'
     - 'app/serializers/status_panel_task_serializer.rb'
     - 'app/services/lock_manager.rb'
     - 'app/services/lock_task.rb'

@@ -7,20 +7,22 @@ module Runners
     SERVICES = {
       kubernetes: {
         update_node_status: Runners::Kubernetes::UpdateNodeStatus,
-        monitor_unresponsive_node: Runners::Kubernetes::MonitorUnresponsiveNode
+        monitor_unresponsive_node: Runners::Kubernetes::MonitorUnresponsiveNode,
+        run_task: Runners::Kubernetes::RunTask
       },
       docker: {
         update_node_status: Runners::Docker::UpdateNodeStatus,
-        monitor_unresponsive_node: Runners::Docker::MonitorUnresponsiveNode
+        monitor_unresponsive_node: Runners::Docker::MonitorUnresponsiveNode,
+        run_task: Runners::Docker::RunTask
       }
     }.freeze
 
     def self.fabricate(runner:, service:)
-      service = SERVICES.dig(runner, service)
+      service_class = SERVICES.dig(runner.to_sym, service)
 
-      raise ServiceNotFoundForRunner, "No service #{service} found for #{runner}" unless service
+      raise ServiceNotFoundForRunner, "No service #{service} found for #{runner}" unless service_class
 
-      service.new
+      service_class.new
     end
   end
 end
