@@ -3,13 +3,7 @@
 module Runners
   module Docker
     class UpdateNodeStatus
-      attr_reader :node
-
-      def initialize(node:)
-        @node = node
-      end
-
-      def perform
+      def perform(node:)
         Rails.logger.debug("Start updating node status for #{node}")
 
         # Other tasks can be started at this time. Because of this it's necessary to load the tasks first and then the containers

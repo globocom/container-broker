@@ -3,14 +3,8 @@
 module Runners
   module Kubernetes
     class UpdateNodeStatus
-      attr_reader :node
-
-      def initialize(node:)
-        @node = node
-      end
-
-      def perform
-        raise NotImplementedError
+      def perform(node:)
+        raise NotImplementedError, node
       end
     end
   end

@@ -4,6 +4,6 @@ class MonitorUnresponsiveNodeJob < ApplicationJob
   queue_as :default
 
   def perform(node:)
-    Runners::ServicesFactory.fabricate(node: node, service: :monitor_unresponsive_node).perform
+    Runners::ServicesFactory.fabricate(runner: node.runner, service: :monitor_unresponsive_node).perform(node: node)
   end
 end

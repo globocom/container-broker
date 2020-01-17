@@ -15,12 +15,12 @@ module Runners
       }
     }.freeze
 
-    def self.fabricate(node:, service:)
-      service = SERVICES.dig(node.runner, service)
+    def self.fabricate(runner:, service:)
+      service = SERVICES.dig(runner, service)
 
-      raise ServiceNotFoundForRunner, "No service #{service} found for #{node.runner}" unless service
+      raise ServiceNotFoundForRunner, "No service #{service} found for #{runner}" unless service
 
-      service.new(node: node)
+      service.new
     end
   end
 end

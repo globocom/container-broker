@@ -6,8 +6,6 @@ RSpec.describe Runners::Docker::UpdateNodeStatus, type: :service do
   let(:node) { Fabricate(:node) }
   let(:containers) { [] }
 
-  subject { described_class.new(node: node) }
-
   before do
     allow(Docker::Container).to receive(:all).and_return(containers)
     allow(Docker).to receive(:info).and_return("SystemTime" => Time.zone.now.to_s)
@@ -29,13 +27,13 @@ RSpec.describe Runners::Docker::UpdateNodeStatus, type: :service do
         context "and the slot is running" do
           it "marks slot as releasing" do
             expect do
-              subject.perform
+              subject.perform(node: node)
               slot.reload
             end.to change(slot, :status).to("releasing")
           end
 
           it "enqueues slot releasing job" do
-            subject.perform
+            subject.perform(node: node)
             expect(ReleaseSlotJob).to have_been_enqueued.with(slot: slot, container_id: container_id)
           end
         end
@@ -46,13 +44,13 @@ RSpec.describe Runners::Docker::UpdateNodeStatus, type: :service do
 
         it "keeps slot as running" do
           expect do
-            subject.perform
+            subject.perform(node: node)
             slot.reload
           end.to_not change(slot, :status)
         end
 
         it "does not enqueue slot releasing job" do
-          subject.perform
+          subject.perform(node: node)
           expect(ReleaseSlotJob).to_not have_been_enqueued.with(slot: slot)
         end
       end
@@ -70,7 +68,7 @@ RSpec.describe Runners::Docker::UpdateNodeStatus, type: :service do
 
       it "calls RescheduleTasksForMissingContainers perform" do
         expect(reschedule_tasks_for_missing_containers_service).to receive(:perform)
-        subject.perform
+        subject.perform(node: node)
       end
     end
   end
