@@ -7,8 +7,8 @@ RSpec.describe MonitorUnresponsiveNodeJob, type: :job do
   let(:docker_monitor_unresponsive_node_instance) { double(Runners::Docker::MonitorUnresponsiveNode) }
 
   before do
-    allow(Runners::Fabricate).to receive(:monitor_unresponsive_node)
-      .with(node: node)
+    allow(Runners::ServicesFactory).to receive(:fabricate)
+      .with(node: node, service: :monitor_unresponsive_node)
       .and_return(docker_monitor_unresponsive_node_instance)
   end
 

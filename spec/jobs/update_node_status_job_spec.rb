@@ -7,7 +7,7 @@ RSpec.describe UpdateNodeStatusJob, type: :job do
   let(:docker_runner_instance) { double(Runners::Docker::UpdateNodeStatus) }
 
   before do
-    allow(Runners::Fabricate).to receive(:update_node_status).with(node: node).and_return(docker_runner_instance)
+    allow(Runners::ServicesFactory).to receive(:fabricate).with(node: node, service: :update_node_status).and_return(docker_runner_instance)
   end
 
   context "when UpdateNodeStatusJob is locked" do
