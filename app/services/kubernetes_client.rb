@@ -1,22 +1,23 @@
 # frozen_string_literal: true
 
 class KubernetesClient
-  attr_reader :uri, :bearer_token
+  attr_reader :uri, :bearer_token, :namespace
 
-  def initialize(uri:, bearer_token:)
+  def initialize(uri:, bearer_token:, namespace:)
     @uri = uri
     @bearer_token = bearer_token
+    @namespace = namespace
   end
 
   # rubocop:disable Metrics/ParameterLists
-  def create_job(job_name:, namespace:, image:, cmd:, internal_mounts: [], external_mounts: [], node_selector:)
+  def create_job(job_name:, image:, cmd:, internal_mounts: [], external_mounts: [], node_selector:)
     job = Kubeclient::Resource.new(
       metadata: {
         name: job_name,
         namespace: namespace
       },
       spec: {
-        backoffLimit: 2,
+        backoffLimit: 0,
         template: {
           spec: {
             containers: [
@@ -50,8 +51,27 @@ class KubernetesClient
   end
   # rubocop:enable Metrics/ParameterLists
 
+  def fetch_job_logs(job_name:)
+    pod_name = pod_client.get_pods(namespace: namespace, label_selector: "job-name=#{job_name}").first&.metadata&.name
+    raise "Pod não encontrado" unless pod_name
+
+    pod_client.get_pod_log(pod_name, namespace)
+  end
+
+  def fetch_jobs_status
+    batch_client
+      .get_jobs(namespace: namespace)
+      .each_with_object({}) do |job, result|
+        result[job.metadata.name] = job.status
+      end
+  end
+
   def batch_client
     Kubeclient::Client.new(build_client_uri(path: "/apis/batch"), "v1", auth_options: { bearer_token: bearer_token })
+  end
+
+  def pod_client
+    Kubeclient::Client.new(build_client_uri(path: "/api"), "v1", auth_options: { bearer_token: bearer_token })
   end
 
   def build_client_uri(path:)

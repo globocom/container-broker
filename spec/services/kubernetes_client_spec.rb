@@ -2,7 +2,7 @@
 
 require "rails_helper"
 RSpec.describe KubernetesClient do
-  subject(:kubernetes_client) { described_class.new(uri: uri, bearer_token: bearer_token) }
+  subject(:kubernetes_client) { described_class.new(uri: uri, bearer_token: bearer_token, namespace: namespace) }
   let(:kubeclient) { double(Kubeclient::Client, create_job: nil) }
 
   let(:uri) { "https://cloud.test" }
@@ -42,7 +42,6 @@ RSpec.describe KubernetesClient do
     def create_job
       kubernetes_client.create_job(
         job_name: job_name,
-        namespace: namespace,
         image: image,
         cmd: cmd,
         internal_mounts: internal_mounts,
@@ -63,7 +62,7 @@ RSpec.describe KubernetesClient do
           name: "create-folder-123", namespace: "my-namespace"
         },
         spec: {
-          backoffLimit: 2,
+          backoffLimit: 0,
           template: {
             spec:
             {
@@ -113,6 +112,54 @@ RSpec.describe KubernetesClient do
       expect(kubeclient).to receive(:create_job).with(resource)
 
       create_job
+    end
+  end
+
+  context "getting jobs statuses" do
+    let(:job_name) { "create-folder-12345" }
+    let(:job_list) do
+      [
+        Kubeclient::Resource.new(metadata: { name: "job1" }, status: { startTime: Time.zone.now - 2, completionTime: Time.zone.now - 1, succeeded: 1 }),
+        Kubeclient::Resource.new(metadata: { name: "job2" }, status: { startTime: Time.zone.now - 2, completionTime: Time.zone.now - 1, succeeded: 1 }),
+        Kubeclient::Resource.new(metadata: { name: "job3" }, status: { startTime: Time.zone.now - 2, failed: 3 })
+      ]
+    end
+
+    before do
+      allow(subject.batch_client).to receive(:get_jobs).and_return(job_list)
+    end
+
+    it "gets all jobs status" do
+      expect(subject.fetch_jobs_status).to match(
+        "job1" => have_attributes(startTime: be_a(Time), completionTime: be_a(Time), succeeded: 1),
+        "job2" => have_attributes(startTime: be_a(Time), completionTime: be_a(Time), succeeded: 1),
+        "job3" => have_attributes(startTime: be_a(Time), failed: 3)
+      )
+    end
+  end
+
+  context "getting job logs" do
+    let(:job_name) { "create-folder-12345" }
+    let(:pod_name) { "#{job_name}-xyz1" }
+    let(:log) { "Logs here" }
+    let(:pod_list) do
+      [
+        Kubeclient::Resource.new(metadata: { name: pod_name })
+      ]
+    end
+    before do
+      allow(subject.pod_client).to receive(:get_pods).with(namespace: namespace, label_selector: "job-name=#{job_name}").and_return(pod_list)
+      allow(subject.pod_client).to receive(:get_pod_log).with(pod_name, namespace).and_return(log)
+    end
+
+    it "gets the pod associated with the job" do
+      expect(subject.send(:pod_client)).to receive(:get_pods).with(namespace: namespace, label_selector: "job-name=#{job_name}").and_return(pod_list)
+
+      subject.fetch_job_logs(job_name: job_name)
+    end
+
+    it "returns the log" do
+      expect(subject.fetch_job_logs(job_name: job_name)).to eq(log)
     end
   end
 end
