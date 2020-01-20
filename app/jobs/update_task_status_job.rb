@@ -50,8 +50,6 @@ class UpdateTaskStatusJob < ApplicationJob
     return unless task.persist_logs
 
     Rails.logger.debug("Persisting logs for #{task}")
-    # streaming_logs avoids some encoding issues and should be safe since container status = exited
-    # (see https://github.com/swipely/docker-api/issues/290 for reference)
     container_logs = Runners::ServicesFactory
                      .fabricate(runner: task.slot.node.runner, service: :fetch_logs)
                      .perform(task: task)
