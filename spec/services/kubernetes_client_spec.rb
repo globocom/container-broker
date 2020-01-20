@@ -51,7 +51,8 @@ RSpec.describe KubernetesClient do
     end
 
     it "authenticates in the cluster using the provided token" do
-      expect(Kubeclient::Client).to receive(:new).with("https://cloud.test/apis/batch", "v1", auth_options: { bearer_token: bearer_token })
+      expect(Kubeclient::Client).to receive(:new)
+        .with("https://cloud.test/apis/batch", "v1", auth_options: { bearer_token: bearer_token })
 
       create_job
     end
@@ -142,24 +143,41 @@ RSpec.describe KubernetesClient do
     let(:job_name) { "create-folder-12345" }
     let(:pod_name) { "#{job_name}-xyz1" }
     let(:log) { "Logs here" }
-    let(:pod_list) do
-      [
-        Kubeclient::Resource.new(metadata: { name: pod_name })
-      ]
-    end
     before do
-      allow(subject.pod_client).to receive(:get_pods).with(namespace: namespace, label_selector: "job-name=#{job_name}").and_return(pod_list)
-      allow(subject.pod_client).to receive(:get_pod_log).with(pod_name, namespace).and_return(log)
+      allow(subject.pod_client).to receive(:get_pods)
+        .with(namespace: namespace, label_selector: "job-name=#{job_name}")
+        .and_return(pod_list)
+
+      allow(subject.pod_client).to receive(:get_pod_log)
+        .with(pod_name, namespace)
+        .and_return(log)
     end
 
-    it "gets the pod associated with the job" do
-      expect(subject.send(:pod_client)).to receive(:get_pods).with(namespace: namespace, label_selector: "job-name=#{job_name}").and_return(pod_list)
+    context "when pod exists" do
+      let(:pod_list) do
+        [
+          Kubeclient::Resource.new(metadata: { name: pod_name })
+        ]
+      end
 
-      subject.fetch_job_logs(job_name: job_name)
+      it "gets the pod associated with the job" do
+        expect(subject.send(:pod_client)).to receive(:get_pods)
+          .with(namespace: namespace, label_selector: "job-name=#{job_name}").and_return(pod_list)
+
+        subject.fetch_job_logs(job_name: job_name)
+      end
+
+      it "returns the log" do
+        expect(subject.fetch_job_logs(job_name: job_name)).to eq(log)
+      end
     end
 
-    it "returns the log" do
-      expect(subject.fetch_job_logs(job_name: job_name)).to eq(log)
+    context "when the pod does not exist" do
+      let(:pod_list) { [] }
+      it "raises an error" do
+        expect { subject.fetch_job_logs(job_name: job_name) }
+          .to raise_error(described_class::PodNotFoundError, "Pod not found for job #{job_name}")
+      end
     end
   end
 end

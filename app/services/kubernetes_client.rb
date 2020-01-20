@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class KubernetesClient
+  class PodNotFoundError < StandardError; end
+
   attr_reader :uri, :bearer_token, :namespace
 
   def initialize(uri:, bearer_token:, namespace:)
@@ -53,7 +55,8 @@ class KubernetesClient
 
   def fetch_job_logs(job_name:)
     pod_name = pod_client.get_pods(namespace: namespace, label_selector: "job-name=#{job_name}").first&.metadata&.name
-    raise "Pod não encontrado" unless pod_name
+
+    raise PodNotFoundError, "Pod not found for job #{job_name}" unless pod_name
 
     pod_client.get_pod_log(pod_name, namespace)
   end
