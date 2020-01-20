@@ -12,7 +12,8 @@ module Runners
         kill_slot_container: Runners::Kubernetes::KillSlotContainer,
         fetch_task_container: Runners::Kubernetes::FetchTaskContainer,
         remove_container: Runners::Kubernetes::RemoveContainer,
-        fetch_logs: Runners::Kubernetes::FetchLogs
+        fetch_logs: Runners::Kubernetes::FetchLogs,
+        fetch_execution_info: Runners::Kubernetes::FetchExecutionInfo
       },
       docker: {
         update_node_status: Runners::Docker::UpdateNodeStatus,
@@ -21,7 +22,8 @@ module Runners
         kill_slot_container: Runners::Docker::KillSlotContainer,
         fetch_task_container: Runners::Docker::FetchTaskContainer,
         remove_container: Runners::Docker::RemoveContainer,
-        fetch_logs: Runners::Docker::FetchLogs
+        fetch_logs: Runners::Docker::FetchLogs,
+        fetch_execution_info: Runners::Docker::FetchExecutionInfo
       }
     }.freeze
 

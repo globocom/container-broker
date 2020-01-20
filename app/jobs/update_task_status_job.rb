@@ -9,15 +9,14 @@ class UpdateTaskStatusJob < ApplicationJob
     Rails.logger.debug("Updating status for task #{task}")
     Rails.logger.debug("Task #{task} is running in slot #{task.slot}")
 
-    # TODO: Review the container object, because it's specific to the docker runner
-    container = Runners::ServicesFactory.fabricate(runner: task.slot.node.runner, service: :fetch_task_container).perform(task: task)
+    execution_info = Runners::ServicesFactory
+                     .fabricate(runner: task.slot.node.runner, service: :fetch_execution_info)
+                     .perform(task: task)
 
-    container_state = container.info["State"]
+    Rails.logger.debug("Got container #{execution_info.id} with state #{execution_info}")
 
-    Rails.logger.debug("Got container #{container.id} with state #{container_state}")
-
-    container_status = container_state["Status"]
-    exit_code = container_state["ExitCode"]
+    container_status = execution_info.status
+    exit_code = execution_info.exit_code
 
     unless container_status == "exited"
       raise InvalidContainerStatusError,
@@ -27,18 +26,18 @@ class UpdateTaskStatusJob < ApplicationJob
     Rails.logger.debug("Container is in status #{container_status} and exit code #{exit_code}")
 
     task.exit_code = exit_code
-    task.started_at = container_state["StartedAt"]
-    task.finished_at = container_state["FinishedAt"]
+    task.started_at = execution_info.started_at
+    task.finished_at = execution_info.finished_at
 
-    persist_logs(task, container)
+    persist_logs(task)
 
     if exit_code.zero?
       Rails.logger.debug("Marking task as completed and no errors")
       task.error = nil
       task.completed!
     else
-      Rails.logger.debug("Marked task for retry and set error as #{container_state["Error"]}")
-      task.error = container_state["Error"]
+      Rails.logger.debug("Marked task for retry and set error as #{execution_info.error}")
+      task.error = execution_info.error
       task.mark_as_retry
     end
 
@@ -47,14 +46,15 @@ class UpdateTaskStatusJob < ApplicationJob
     add_metric(task)
   end
 
-  def persist_logs(task, container)
+  def persist_logs(task)
     return unless task.persist_logs
 
     Rails.logger.debug("Persisting logs for #{task}")
     # streaming_logs avoids some encoding issues and should be safe since container status = exited
     # (see https://github.com/swipely/docker-api/issues/290 for reference)
-    container_logs = container.streaming_logs(stdout: true, stderr: true, tail: 100)
-
+    container_logs = Runners::ServicesFactory
+                     .fabricate(runner: task.slot.node.runner, service: :fetch_logs)
+                     .perform(task: task)
     task.set_logs(container_logs)
   end
 

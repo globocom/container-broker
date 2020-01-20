@@ -110,7 +110,7 @@ RSpec.describe UpdateTaskStatusJob, type: :job do
       let(:task_persist_logs) { true }
 
       before do
-        allow(container).to receive(:streaming_logs).with(stdout: true, stderr: true, tail: 100).and_return(logs)
+        allow(container).to receive(:streaming_logs).with(stdout: true, stderr: true, tail: 1_000).and_return(logs)
       end
 
       it "persist container logs to Task" do
