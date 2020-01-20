@@ -9,6 +9,7 @@ class UpdateTaskStatusJob < ApplicationJob
     Rails.logger.debug("Updating status for task #{task}")
     Rails.logger.debug("Task #{task} is running in slot #{task.slot}")
 
+    # TODO: Review the container object, because it's specific to the docker runner
     container = Runners::ServicesFactory.fabricate(runner: task.slot.node.runner, service: :fetch_task_container).perform(task: task)
 
     container_state = container.info["State"]
