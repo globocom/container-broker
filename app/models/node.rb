@@ -43,7 +43,7 @@ class Node
   end
 
   def docker_connection
-    Docker::Connection.new(hostname, connect_timeout: 10, read_timeout: 10, write_timeout: 10)
+    ::Docker::Connection.new(hostname, connect_timeout: 10, read_timeout: 10, write_timeout: 10)
   end
 
   def register_error(error)
