@@ -53,8 +53,7 @@ class Task
 
   def get_logs
     if started?
-      # TODO: Maybe create a specific service to fetch logs, because this way it's specific to the docker runner
-      Runners::ServicesFactory.fabricate(runner: slot.node.runner, service: :fetch_task_container).perform(task: task).streaming_logs(stdout: true, stderr: true, tail: 1_000)
+      Runners::ServicesFactory.fabricate(runner: slot.node.runner, service: :fetch_logs).perform(task: self)
     else
       logs.try(:data)
     end

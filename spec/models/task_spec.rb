@@ -5,7 +5,8 @@ require "rails_helper"
 RSpec.describe Task, type: :model do
   let(:now) { Time.zone.now }
   let(:execution_type) { "test-type1" }
-  subject { Fabricate(:task, execution_type: execution_type) }
+  let(:slot) { Fabricate(:slot) }
+  subject { Fabricate(:task, execution_type: execution_type, slot: slot) }
 
   context "for new tasks" do
     it "saves creation date" do
@@ -78,6 +79,36 @@ RSpec.describe Task, type: :model do
 
       it "does not calculate duration" do
         expect(subject.seconds_running).to be_nil
+      end
+    end
+  end
+
+  context "for gettings logs" do
+    context "and task has started" do
+      let(:docker_fetch_logs_instance) { double(Runners::Docker::FetchLogs) }
+
+      before do
+        subject.started!
+
+        allow(Runners::ServicesFactory).to receive(:fabricate)
+          .with(runner: subject.slot.node.runner, service: :fetch_logs)
+          .and_return(docker_fetch_logs_instance)
+      end
+
+      it "fetches logs" do
+        expect(docker_fetch_logs_instance).to receive(:perform).with(task: subject)
+
+        subject.get_logs
+      end
+    end
+
+    context "and task has not started" do
+      before do
+        subject.set_logs("test log")
+      end
+
+      it "fetches logs" do
+        expect(subject.get_logs).to eq("test log")
       end
     end
   end
