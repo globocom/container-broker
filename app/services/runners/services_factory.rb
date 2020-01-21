@@ -7,7 +7,7 @@ module Runners
     SERVICES = {
       kubernetes: {
         update_node_status: Runners::Kubernetes::UpdateNodeStatus,
-        monitor_unresponsive_node: Runners::Kubernetes::MonitorUnresponsiveNode,
+        node_availability: Runners::Kubernetes::NodeAvailability,
         run_task: Runners::Kubernetes::RunTask,
         kill_slot_container: Runners::Kubernetes::KillSlotContainer,
         fetch_task_container: Runners::Kubernetes::FetchTaskContainer,
@@ -17,7 +17,7 @@ module Runners
       },
       docker: {
         update_node_status: Runners::Docker::UpdateNodeStatus,
-        monitor_unresponsive_node: Runners::Docker::MonitorUnresponsiveNode,
+        node_availability: Runners::Docker::NodeAvailability,
         run_task: Runners::Docker::RunTask,
         kill_slot_container: Runners::Docker::KillSlotContainer,
         fetch_task_container: Runners::Docker::FetchTaskContainer,
