@@ -11,6 +11,10 @@ class KubernetesClient
     @namespace = namespace
   end
 
+  def api_info
+    pod_client.api
+  end
+
   # rubocop:disable Metrics/ParameterLists
   def create_job(job_name:, image:, cmd:, internal_mounts: [], external_mounts: [], node_selector:)
     job = Kubeclient::Resource.new(

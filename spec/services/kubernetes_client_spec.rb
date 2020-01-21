@@ -190,4 +190,33 @@ RSpec.describe KubernetesClient do
       end
     end
   end
+
+  context "getting the cluster availability" do
+    context "when api is valid" do
+      before do
+        allow(pod_client).to receive(:api).and_return(
+          "kind" => "APIVersions",
+          "versions" => ["v1"],
+          "serverAddressByClientCIDRs" => [
+            {
+              "clientCIDR" => "0.0.0.0/0",
+              "serverAddress" => "10.224.139.13:443"
+            }
+          ]
+        )
+      end
+
+      it "returns an hash" do
+        expect(subject.api_info).to be_a(Hash)
+      end
+    end
+
+    context "when api is not valid" do
+      before { allow(pod_client).to receive(:api).and_raise(SocketError) }
+
+      it "raises the error" do
+        expect { subject.api_info }.to raise_error(SocketError)
+      end
+    end
+  end
 end
