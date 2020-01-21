@@ -3,13 +3,33 @@
 require "rails_helper"
 
 RSpec.describe Node, type: :model do
-  subject { Fabricate.build(:node) }
+  subject(:node) { Fabricate.build(:node) }
 
-  context "creating a node" do
-    subject { Fabricate.build(:node) }
+  context "creating a node without setting a runner" do
+    subject { Node.new }
 
-    it "has container runner set to docker as default" do
-      expect(subject.docker?).to eq(true)
+    it { is_expected.to be_docker }
+  end
+
+  context "when node is docker" do
+    it "has a docker connection" do
+      expect(node.docker_connection).to be_a(::Docker::Connection)
+    end
+
+    it "raises an error when getting kubernetes client" do
+      expect { node.kubernetes_client }.to raise_error(described_class::InvalidRunner)
+    end
+  end
+
+  context "when node is kubernetes" do
+    subject(:node) { Fabricate.build(:node_kubernetes) }
+
+    it "has a kubernetes client" do
+      expect(node.kubernetes_client).to be_a(KubernetesClient)
+    end
+
+    it "raises an error when getting docker connection" do
+      expect { node.docker_connection }.to raise_error(described_class::InvalidRunner)
     end
   end
 

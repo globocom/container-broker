@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Node
+  class InvalidRunner < StandardError; end
   include Mongoid::Document
   include Mongoid::Uuid
   include Mongoid::Timestamps
@@ -9,7 +10,6 @@ class Node
 
   field :name, type: String
   field :hostname, type: String
-  field :available, type: Boolean, default: true
   field :last_error, type: String
   field :last_success_at, type: DateTime
   field :accept_new_tasks, type: Boolean, default: true
@@ -19,12 +19,16 @@ class Node
   enumerable :runner, %w[docker kubernetes], default: :docker
 
   has_many :slots
+  embeds_one :kubernetes_config
 
   scope :accepting_new_tasks, -> { where(accept_new_tasks: true) }
 
   validates :hostname, presence: true
   validates :slots_execution_types, presence: true
   validate :execution_types_format
+
+  validates :kubernetes_config, presence: true, if: :kubernetes?
+  validates :kubernetes_config, absence: true, unless: :kubernetes?
 
   def usage_per_execution_type
     NodeUsagePercentagePerExecutionType.new(self).perform
@@ -43,7 +47,19 @@ class Node
   end
 
   def docker_connection
+    raise(InvalidRunner, "Node must be a docker runner") unless docker?
+
     ::Docker::Connection.new(hostname, connect_timeout: 10, read_timeout: 10, write_timeout: 10)
+  end
+
+  def kubernetes_client
+    raise(InvalidRunner, "Node must be a kubernetes runner") unless kubernetes?
+
+    KubernetesClient.new(
+      uri: hostname,
+      bearer_token: kubernetes_config.bearer_token,
+      namespace: kubernetes_config.namespace
+    )
   end
 
   def register_error(error)
