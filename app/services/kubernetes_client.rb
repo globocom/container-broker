@@ -69,6 +69,8 @@ class KubernetesClient
       end
   end
 
+  private
+
   def batch_client
     Kubeclient::Client.new(build_client_uri(path: "/apis/batch"), "v1", auth_options: { bearer_token: bearer_token })
   end
