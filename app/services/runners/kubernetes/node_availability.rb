@@ -4,8 +4,7 @@ module Runners
   module Kubernetes
     class NodeAvailability
       def perform(node:)
-        puts "---> NodeAvailability on #{node}"
-        # Calls method cluster_info in kubernetes client
+        node.kubernetes_client.api_info
       end
     end
   end
