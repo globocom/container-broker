@@ -6,6 +6,7 @@ Fabricator(:task) do
   image "busybox:1.25"
   cmd "sleep 5"
   storage_mount "/tmp"
+  ingest_storage_mount "/opt/ef-shared"
   status "waiting"
   slot nil
   exit_code nil
