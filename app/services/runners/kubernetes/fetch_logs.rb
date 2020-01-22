@@ -4,7 +4,12 @@ module Runners
   module Kubernetes
     class FetchLogs
       def perform(task:)
-        raise NotImplementedError, task
+        task
+          .slot
+          .node
+          .kubernetes_client
+          .fetch_job_logs(job_name: task.container_id)
+          .body
       end
     end
   end
