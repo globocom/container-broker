@@ -58,11 +58,11 @@ class KubernetesClient
   # rubocop:enable Metrics/ParameterLists
 
   def fetch_job_logs(job_name:)
-    pod_name = pod_client.get_pods(namespace: namespace, label_selector: "job-name=#{job_name}").first&.metadata&.name
+    pod_client.get_pod_log(fetch_pod_name(job_name: job_name), namespace)
+  end
 
-    raise PodNotFoundError, "Pod not found for job #{job_name}" unless pod_name
-
-    pod_client.get_pod_log(pod_name, namespace)
+  def fetch_pod(job_name:)
+    pod_client.get_pod(fetch_pod_name(job_name: job_name), namespace)
   end
 
   def fetch_jobs_status
@@ -74,6 +74,14 @@ class KubernetesClient
   end
 
   private
+
+  def fetch_pod_name(job_name:)
+    job_pod_name = pod_client.get_pods(namespace: namespace, label_selector: "job-name=#{job_name}").first&.metadata&.name
+
+    raise PodNotFoundError, "Pod not found for job #{job_name}" unless job_pod_name
+
+    job_pod_name
+  end
 
   def batch_client
     Kubeclient::Client.new(build_client_uri(path: "/apis/batch"), "v1", auth_options: { bearer_token: bearer_token })

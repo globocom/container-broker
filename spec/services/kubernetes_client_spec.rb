@@ -147,6 +147,43 @@ RSpec.describe KubernetesClient do
     end
   end
 
+  context "getting pod" do
+    let(:job_name) { "create-folder-12345" }
+    let(:pod_name) { "#{job_name}-xyz1" }
+    let(:pod) { Kubeclient::Resource.new(kind: "Pod") }
+
+    before do
+      allow(pod_client).to receive(:get_pods)
+        .with(namespace: namespace, label_selector: "job-name=#{job_name}")
+        .and_return(pod_list)
+
+      allow(pod_client).to receive(:get_pod)
+        .with(pod_name, namespace)
+        .and_return(pod)
+    end
+
+    context "when pod exists" do
+      let(:pod_list) do
+        [
+          Kubeclient::Resource.new(metadata: { name: pod_name })
+        ]
+      end
+
+      it "returns the pod" do
+        expect(subject.fetch_pod(job_name: job_name)).to eq(pod)
+      end
+    end
+
+    context "when the pod does not exist" do
+      let(:pod_list) { [] }
+
+      it "raises an error" do
+        expect { subject.fetch_job_logs(job_name: job_name) }
+          .to raise_error(described_class::PodNotFoundError, "Pod not found for job #{job_name}")
+      end
+    end
+  end
+
   context "getting job logs" do
     let(:job_name) { "create-folder-12345" }
     let(:pod_name) { "#{job_name}-xyz1" }
