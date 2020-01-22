@@ -92,15 +92,7 @@ class Task
   end
 
   def seconds_running
-    if completed? || failed?
-      calculate_second_span(started_at, finished_at)
-    elsif started?
-      calculate_second_span(started_at, Time.zone.now.to_datetime)
-    end
-  end
-
-  def calculate_second_span(start, finish)
-    ((finish - start) * 1.day.seconds).to_i if finish.present? && start.present?
+    milliseconds_running&.div(1000)
   end
 
   def calculate_millisecond_span(start, finish)
