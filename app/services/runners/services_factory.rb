@@ -10,7 +10,6 @@ module Runners
         node_availability: Runners::Kubernetes::NodeAvailability,
         run_task: Runners::Kubernetes::RunTask,
         kill_slot_container: Runners::Kubernetes::KillSlotContainer,
-        fetch_task_container: Runners::Kubernetes::FetchTaskContainer,
         remove_container: Runners::Kubernetes::RemoveContainer,
         fetch_logs: Runners::Kubernetes::FetchLogs,
         fetch_execution_info: Runners::Kubernetes::FetchExecutionInfo
