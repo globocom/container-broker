@@ -73,6 +73,10 @@ class KubernetesClient
       end
   end
 
+  def delete_job(job_name:)
+    batch_client.delete_job(job_name, namespace)
+  end
+
   private
 
   def fetch_pod_name(job_name:)

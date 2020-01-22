@@ -256,4 +256,28 @@ RSpec.describe KubernetesClient do
       end
     end
   end
+
+  context "deleting job" do
+    let(:job_name) { "job-name" }
+
+    context "when job exists" do
+      it "deletes job" do
+        expect(batch_client).to receive(:delete_job).with(job_name, namespace)
+
+        subject.delete_job(job_name: job_name)
+      end
+    end
+
+    context "when job does not exist" do
+      before do
+        allow(batch_client).to receive(:delete_job)
+          .with(job_name, namespace)
+          .and_raise(Kubeclient::ResourceNotFoundError.new(404, "Not found", nil))
+      end
+
+      it "raises the error" do
+        expect { subject.delete_job(job_name: job_name) }.to raise_error(Kubeclient::ResourceNotFoundError)
+      end
+    end
+  end
 end
