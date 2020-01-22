@@ -6,29 +6,9 @@ module Runners
       NFS_NAME = "nfs"
 
       def perform(task:, slot:)
-        job_name = create_job(task: task, node: slot.node)
-
-        task.update!(container_id: job_name)
-        task.mark_as_started!
-        slot.mark_as_running(current_task: task, container_id: job_name)
-
-        add_metric(task)
-
-        task
-      rescue StandardError => e
-        message = "#{e.class}: #{e.message}"
-        Rails.logger.debug("Error creating #{task}: #{message}")
-
-        slot.release
-        Rails.logger.debug("#{slot} released")
-
-        task.update!(container_id: nil, error: message)
-        Rails.logger.debug("#{task} updated with error message")
-
-        add_metric(task)
-
-        task.mark_as_retry
-        Rails.logger.debug("#{task} marked as retry")
+        create_job(task: task, node: slot.node)
+      rescue SocketError => e then
+        raise Node::NodeConnectionError, "#{e.class}: #{e.message}"
       end
 
       def create_job(task:, node:)
@@ -36,13 +16,13 @@ module Runners
           job_name: generate_job_name(task: task),
           image: task.image,
           cmd: task.cmd,
-          internal_mounts: internal_mounts(task: task, node: node),
+          internal_mounts: internal_mounts(task: task),
           external_mounts: external_mounts(task: task, node: node),
           node_selector: node.kubernetes_config.node_selector
         )
       end
 
-      def internal_mounts(task:, node:)
+      def internal_mounts(task:)
         return [] if task.ingest_storage_mount.blank?
 
         [

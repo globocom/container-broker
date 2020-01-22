@@ -2,6 +2,8 @@
 
 class Node
   class InvalidRunner < StandardError; end
+  class NodeConnectionError < StandardError; end
+
   include Mongoid::Document
   include Mongoid::Uuid
   include Mongoid::Timestamps

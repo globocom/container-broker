@@ -37,8 +37,7 @@ class UpdateTaskStatusJob < ApplicationJob
       task.completed!
     else
       Rails.logger.debug("Marked task for retry and set error as #{execution_info.error}")
-      task.error = execution_info.error
-      task.mark_as_retry
+      task.mark_as_retry(error: execution_info.error)
     end
 
     task.save!

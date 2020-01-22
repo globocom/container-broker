@@ -59,13 +59,15 @@ class Task
     end
   end
 
-  def mark_as_started!
-    update!(started_at: Time.zone.now)
+  def mark_as_started!(container_id:, slot:)
+    update!(started_at: Time.zone.now, container_id: container_id, slot: slot)
 
     started!
   end
 
-  def mark_as_retry
+  def mark_as_retry(error: nil)
+    update!(error: error)
+
     if try_count < Settings.task_retry_count
       update(try_count: try_count + 1, slot: nil)
       retry!

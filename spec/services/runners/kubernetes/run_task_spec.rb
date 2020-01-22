@@ -94,75 +94,38 @@ RSpec.describe Runners::Kubernetes::RunTask do
           .with(hash_including(internal_mounts: []))
       end
 
-      it "with external mounts" do
+      it "without external mounts" do
         expect(kubernetes_client).to have_received(:create_job)
           .with(hash_including(external_mounts: []))
       end
     end
   end
 
-  context "when task starts without errors" do
-    it "updates the task with the job name" do
-      expect { subject.perform(task: task, slot: slot) }
-        .to change { task.reload.container_id }
-        .to(job_name)
+  context "when the creation fails" do
+    context "and is a node connectivity problem" do
+      before do
+        allow(kubernetes_client).to receive(:create_job).and_raise(SocketError, "Error connecting with kubernetes")
+      end
+
+      it "raises NodeConnectionError" do
+        expect { subject.perform(task: task, slot: slot) }.to raise_error(Node::NodeConnectionError, "SocketError: Error connecting with kubernetes")
+      end
     end
 
-    it "marks task as started" do
-      subject.perform(task: task, slot: slot)
+    context "and is other error" do
+      before do
+        allow(kubernetes_client).to receive(:create_job).and_raise(StandardError, "Error parsing the task command")
+      end
 
-      expect(task.reload).to be_started
-    end
-
-    it "changes slot status to running" do
-      subject.perform(task: task, slot: slot)
-
-      expect(slot.reload).to be_running
-    end
-
-    it "sets slot current task" do
-      subject.perform(task: task, slot: slot)
-
-      expect(slot.reload.current_task).to eq(task)
-    end
-
-    it "sets slot container_id with job_name" do
-      subject.perform(task: task, slot: slot)
-
-      expect(slot.reload.container_id).to eq(job_name)
-    end
-
-    it "sends metrics to measures" do
-      metrics = double(Metrics)
-      expect(Metrics).to receive(:new).with("tasks").and_return(metrics)
-      expect(metrics).to receive(:count).with(hash_including(task_id: task.id))
-
-      subject.perform(task: task, slot: slot)
+      it "raises the same error" do
+        expect { subject.perform(task: task, slot: slot) }.to raise_error(StandardError, "Error parsing the task command")
+      end
     end
   end
 
-  context "when there is an error in job creation" do
-    before do
-      allow(kubernetes_client).to receive(:create_job).and_raise(SocketError, "Error creating job in kubernetes cluster")
-    end
-
-    it "does not raises the error" do
-      expect { subject.perform(task: task, slot: slot) }.to_not raise_error
-    end
-
-    it "marks task as retry" do
-      subject.perform(task: task, slot: slot)
-      expect(task.reload).to be_retry
-    end
-
-    it "sets the error in the task" do
-      subject.perform(task: task, slot: slot)
-      expect(task.error).to eq("SocketError: Error creating job in kubernetes cluster")
-    end
-
-    it "releases the slot" do
-      subject.perform(task: task, slot: slot)
-      expect(slot.reload).to be_idle
+  context "when task starts without errors" do
+    it "returns job name" do
+      expect(subject.perform(task: task, slot: slot)).to start_with(job_name)
     end
   end
 end
