@@ -254,40 +254,46 @@ RSpec.describe KubernetesClient do
     end
 
     it "gets all pods status grouped by job name" do
-      expect(subject.fetch_pods_status).to match(
+      expect(subject.fetch_pods).to match(
         "job1" => have_attributes(
-          containerStatuses: [
-            have_attributes(
-              state: have_attributes(
-                terminated: have_attributes(
-                  reason: "Completed"
+          status: have_attributes(
+            containerStatuses: [
+              have_attributes(
+                state: have_attributes(
+                  terminated: have_attributes(
+                    reason: "Completed"
+                  )
                 )
               )
-            )
-          ]
+            ]
+          )
         ),
         "job2" => have_attributes(
-          containerStatuses: [
-            have_attributes(
-              state: have_attributes(
-                waiting: have_attributes(
-                  reason: "ImagePullBackOff",
-                  message: "Back-off pulling image buxyboxxx"
+          status: have_attributes(
+            containerStatuses: [
+              have_attributes(
+                state: have_attributes(
+                  waiting: have_attributes(
+                    reason: "ImagePullBackOff",
+                    message: "Back-off pulling image buxyboxxx"
+                  )
                 )
               )
-            )
-          ]
+            ]
+          )
         ),
         "job3" => have_attributes(
-          containerStatuses: [
-            have_attributes(
-              state: have_attributes(
-                running: have_attributes(
-                  startedAt: "2020-01-20T21:20:32Z"
+          status: have_attributes(
+            containerStatuses: [
+              have_attributes(
+                state: have_attributes(
+                  running: have_attributes(
+                    startedAt: "2020-01-20T21:20:32Z"
+                  )
                 )
               )
-            )
-          ]
+            ]
+          )
         )
       )
     end
