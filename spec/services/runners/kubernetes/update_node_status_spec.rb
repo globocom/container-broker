@@ -9,16 +9,35 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
   let(:succeeded) { nil }
   let(:failed) { nil }
   let(:kubernetes_client) { double(KubernetesClient) }
-  let(:jobs_status) do
+  let(:state) do
     {
-      "job_name" => Kubeclient::Resource.new(succeeded: succeeded, failed: failed),
-      "job_name_2" => Kubeclient::Resource.new(succeeded: succeeded, failed: failed)
+      running: {
+        startedAt: "2020-01-21T21:20:32Z"
+      }
+    }
+  end
+  let(:pods) do
+    {
+      "job_name" => Kubeclient::Resource.new(
+        metadata: {
+          labels: {
+            "job-name" => "job1"
+          }
+        },
+        status: {
+          containerStatuses: [
+            {
+              state: state
+            }
+          ]
+        }
+      )
     }
   end
 
   before do
     allow(node).to receive(:kubernetes_client).and_return(kubernetes_client)
-    allow(kubernetes_client).to receive(:fetch_jobs_status).and_return(jobs_status)
+    allow(kubernetes_client).to receive(:fetch_pods).and_return(pods)
   end
 
   it "updates node last success" do
@@ -29,7 +48,7 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
 
   context "when Kubeclient raises an HTTP error" do
     before do
-      allow(kubernetes_client).to receive(:fetch_jobs_status).and_raise(Kubeclient::HttpError.new(nil, "error_message", nil))
+      allow(kubernetes_client).to receive(:fetch_pods).and_raise(Kubeclient::HttpError.new(nil, "error_message", nil))
     end
 
     it "registers error" do
@@ -41,7 +60,7 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
 
   context "when SocketError is raised" do
     before do
-      allow(kubernetes_client).to receive(:fetch_jobs_status).and_raise(SocketError.new("error_message_socket"))
+      allow(kubernetes_client).to receive(:fetch_pods).and_raise(SocketError.new("error_message_socket"))
     end
 
     it "registers error" do
@@ -52,8 +71,13 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
   end
 
   context "when job is not completed" do
-    let(:succeeded) { nil }
-    let(:failed) { nil }
+    let(:state) do
+      {
+        running: {
+          startedAt: "2020-01-21T21:20:32Z"
+        }
+      }
+    end
 
     it "does not release slot" do
       expect(ReleaseSlotJob).not_to receive(:perform_later)
@@ -64,7 +88,16 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
   end
 
   context "when job is succeeded" do
-    let(:succeeded) { 1 }
+    let(:state) do
+      {
+        terminated: {
+          exitCode: 0,
+          reason: "Completed",
+          startedAt: "2020-01-21T21:20:32Z",
+          finishedAt: "2020-01-21T21:20:32Z"
+        }
+      }
+    end
 
     context "and slot is running" do
       it "releases slot" do
@@ -89,7 +122,16 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
   end
 
   context "when job is failed" do
-    let(:failed) { 1 }
+    let(:state) do
+      {
+        terminated: {
+          exitCode: 127,
+          reason: "Error",
+          startedAt: "2020-01-21T21:20:32Z",
+          finishedAt: "2020-01-21T21:20:32Z"
+        }
+      }
+    end
 
     context "and slot is running" do
       it "releases slot" do

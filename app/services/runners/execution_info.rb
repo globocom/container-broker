@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Runners
-  class ExecutionInfo < Struct.new(:id, :status, :exit_code, :started_at, :finished_at, :error, keyword_init: true)
+  ExecutionInfo = Struct.new(:id, :status, :exit_code, :started_at, :finished_at, :error, keyword_init: true) do
     def success?
       status == "success"
     end

@@ -13,25 +13,22 @@ class UpdateTaskStatusJob < ApplicationJob
                      .fabricate(runner: task.slot.node.runner, service: :fetch_execution_info)
                      .perform(task: task)
 
-    Rails.logger.debug("Got container #{execution_info.id} with state #{execution_info}")
+    Rails.logger.debug("Got container #{execution_info.id} with state #{execution_info.status}")
 
-    container_status = execution_info.status
-    exit_code = execution_info.exit_code
-
-    unless container_status == "exited"
+    unless execution_info.terminated?
       raise InvalidContainerStatusError,
-            "Container status should be exited (current status: #{container_status})"
+            "Container status should be exited (current status: #{execution_info.status})"
     end
 
-    Rails.logger.debug("Container is in status #{container_status} and exit code #{exit_code}")
+    Rails.logger.debug("Container is in status #{execution_info.status} and exit code #{execution_info.exit_code}")
 
-    task.exit_code = exit_code
+    task.exit_code = execution_info.exit_code
     task.started_at = execution_info.started_at
     task.finished_at = execution_info.finished_at
 
     persist_logs(task)
 
-    if exit_code.zero?
+    if execution_info.success?
       Rails.logger.debug("Marking task as completed and no errors")
       task.error = nil
       task.completed!
