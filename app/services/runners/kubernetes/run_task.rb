@@ -62,7 +62,10 @@ module Runners
       end
 
       def generate_job_name(task:)
-        "#{task.name}-#{SecureRandom.alphanumeric(8).downcase}"
+        prefix = task.name.downcase.gsub(/[^a-z0-9_-]+/, "-")
+        random_suffix = SecureRandom.alphanumeric(8).downcase
+
+        "#{prefix}-#{random_suffix}"
       end
     end
   end

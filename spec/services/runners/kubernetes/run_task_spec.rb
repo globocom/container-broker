@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe Runners::Kubernetes::RunTask do
-  let(:task) { Fabricate(:task) }
+  let(:task) { Fabricate(:task, name: "Test task #1") }
   let(:node) { Fabricate(:node_kubernetes) }
   let(:slot) { Fabricate(:slot_attaching, node: node) }
   let(:job_name) { "job-name" }
@@ -26,7 +26,7 @@ RSpec.describe Runners::Kubernetes::RunTask do
     it "with job_name" do
       expect(kubernetes_client).to have_received(:create_job).with(
         hash_including(
-          job_name: a_string_starting_with(task.name)
+          job_name: a_string_starting_with("test-task-1-")
         )
       )
     end
