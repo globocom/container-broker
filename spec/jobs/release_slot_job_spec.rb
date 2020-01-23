@@ -25,11 +25,6 @@ RSpec.describe ReleaseSlotJob, type: :job do
     subject.perform(slot: slot, container_id: container_id)
   end
 
-  it "even when the container_id is not given" do
-    expect(UpdateTaskStatusJob).to receive(:perform_now).with(task)
-    subject.perform(slot: slot)
-  end
-
   it "schedules container removal from docker" do
     subject.perform(slot: slot, container_id: container_id)
     expect(RemoveContainerJob).to have_been_enqueued.with(node: slot.node, container_id: container_id)

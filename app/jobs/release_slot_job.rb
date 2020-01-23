@@ -7,9 +7,6 @@ class ReleaseSlotJob < ApplicationJob
   def perform(slot:, container_id: nil)
     Rails.logger.debug("ReleaseSlotJob for #{slot} and container #{container_id}")
 
-    # TODO: Remove after deploy. It is just to not break the jobs enqueued before deploy.
-    container_id ||= slot.container_id
-
     check_same_container_id(slot: slot, container_id: container_id)
 
     UpdateTaskStatusJob.perform_now(slot.current_task)
