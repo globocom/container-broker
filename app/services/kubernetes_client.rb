@@ -77,6 +77,14 @@ class KubernetesClient
     batch_client.delete_job(job_name, namespace)
   end
 
+  def fetch_pods_status
+    pod_client
+      .get_pods(namespace: namespace)
+      .each_with_object({}) do |pod, result|
+        result[pod.metadata.labels["job-name"]] = pod.status
+      end
+  end
+
   private
 
   def fetch_pod_name(job_name:)

@@ -184,6 +184,115 @@ RSpec.describe KubernetesClient do
     end
   end
 
+  context "getting pods statuses" do
+    let(:pod_list) do
+      [
+        Kubeclient::Resource.new(
+          metadata: {
+            labels: {
+              "job-name" => "job1"
+            }
+          },
+          status: {
+            containerStatuses: [
+              {
+                state: {
+                  terminated: {
+                    exitCode: 0,
+                    reason: "Completed",
+                    startedAt: "2020-01-21T21:20:32Z",
+                    finishedAt: "2020-01-21T21:20:32Z",
+                    containerID: "docker://f2057c90849270e2e9991fcb6916f5200998ab6cfed08f6b14d905adc8ae366b"
+                  }
+                }
+              }
+            ]
+          }
+        ),
+        Kubeclient::Resource.new(
+          metadata: {
+            labels: {
+              "job-name" => "job2"
+            }
+          },
+          status: {
+            containerStatuses: [
+              {
+                state: {
+                  waiting: {
+                    reason: "ImagePullBackOff",
+                    message: "Back-off pulling image buxyboxxx"
+                  }
+                }
+              }
+            ]
+          }
+        ),
+        Kubeclient::Resource.new(
+          metadata: {
+            labels: {
+              "job-name" => "job3"
+            }
+          },
+          status: {
+            containerStatuses: [
+              {
+                state: {
+                  running: {
+                    startedAt: "2020-01-20T21:20:32Z"
+                  }
+                }
+              }
+            ]
+          }
+        )
+      ]
+    end
+
+    before do
+      allow(pod_client).to receive(:get_pods).and_return(pod_list)
+    end
+
+    it "gets all pods status grouped by job name" do
+      expect(subject.fetch_pods_status).to match(
+        "job1" => have_attributes(
+          containerStatuses: [
+            have_attributes(
+              state: have_attributes(
+                terminated: have_attributes(
+                  reason: "Completed"
+                )
+              )
+            )
+          ]
+        ),
+        "job2" => have_attributes(
+          containerStatuses: [
+            have_attributes(
+              state: have_attributes(
+                waiting: have_attributes(
+                  reason: "ImagePullBackOff",
+                  message: "Back-off pulling image buxyboxxx"
+                )
+              )
+            )
+          ]
+        ),
+        "job3" => have_attributes(
+          containerStatuses: [
+            have_attributes(
+              state: have_attributes(
+                running: have_attributes(
+                  startedAt: "2020-01-20T21:20:32Z"
+                )
+              )
+            )
+          ]
+        )
+      )
+    end
+  end
+
   context "getting job logs" do
     let(:job_name) { "create-folder-12345" }
     let(:pod_name) { "#{job_name}-xyz1" }
