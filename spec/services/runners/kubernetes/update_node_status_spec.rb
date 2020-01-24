@@ -6,9 +6,8 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
   let(:node) { Fabricate(:node_kubernetes) }
   let(:slot_status) { :running }
   let!(:slot) { Fabricate(:slot, status: slot_status, container_id: "job_name", node: node) }
-  let(:succeeded) { nil }
-  let(:failed) { nil }
   let(:kubernetes_client) { double(KubernetesClient) }
+  let(:pod_job_name) { "job_name" }
   let(:state) do
     {
       running: {
@@ -18,10 +17,10 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
   end
   let(:pods) do
     {
-      "job_name" => Kubeclient::Resource.new(
+      pod_job_name => Kubeclient::Resource.new(
         metadata: {
           labels: {
-            "job-name" => "job1"
+            "job-name" => pod_job_name
           }
         },
         status: {
@@ -70,88 +69,107 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
     end
   end
 
-  context "when job is not completed" do
-    let(:state) do
-      {
-        running: {
-          startedAt: "2020-01-21T21:20:32Z"
+  context "when slot exists" do
+    context "when job is not completed" do
+      let(:state) do
+        {
+          running: {
+            startedAt: "2020-01-21T21:20:32Z"
+          }
         }
-      }
+      end
+
+      it "does not release slot" do
+        expect(ReleaseSlotJob).not_to receive(:perform_later)
+          .with(hash_including(container_id: "job_name"))
+
+        subject.perform(node: node)
+      end
     end
 
-    it "does not release slot" do
-      expect(ReleaseSlotJob).not_to receive(:perform_later)
-        .with(hash_including(container_id: "job_name"))
+    context "when job is succeeded" do
+      let(:state) do
+        {
+          terminated: {
+            exitCode: 0,
+            reason: "Completed",
+            startedAt: "2020-01-21T21:20:32Z",
+            finishedAt: "2020-01-21T21:20:32Z"
+          }
+        }
+      end
+
+      context "and slot is running" do
+        it "releases slot" do
+          expect { subject.perform(node: node) }.to change { slot.reload.status }.from("running").to("releasing")
+        end
+
+        it "performs ReleaseSlotJob" do
+          expect(ReleaseSlotJob).to receive(:perform_later)
+            .with(hash_including(container_id: "job_name"))
+
+          subject.perform(node: node)
+        end
+      end
+
+      context "and slot is not running" do
+        let(:slot_status) { :idle }
+
+        it "does not release slot" do
+          expect { subject.perform(node: node) }.to_not(change { slot.reload.status })
+        end
+      end
+    end
+
+    context "when job is failed" do
+      let(:state) do
+        {
+          terminated: {
+            exitCode: 127,
+            reason: "Error",
+            startedAt: "2020-01-21T21:20:32Z",
+            finishedAt: "2020-01-21T21:20:32Z"
+          }
+        }
+      end
+
+      context "and slot is running" do
+        it "releases slot" do
+          expect { subject.perform(node: node) }.to change { slot.reload.status }.from("running").to("releasing")
+        end
+
+        it "performs ReleaseSlotJob" do
+          expect(ReleaseSlotJob).to receive(:perform_later)
+            .with(hash_including(container_id: "job_name"))
+
+          subject.perform(node: node)
+        end
+      end
+
+      context "and slot is not running" do
+        let(:slot_status) { :idle }
+
+        it "does not release slot" do
+          expect { subject.perform(node: node) }.to_not(change { slot.reload.status })
+        end
+      end
+    end
+
+    it "does not remove container" do
+      expect(RemoveContainerJob).to_not receive(:perform_later)
 
       subject.perform(node: node)
     end
   end
 
-  context "when job is succeeded" do
-    let(:state) do
-      {
-        terminated: {
-          exitCode: 0,
-          reason: "Completed",
-          startedAt: "2020-01-21T21:20:32Z",
-          finishedAt: "2020-01-21T21:20:32Z"
-        }
-      }
-    end
+  context "when slot does not exist" do
+    let(:pod_job_name) { "other-job-name" }
 
-    context "and slot is running" do
-      it "releases slot" do
-        expect { subject.perform(node: node) }.to change { slot.reload.status }.from("running").to("releasing")
-      end
+    it "removes container" do
+      expect(RemoveContainerJob).to receive(:perform_later)
+        .with(node: node, container_id: pod_job_name)
 
-      it "performs ReleaseSlotJob" do
-        expect(ReleaseSlotJob).to receive(:perform_later)
-          .with(hash_including(container_id: "job_name"))
-
-        subject.perform(node: node)
-      end
-    end
-
-    context "and slot is not running" do
-      let(:slot_status) { :idle }
-
-      it "does not release slot" do
-        expect { subject.perform(node: node) }.to_not(change { slot.reload.status })
-      end
-    end
-  end
-
-  context "when job is failed" do
-    let(:state) do
-      {
-        terminated: {
-          exitCode: 127,
-          reason: "Error",
-          startedAt: "2020-01-21T21:20:32Z",
-          finishedAt: "2020-01-21T21:20:32Z"
-        }
-      }
-    end
-
-    context "and slot is running" do
-      it "releases slot" do
-        expect { subject.perform(node: node) }.to change { slot.reload.status }.from("running").to("releasing")
-      end
-
-      it "performs ReleaseSlotJob" do
-        expect(ReleaseSlotJob).to receive(:perform_later)
-          .with(hash_including(container_id: "job_name"))
-
-        subject.perform(node: node)
-      end
-    end
-
-    context "and slot is not running" do
-      let(:slot_status) { :idle }
-
-      it "does not release slot" do
-        expect { subject.perform(node: node) }.to_not(change { slot.reload.status })
-      end
+      subject.perform(node: node)
     end
   end
 end
