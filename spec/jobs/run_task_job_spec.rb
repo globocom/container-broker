@@ -8,7 +8,6 @@ RSpec.describe RunTaskJob, type: :job do
   let(:slot) { Fabricate(:slot_attaching, node: node) }
   let(:create_task_service) { double }
   let(:runner_id) { SecureRandom.hex }
-  let(:runner_id) { "runner-1234" }
 
   def perform
     subject.perform(task: task, slot: slot)
@@ -20,8 +19,10 @@ RSpec.describe RunTaskJob, type: :job do
       .and_return(create_task_service)
 
     allow(create_task_service).to receive(:perform)
-      .with(task: task, slot: slot, runner_id: task.name)
+      .with(task: task, slot: slot, runner_id: runner_id)
       .and_return(runner_id)
+
+    allow(task).to receive(:generate_runner_id).and_return(runner_id)
   end
 
   context "when run task returns an error" do
