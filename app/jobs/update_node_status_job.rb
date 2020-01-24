@@ -9,7 +9,9 @@ class UpdateNodeStatusJob < ApplicationJob
     updated = LockManager.new(type: self.class.to_s, id: node.id, expire: 1.minute, wait: false).lock do
       Rails.logger.debug("Lock acquired for update status of #{node}")
 
-      Runners::ServicesFactory.fabricate(runner: node.runner, service: :update_node_status).perform(node: node)
+      ::Runners::ServicesFactory
+        .fabricate(runner: node.runner, service: :update_node_status)
+        .perform(node: node)
 
       Rails.logger.debug("Releasing lock for update status of #{node}")
       true
