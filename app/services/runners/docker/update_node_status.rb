@@ -14,7 +14,7 @@ module Runners
         Rails.logger.debug("Got #{containers.count} containers")
 
         containers.each do |container|
-          container_names = container.info["Names"].map { |name| name.remove(%r{^/}) }
+          container_names = extract_names(container: container)
 
           slot = node.slots.find_by(:runner_id.in => container_names)
           if slot
@@ -46,8 +46,10 @@ module Runners
           end
         end
 
+        all_container_names = containers.flat_map {|container| extract_names(container: container) }
+
         RescheduleTasksForMissingContainers
-          .new(containers: containers, started_tasks: started_tasks)
+          .new(runner_ids: all_container_names, started_tasks: started_tasks)
           .perform
 
         node.update_last_success
@@ -59,6 +61,12 @@ module Runners
 
       def started_with_error?(container:, docker_connection:)
         container.info["State"] == "created" && ::Docker::Container.get(container.id, docker_connection).info["State"]["ExitCode"].positive?
+      end
+
+      def extract_names(container:)
+        container.info["Names"].map do |name|
+          name.remove(%r{^/})
+        end
       end
     end
   end

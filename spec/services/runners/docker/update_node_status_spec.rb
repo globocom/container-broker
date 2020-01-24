@@ -74,7 +74,7 @@ RSpec.describe Runners::Docker::UpdateNodeStatus, type: :service do
 
       before do
         allow(RescheduleTasksForMissingContainers).to receive(:new)
-          .with(started_tasks: started_tasks, containers: containers)
+          .with(started_tasks: started_tasks, runner_ids: contain_exactly("runner-123", "other-container-name"))
           .and_return(reschedule_tasks_for_missing_containers_service)
       end
 

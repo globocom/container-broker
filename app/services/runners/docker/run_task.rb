@@ -4,7 +4,7 @@ module Runners
   module Docker
     class RunTask
       def perform(task:, slot:, runner_id:)
-        Rails.logger.debug("Performing RunTaskJob for #{task} #{slot}")
+        Rails.logger.debug("Performing Docker::RunTask for #{task} #{slot}")
 
         pull_image(task: task, slot: slot)
         Rails.logger.debug("Image pulled for #{task} #{slot}")
