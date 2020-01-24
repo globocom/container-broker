@@ -25,7 +25,7 @@ module Runners
 
             if container.info["State"] == "exited"
               Rails.logger.debug("Container #{container_name} exited")
-              if slot.status == "running"
+              if slot.running?
                 slot.releasing!
                 Rails.logger.debug("Slot was running. Marked as releasing. Slot: #{slot}. Current task: #{slot.current_task}")
                 ReleaseSlotJob.perform_later(slot: MongoidSerializableModel.new(slot), container_id: container.id)
