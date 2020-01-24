@@ -5,15 +5,15 @@ module Runners
     class RunTask
       NFS_NAME = "nfs"
 
-      def perform(task:, slot:)
-        create_job(task: task, node: slot.node)
+      def perform(task:, slot:, runner_id:)
+        create_job(task: task, node: slot.node, runner_id: runner_id)
       rescue SocketError => e then
         raise Node::NodeConnectionError, "#{e.class}: #{e.message}"
       end
 
-      def create_job(task:, node:)
+      def create_job(task:, node:, runner_id:)
         node.kubernetes_client.create_job(
-          job_name: generate_job_name(task: task),
+          job_name: runner_id,
           image: task.image,
           cmd: task.cmd,
           internal_mounts: internal_mounts(task: task),

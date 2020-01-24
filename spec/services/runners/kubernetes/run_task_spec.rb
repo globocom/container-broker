@@ -17,16 +17,16 @@ RSpec.describe Runners::Kubernetes::RunTask do
   it "calls create_job in the kubernetes client" do
     expect(kubernetes_client).to receive(:create_job)
 
-    subject.perform(task: task, slot: slot)
+    subject.perform(task: task, slot: slot, runner_id: job_name)
   end
 
   context "creates job with parameters" do
-    before { subject.perform(task: task, slot: slot) }
+    before { subject.perform(task: task, slot: slot, runner_id: job_name) }
 
     it "with job_name" do
       expect(kubernetes_client).to have_received(:create_job).with(
         hash_including(
-          job_name: a_string_starting_with("test-task-1-")
+          job_name: job_name
         )
       )
     end
@@ -108,7 +108,7 @@ RSpec.describe Runners::Kubernetes::RunTask do
       end
 
       it "raises NodeConnectionError" do
-        expect { subject.perform(task: task, slot: slot) }.to raise_error(Node::NodeConnectionError, "SocketError: Error connecting with kubernetes")
+        expect { subject.perform(task: task, slot: slot, runner_id: job_name) }.to raise_error(Node::NodeConnectionError, "SocketError: Error connecting with kubernetes")
       end
     end
 
@@ -118,14 +118,14 @@ RSpec.describe Runners::Kubernetes::RunTask do
       end
 
       it "raises the same error" do
-        expect { subject.perform(task: task, slot: slot) }.to raise_error(StandardError, "Error parsing the task command")
+        expect { subject.perform(task: task, slot: slot, runner_id: job_name) }.to raise_error(StandardError, "Error parsing the task command")
       end
     end
   end
 
   context "when task starts without errors" do
     it "returns job name" do
-      expect(subject.perform(task: task, slot: slot)).to start_with(job_name)
+      expect(subject.perform(task: task, slot: slot, runner_id: job_name)).to start_with(job_name)
     end
   end
 end
