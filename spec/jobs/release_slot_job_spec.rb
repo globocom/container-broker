@@ -20,7 +20,7 @@ RSpec.describe ReleaseSlotJob, type: :job do
     allow(check_for_slot_removal_service).to receive(:removed?).and_return(slot_removed)
   end
 
-   it "updates task status" do
+  it "updates task status" do
     expect(UpdateTaskStatusJob).to receive(:perform_now).with(task)
     subject.perform(slot: slot, runner_id: runner_id)
   end
