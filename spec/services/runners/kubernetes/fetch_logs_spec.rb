@@ -20,4 +20,30 @@ RSpec.describe Runners::Kubernetes::FetchLogs, type: :service do
   it "fetches job logs" do
     expect(subject.perform(task: task)).to eq("logs")
   end
+
+  context "when receiving an error" do
+    context "and it's bad request" do
+      before do
+        allow(kubernetes_client).to receive(:fetch_job_logs)
+          .with(job_name: task.container_id)
+          .and_raise(Kubeclient::HttpError.new(400, "message", nil))
+      end
+
+      it "returns nil" do
+        expect(subject.perform(task: task)).to be_nil
+      end
+    end
+
+    context "and it's another error" do
+      before do
+        allow(kubernetes_client).to receive(:fetch_job_logs)
+          .with(job_name: task.container_id)
+          .and_raise(Kubeclient::HttpError.new(404, "message", nil))
+      end
+
+      it "raises the error" do
+        expect { subject.perform(task: task) }.to raise_error(Kubeclient::HttpError)
+      end
+    end
+  end
 end
