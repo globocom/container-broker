@@ -9,7 +9,7 @@ class ReleaseSlotJob < ApplicationJob
 
     check_same_container_id(slot: slot, container_id: container_id)
 
-    UpdateTaskStatusJob.perform_now(slot.current_task)
+    UpdateTaskStatusJob.perform_now(slot.current_task.reload)
 
     Rails.logger.debug("Enqueueing container removal")
     RemoveContainerJob.perform_later(node: MongoidSerializableModel.new(slot.node), container_id: slot.container_id) if Settings.delete_container_after_run
