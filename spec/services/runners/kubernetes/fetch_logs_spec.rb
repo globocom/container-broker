@@ -34,7 +34,7 @@ RSpec.describe Runners::Kubernetes::FetchLogs, type: :service do
       end
     end
 
-    context "and it's another error" do
+    context "and it's other error" do
       before do
         allow(kubernetes_client).to receive(:fetch_job_logs)
           .with(job_name: task.container_id)
