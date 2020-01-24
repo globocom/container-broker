@@ -30,7 +30,7 @@ RSpec.describe Runners::Kubernetes::FetchLogs, type: :service do
       end
 
       it "returns nil" do
-        expect(subject.perform(task: task)).to be_nil
+        expect(subject.perform(task: task)).to be_empty
       end
     end
 

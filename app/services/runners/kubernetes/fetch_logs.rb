@@ -18,7 +18,7 @@ module Runners
         raise e unless HTTP_ERRORS_TO_IGNORE.include?(e.error_code)
 
         Rails.logger.error("Error on fetching kubernetes pod logs - #{e.error_code} - #{e.message}")
-        nil
+        ""
       end
     end
   end
