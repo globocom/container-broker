@@ -58,11 +58,20 @@ module Runners
       end
 
       def error?
-        terminated_with_error? || reason_is_error?
+        terminated_with_error? || reason_is_error? || schedulable_error_messsage
+      end
+
+      def schedulable_error_messsage
+        return if pod.status&.phase != "Pending"
+
+        found = pod&.status&.conditions&.find { |condition| condition.reason == "Unschedulable" }
+        "#{found.reason}: #{found.message}" if found
       end
 
       def error_message
         return unless error?
+
+        return schedulable_error_messsage if schedulable_error_messsage.present?
 
         reason.values.compact.join(": ")
       end

@@ -51,6 +51,44 @@ RSpec.describe Runners::Kubernetes::CreateExecutionInfo, type: :service do
     end
   end
 
+  context "when job has a schedulable error message" do
+    let(:pod) do
+      Kubeclient::Resource.new(
+        status: {
+          phase: "Pending",
+          conditions: [
+            reason: "Unschedulable",
+            message: "0/28 nodes are available: 26 node(s) didn't match node selector, 4 Insufficient cpu."
+          ]
+        }
+      )
+    end
+
+    context "fetches error execution info" do
+      subject { described_class.new.perform(pod: pod) }
+
+      it "with status" do
+        expect(subject).to be_error
+      end
+
+      it "with exit code" do
+        expect(subject.exit_code).to be_nil
+      end
+
+      it "with started at" do
+        expect(subject.started_at).to be_nil
+      end
+
+      it "with finished at" do
+        expect(subject.finished_at).to be_nil
+      end
+
+      it "with error" do
+        expect(subject.error).to eq("Unschedulable: 0/28 nodes are available: 26 node(s) didn't match node selector, 4 Insufficient cpu.")
+      end
+    end
+  end
+
   context "when job is pending" do
     context "and has an error reason" do
       let(:pod) do
