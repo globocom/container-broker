@@ -3,19 +3,19 @@
 module Runners
   module Docker
     class RunTask
-      def perform(task:, slot:)
+      def perform(task:, slot:, container_name:)
         Rails.logger.debug("Performing RunTaskJob for #{task} #{slot}")
 
         pull_image(task: task, slot: slot)
         Rails.logger.debug("Image pulled for #{task} #{slot}")
 
-        container = create_container(task: task, slot: slot)
-        Rails.logger.debug("Container #{container.id} created for #{task} #{slot}")
+        container = create_container(task: task, slot: slot, name: container_name)
+        Rails.logger.debug("Container #{container.id} created for #{task} #{slot} with name #{container_name}")
 
         container.start
         Rails.logger.debug("Container #{container.id} started")
 
-        container.id
+        container_name
       rescue Excon::Error, ::Docker::Error::TimeoutError => e then
         message = "Docker connection error: #{e.message}"
         message += "\n#{e.response.body}" if e.respond_to?(:response)
@@ -35,7 +35,7 @@ module Runners
         ::Docker::Image.create({ "fromImage" => image_name, "tag" => image_tag }, nil, slot.node.docker_connection)
       end
 
-      def create_container(task:, slot:)
+      def create_container(task:, slot:, name:)
         binds = []
         binds << Filer::Container.bind(task.storage_mount) if task.storage_mount.present?
         binds << Filer::Ingest.bind(task.ingest_storage_mount) if task.ingest_storage_mount.present?
@@ -43,6 +43,7 @@ module Runners
         ::Docker::Container.create(
           {
             "Image" => task.image,
+            "Name" => name,
             "HostConfig" => {
               "Binds" => binds,
               "NetworkMode" => ENV["DOCKER_CONTAINERS_NETWORK"].to_s

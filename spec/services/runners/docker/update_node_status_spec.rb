@@ -15,10 +15,22 @@ RSpec.describe Runners::Docker::UpdateNodeStatus, type: :service do
     let(:containers) { [container] }
     let(:container_id) { SecureRandom.hex }
     let(:container_creation_date) { 2.minutes.ago.to_s.to_i }
-    let(:container) { double("Docker::Container", id: container_id, info: { "State" => container_state, "Names" => [], "Created" => container_creation_date }) }
+    let(:container_name) { "runner-123" }
+    let(:container) do
+      double(
+        "Docker::Container",
+        id: container_id,
+        info: {
+          "State" => container_state,
+          "Names" => ["other-container-name", "/runner-123"],
+          "Created" => container_creation_date
+        }
+      )
+    end
+
     let(:container_state) { "" }
 
-    let!(:slot) { Fabricate(:slot_running, node: node, container_id: container_id) }
+    let!(:slot) { Fabricate(:slot_running, node: node, container_id: container_name) }
 
     context "when a slot is found with that container id" do
       context "and the container status is exited" do
