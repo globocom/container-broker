@@ -77,7 +77,7 @@ RSpec.describe Runners::Docker::RunTask, type: :service do
     let(:container_create_options) do
       {
         "Image" => "#{image}:#{image_tag}",
-        "Name" => runner_id,
+        "name" => runner_id,
         "HostConfig" => {
           "Binds" => [
             "/tmp/ef-shared:/tmp/workdir",
