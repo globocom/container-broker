@@ -13,13 +13,13 @@ RSpec.describe Runners::Docker::UpdateNodeStatus, type: :service do
 
   context "for all containers" do
     let(:containers) { [container] }
-    let(:container_id) { SecureRandom.hex }
+    let(:runner_id) { SecureRandom.hex }
     let(:container_creation_date) { 2.minutes.ago.to_s.to_i }
-    let(:container_name) { "runner-123" }
+    let(:runner_id) { "runner-123" }
     let(:container) do
       double(
         "Docker::Container",
-        id: container_id,
+        id: runner_id,
         info: {
           "State" => container_state,
           "Names" => ["other-container-name", "/runner-123"],
@@ -30,7 +30,7 @@ RSpec.describe Runners::Docker::UpdateNodeStatus, type: :service do
 
     let(:container_state) { "" }
 
-    let!(:slot) { Fabricate(:slot_running, node: node, container_id: container_name) }
+    let!(:slot) { Fabricate(:slot_running, node: node, runner_id: runner_id) }
 
     context "when a slot is found with that container id" do
       context "and the container status is exited" do
@@ -46,7 +46,7 @@ RSpec.describe Runners::Docker::UpdateNodeStatus, type: :service do
 
           it "enqueues slot releasing job" do
             subject.perform(node: node)
-            expect(ReleaseSlotJob).to have_been_enqueued.with(slot: slot, container_id: container_id)
+            expect(ReleaseSlotJob).to have_been_enqueued.with(slot: slot, runner_id: runner_id)
           end
         end
       end

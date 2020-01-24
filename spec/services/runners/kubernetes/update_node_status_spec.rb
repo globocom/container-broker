@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
   let(:node) { Fabricate(:node_kubernetes) }
   let(:slot_status) { :running }
-  let!(:slot) { Fabricate(:slot, status: slot_status, container_id: "job_name", node: node) }
+  let!(:slot) { Fabricate(:slot, status: slot_status, runner_id: "job_name", node: node) }
   let(:kubernetes_client) { double(KubernetesClient) }
   let(:pod_job_name) { "job_name" }
   let(:state) do
@@ -81,7 +81,7 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
 
       it "does not release slot" do
         expect(ReleaseSlotJob).not_to receive(:perform_later)
-          .with(hash_including(container_id: "job_name"))
+          .with(hash_including(runner_id: "job_name"))
 
         subject.perform(node: node)
       end
@@ -106,7 +106,7 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
 
         it "performs ReleaseSlotJob" do
           expect(ReleaseSlotJob).to receive(:perform_later)
-            .with(hash_including(container_id: "job_name"))
+            .with(hash_including(runner_id: "job_name"))
 
           subject.perform(node: node)
         end
@@ -140,7 +140,7 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
 
         it "performs ReleaseSlotJob" do
           expect(ReleaseSlotJob).to receive(:perform_later)
-            .with(hash_including(container_id: "job_name"))
+            .with(hash_including(runner_id: "job_name"))
 
           subject.perform(node: node)
         end
@@ -167,7 +167,7 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
 
     it "removes container" do
       expect(RemoveContainerJob).to receive(:perform_later)
-        .with(node: node, container_id: pod_job_name)
+        .with(node: node, runner_id: pod_job_name)
 
       subject.perform(node: node)
     end

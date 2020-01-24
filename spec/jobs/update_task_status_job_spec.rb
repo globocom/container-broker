@@ -6,11 +6,11 @@ RSpec.describe UpdateTaskStatusJob, type: :job do
   let(:node) { Fabricate(:node) }
   let(:slot) { Fabricate(:slot_idle, node: node, execution_type: "test") }
   let(:task_persist_logs) { false }
-  let(:task) { Fabricate(:task, slot: slot, container_id: container_id, status: task_status, persist_logs: task_persist_logs) }
+  let(:task) { Fabricate(:task, slot: slot, runner_id: runner_id, status: task_status, persist_logs: task_persist_logs) }
   let(:task_status) { "running" }
   let(:docker_connection) { double("Docker::Connection") }
-  let(:container_id) { "11223344" }
-  let(:container) { double("Docker::Container", id: container_id, info: container_info) }
+  let(:runner_id) { "11223344" }
+  let(:container) { double("Docker::Container", id: runner_id, info: container_info) }
   let(:container_status) { "exited" }
   let(:container_exit_code) { 0 }
   let(:container_error) { "" }
@@ -33,7 +33,7 @@ RSpec.describe UpdateTaskStatusJob, type: :job do
   end
 
   before do
-    allow(Docker::Container).to receive(:get).with(container_id, { all: true }, docker_connection).and_return(container)
+    allow(Docker::Container).to receive(:get).with(runner_id, { all: true }, docker_connection).and_return(container)
     allow(node).to receive(:docker_connection).and_return(docker_connection)
   end
 

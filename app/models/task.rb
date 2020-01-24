@@ -7,7 +7,7 @@ class Task
   include MongoidEnumerable
 
   field :name, type: String
-  field :container_id, type: String # do not remove - needed for update status after completion
+  field :runner_id, type: String
   field :image, type: String
   field :execution_type, type: String
   field :cmd, type: String
@@ -47,6 +47,13 @@ class Task
     message: Constants::ExecutionType::INVALID_FORMAT_MESSAGE
   }
 
+  # TODO: Remove this getter after first deploy
+  def runner_id
+    return super if Rails.env.test?
+
+    super || attributes["runner_id"]
+  end
+
   def set_logs(logs)
     self.logs = BSON::Binary.new(logs, :generic)
   end
@@ -59,8 +66,8 @@ class Task
     end
   end
 
-  def mark_as_started!(container_id:, slot:)
-    update!(started_at: Time.zone.now, container_id: container_id, slot: slot)
+  def mark_as_started!(runner_id:, slot:)
+    update!(started_at: Time.zone.now, runner_id: runner_id, slot: slot)
 
     started!
   end

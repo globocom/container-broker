@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe Runners::Kubernetes::FetchLogs, type: :service do
   let(:node) { Fabricate.build(:node_kubernetes) }
   let(:slot) { Fabricate.build(:slot, node: node) }
-  let(:task) { Fabricate.build(:task, slot: slot, container_id: "container-id") }
+  let(:task) { Fabricate.build(:task, slot: slot, runner_id: "container-id") }
   let(:response) { double(RestClient::Response, body: "logs") }
   let(:kubernetes_client) { double(KubernetesClient) }
 
@@ -13,7 +13,7 @@ RSpec.describe Runners::Kubernetes::FetchLogs, type: :service do
     allow(node).to receive(:kubernetes_client).and_return(kubernetes_client)
 
     allow(kubernetes_client).to receive(:fetch_job_logs)
-      .with(job_name: task.container_id)
+      .with(job_name: task.runner_id)
       .and_return(response)
   end
 
@@ -25,7 +25,7 @@ RSpec.describe Runners::Kubernetes::FetchLogs, type: :service do
     context "and it's bad request" do
       before do
         allow(kubernetes_client).to receive(:fetch_job_logs)
-          .with(job_name: task.container_id)
+          .with(job_name: task.runner_id)
           .and_raise(Kubeclient::HttpError.new(400, "message", nil))
       end
 
@@ -37,7 +37,7 @@ RSpec.describe Runners::Kubernetes::FetchLogs, type: :service do
     context "and it's other error" do
       before do
         allow(kubernetes_client).to receive(:fetch_job_logs)
-          .with(job_name: task.container_id)
+          .with(job_name: task.runner_id)
           .and_raise(Kubeclient::HttpError.new(404, "message", nil))
       end
 

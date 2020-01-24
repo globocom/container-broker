@@ -16,19 +16,18 @@ module Runners
         containers.each do |container|
           container_names = container.info["Names"].map { |name| name.remove(%r{^/}) }
 
-          slot = node.slots.find_by(:container_id.in => container_names)
-
+          slot = node.slots.find_by(:runner_id.in => container_names)
           if slot
-            container_name = slot.container_id
+            runner_id = slot.runner_id
 
-            Rails.logger.debug("Slot found for container #{container_name}: #{slot}")
+            Rails.logger.debug("Slot found for container #{runner_id}: #{slot}")
 
             if container.info["State"] == "exited"
-              Rails.logger.debug("Container #{container_name} exited")
+              Rails.logger.debug("Container #{runner_id} exited")
               if slot.running?
                 slot.releasing!
                 Rails.logger.debug("Slot was running. Marked as releasing. Slot: #{slot}. Current task: #{slot.current_task}")
-                ReleaseSlotJob.perform_later(slot: MongoidSerializableModel.new(slot), container_id: container.id)
+                ReleaseSlotJob.perform_later(slot: MongoidSerializableModel.new(slot), runner_id: runner_id)
               else
                 Rails.logger.debug("Slot was not running (it was #{slot.status}). Ignoring.")
               end
@@ -36,12 +35,13 @@ module Runners
               container.start
             end
           else
-            Rails.logger.debug("Slot not found for container #{container_name}")
+            Rails.logger.debug("Slot not found for container #{container_names}")
 
             if (Settings.ignore_containers & container_names).none?
-              RemoveContainerJob.perform_later(node: node, container_id: container.id)
+              # It is needed to select the container using just any of its names
+              RemoveContainerJob.perform_later(node: node, runner_id: container_names.first)
             else
-              Rails.logger.debug("Container #{container_name} #{container_names} is ignored for removal")
+              Rails.logger.debug("Container #{container_names.join(",")} is ignored for removal")
             end
           end
         end

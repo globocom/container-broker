@@ -10,8 +10,7 @@ class Slot
 
   field :name, type: String
   field :execution_type, type: String
-  # TODO: Rename this field (runner_id?)
-  field :container_id, type: String
+  field :runner_id, type: String
   belongs_to :current_task, class_name: "Task", optional: true
 
   belongs_to :node, optional: true
@@ -28,13 +27,20 @@ class Slot
     idle?
   end
 
-  def mark_as_running(current_task:, container_id:)
-    update!(current_task: current_task, container_id: container_id)
+  # TODO: Remove this getter after first deploy
+  def runner_id
+    return super if Rails.env.test?
+
+    super || attributes["runner_id"]
+  end
+
+  def mark_as_running(current_task:, runner_id:)
+    update!(current_task: current_task, runner_id: runner_id)
     running!
   end
 
   def release
-    update!(container_id: nil, current_task: nil)
+    update!(runner_id: nil, current_task: nil)
     idle!
     RunTasksJob.perform_later(execution_type: execution_type)
   end

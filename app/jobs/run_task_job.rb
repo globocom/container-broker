@@ -6,16 +6,16 @@ class RunTaskJob < ApplicationJob
   def perform(task:, slot:)
     Rails.logger.debug("Performing RunTaskJob for #{task} #{slot}")
 
-    container_name = task.name # TODO: MOdificar por task.generate_name
+    runner_id = task.name # TODO: MOdificar por task.generate_name
 
-    container_id = Runners::ServicesFactory
+    runner_id = Runners::ServicesFactory
                    .fabricate(runner: slot.node.runner, service: :run_task)
-                   .perform(task: task, slot: slot, container_name: container_name)
+                   .perform(task: task, slot: slot, runner_id: runner_id)
 
-    task.mark_as_started!(container_id: container_id, slot: slot)
+    task.mark_as_started!(runner_id: runner_id, slot: slot)
     Rails.logger.debug("#{task} marked as started")
 
-    slot.mark_as_running(current_task: task, container_id: container_id)
+    slot.mark_as_running(current_task: task, runner_id: runner_id)
     Rails.logger.debug("#{slot} marked as running")
 
     add_metric(task)

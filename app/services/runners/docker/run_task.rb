@@ -3,19 +3,19 @@
 module Runners
   module Docker
     class RunTask
-      def perform(task:, slot:, container_name:)
+      def perform(task:, slot:, runner_id:)
         Rails.logger.debug("Performing RunTaskJob for #{task} #{slot}")
 
         pull_image(task: task, slot: slot)
         Rails.logger.debug("Image pulled for #{task} #{slot}")
 
-        container = create_container(task: task, slot: slot, name: container_name)
-        Rails.logger.debug("Container #{container.id} created for #{task} #{slot} with name #{container_name}")
+        container = create_container(task: task, slot: slot, name: runner_id)
+        Rails.logger.debug("Container #{container.id} created for #{task} #{slot} with name #{runner_id}")
 
         container.start
         Rails.logger.debug("Container #{container.id} started")
 
-        container_name
+        runner_id
       rescue Excon::Error, ::Docker::Error::TimeoutError => e then
         message = "Docker connection error: #{e.message}"
         message += "\n#{e.response.body}" if e.respond_to?(:response)

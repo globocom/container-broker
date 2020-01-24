@@ -5,7 +5,7 @@ module Runners
     class UpdateNodeStatus
       def perform(node:)
         node.kubernetes_client.fetch_pods.each do |job_name, pod|
-          slot = node.slots.find_by(container_id: job_name)
+          slot = node.slots.find_by(runner_id: job_name)
           if slot
             execution_info = CreateExecutionInfo.new.perform(pod: pod)
             unless execution_info.terminated?
@@ -16,11 +16,11 @@ module Runners
             Rails.logger.debug("Job #{job_name} Complete")
             if slot.running?
               slot.releasing!
-              ReleaseSlotJob.perform_later(slot: MongoidSerializableModel.new(slot), container_id: job_name)
+              ReleaseSlotJob.perform_later(slot: MongoidSerializableModel.new(slot), runner_id: job_name)
             end
           else
             Rails.logger.debug("Slot not found for job #{job_name}. Removing job and pod.")
-            RemoveContainerJob.perform_later(node: node, container_id: job_name)
+            RemoveContainerJob.perform_later(node: node, runner_id: job_name)
           end
         end
 

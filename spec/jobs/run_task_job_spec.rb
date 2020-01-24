@@ -7,8 +7,8 @@ RSpec.describe RunTaskJob, type: :job do
   let(:task) { Fabricate(:task, status: "starting") }
   let(:slot) { Fabricate(:slot_attaching, node: node) }
   let(:create_task_service) { double }
-  let(:container_id) { SecureRandom.hex }
-  let(:container_name) { "runner-1234" }
+  let(:runner_id) { SecureRandom.hex }
+  let(:runner_id) { "runner-1234" }
 
   def perform
     subject.perform(task: task, slot: slot)
@@ -20,8 +20,8 @@ RSpec.describe RunTaskJob, type: :job do
       .and_return(create_task_service)
 
     allow(create_task_service).to receive(:perform)
-      .with(task: task, slot: slot, container_name: task.name)
-      .and_return(container_id)
+      .with(task: task, slot: slot, runner_id: task.name)
+      .and_return(runner_id)
   end
 
   context "when run task returns an error" do
@@ -77,8 +77,8 @@ RSpec.describe RunTaskJob, type: :job do
   end
 
   context "when run task succeeds" do
-    it "updates task container_id" do
-      expect { perform }.to change(task, :container_id).to(container_id)
+    it "updates task runner_id" do
+      expect { perform }.to change(task, :runner_id).to(runner_id)
     end
 
     it "updates task status" do
@@ -105,8 +105,8 @@ RSpec.describe RunTaskJob, type: :job do
       expect { perform }.to change(slot, :current_task).to(task)
     end
 
-    it "updates slot container_id" do
-      expect { perform }.to change(slot, :container_id).to(container_id)
+    it "updates slot runner_id" do
+      expect { perform }.to change(slot, :runner_id).to(runner_id)
     end
   end
 end

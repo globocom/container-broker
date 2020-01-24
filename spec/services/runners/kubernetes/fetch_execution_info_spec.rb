@@ -7,7 +7,7 @@ RSpec.describe Runners::Kubernetes::FetchExecutionInfo, type: :service do
   let(:node) { Fabricate(:node_kubernetes) }
   let(:job_name) { "job-name" }
   let(:slot) { Fabricate(:slot_running, node: node) }
-  let(:task) { Fabricate(:task, container_id: job_name, slot: slot) }
+  let(:task) { Fabricate(:task, runner_id: job_name, slot: slot) }
   let(:pod) { Kubeclient::Resource.new(metadata: { labels: { job_name: job_name } }) }
 
   before do

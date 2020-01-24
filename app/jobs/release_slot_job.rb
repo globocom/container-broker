@@ -4,15 +4,15 @@ class ReleaseSlotJob < ApplicationJob
   class InvalidSlotContainerId < StandardError; end
   queue_as :default
 
-  def perform(slot:, container_id: nil)
-    Rails.logger.debug("ReleaseSlotJob for #{slot} and container #{container_id}")
+  def perform(slot:, container_id: nil, runner_id: container_id)
+    Rails.logger.debug("ReleaseSlotJob for #{slot} and container #{runner_id}")
 
-    check_same_container_id(slot: slot, container_id: container_id)
+    check_same_runner_id(slot: slot, runner_id: runner_id)
 
     UpdateTaskStatusJob.perform_now(slot.current_task.reload)
 
     Rails.logger.debug("Enqueueing container removal")
-    RemoveContainerJob.perform_later(node: MongoidSerializableModel.new(slot.node), container_id: slot.container_id) if Settings.delete_container_after_run
+    RemoveContainerJob.perform_later(node: MongoidSerializableModel.new(slot.node), runner_id: slot.runner_id) if Settings.delete_container_after_run
 
     check_for_slot_removal = CheckForSlotRemoval.new(slot: slot)
     check_for_slot_removal.perform
@@ -28,10 +28,10 @@ class ReleaseSlotJob < ApplicationJob
     raise
   end
 
-  def check_same_container_id(slot:, container_id:)
-    return if container_id == slot.container_id
+  def check_same_runner_id(slot:, runner_id:)
+    return if runner_id == slot.runner_id
 
-    error_message = "Current container id (#{slot.container_id}) in #{slot} is different than the provided (#{container_id})"
+    error_message = "Current container id (#{slot.runner_id}) in #{slot} is different than the provided (#{runner_id})"
 
     Rails.logger.error(error_message)
 

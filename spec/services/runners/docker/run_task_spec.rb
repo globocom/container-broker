@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.describe Runners::Docker::RunTask, type: :service do
   let(:node) { Fabricate(:node) }
-  let(:container_name) { "task-nametask-nametask-nametask-name-xf9865g" }
+  let(:runner_id) { "task-nametask-nametask-nametask-name-xf9865g" }
   let(:task) do
     Task.create!(
       name: "task-name",
@@ -20,7 +20,7 @@ RSpec.describe Runners::Docker::RunTask, type: :service do
   let(:image) { "busybox" }
   let(:image_tag) { "3.1" }
 
-  let(:perform) { subject.perform(task: task, slot: slot, container_name: container_name) }
+  let(:perform) { subject.perform(task: task, slot: slot, runner_id: runner_id) }
   let(:container) { double("Docker::Container", id: "11223344") }
 
   before do
@@ -77,7 +77,7 @@ RSpec.describe Runners::Docker::RunTask, type: :service do
     let(:container_create_options) do
       {
         "Image" => "#{image}:#{image_tag}",
-        "Name" => container_name,
+        "Name" => runner_id,
         "HostConfig" => {
           "Binds" => [
             "/tmp/ef-shared:/tmp/workdir",
@@ -129,8 +129,8 @@ RSpec.describe Runners::Docker::RunTask, type: :service do
       perform
     end
 
-    it "returns the container_id" do
-      expect(perform).to eq(container_name)
+    it "returns the runner_id" do
+      expect(perform).to eq(runner_id)
     end
   end
 end
