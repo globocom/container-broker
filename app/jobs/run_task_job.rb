@@ -6,9 +6,12 @@ class RunTaskJob < ApplicationJob
   def perform(task:, slot:)
     Rails.logger.debug("Performing RunTaskJob for #{task} #{slot}")
 
-    runner_id = task.name # TODO: MOdificar por task.generate_name
+    runner_id = task.generate_runner_id
 
-    runner_id = Runners::ServicesFactory
+    task.update!(runner_id: runner_id)
+    slot.update!(runner_id: runner_id)
+
+    Runners::ServicesFactory
                    .fabricate(runner: slot.node.runner, service: :run_task)
                    .perform(task: task, slot: slot, runner_id: runner_id)
 

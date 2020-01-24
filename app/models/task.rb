@@ -76,7 +76,7 @@ class Task
     update!(error: error)
 
     if try_count < Settings.task_retry_count
-      update(try_count: try_count + 1, slot: nil)
+      update(try_count: try_count + 1, slot: nil, runner_id: nil)
       retry!
       RunTasksJob.perform_later(execution_type: execution_type)
     else
@@ -120,5 +120,12 @@ class Task
 
   def to_s
     "Task #{name} #{uuid} (#{status})"
+  end
+
+  def generate_runner_id
+    prefix = name.downcase.gsub(/[^a-z0-9_-]+/, "-")
+    random_suffix = SecureRandom.alphanumeric(8).downcase
+
+    "#{prefix}-#{random_suffix}"
   end
 end

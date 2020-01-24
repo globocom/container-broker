@@ -42,8 +42,8 @@ module Runners
 
         ::Docker::Container.create(
           {
+            "name" => name,
             "Image" => task.image,
-            "Name" => name,
             "HostConfig" => {
               "Binds" => binds,
               "NetworkMode" => ENV["DOCKER_CONTAINERS_NETWORK"].to_s
