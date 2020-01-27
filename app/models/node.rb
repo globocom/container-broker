@@ -15,6 +15,7 @@ class Node
   field :last_error, type: String
   field :last_success_at, type: DateTime
   field :accept_new_tasks, type: Boolean, default: true
+  field :runner_capacity_reached, type: Boolean, default: false
   field :slots_execution_types, type: Hash, default: {}
 
   enumerable :status, %w[available unstable unavailable], default: "unavailable", after_change: :status_change
@@ -23,7 +24,7 @@ class Node
   has_many :slots
   embeds_one :kubernetes_config
 
-  scope :accepting_new_tasks, -> { where(accept_new_tasks: true) }
+  scope :accepting_new_tasks, -> { where(accept_new_tasks: true, :runner_capacity_reached.in => [nil, false]) }
 
   validates :hostname, presence: true
   validates :slots_execution_types, presence: true

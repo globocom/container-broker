@@ -6,6 +6,7 @@ Fabricator(:node) do
   status "available"
   accept_new_tasks true
   slots_execution_types { { io: 10, cpu: 5 } }
+  runner_capacity_reached false
 end
 
 Fabricator(:node_docker, from: :node)
