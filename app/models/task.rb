@@ -55,7 +55,7 @@ class Task
   end
 
   def set_logs(logs)
-    self.logs = BSON::Binary.new(logs, :generic)
+    self.logs = BSON::Binary.new(logs.dup, :generic)
   end
 
   def get_logs
