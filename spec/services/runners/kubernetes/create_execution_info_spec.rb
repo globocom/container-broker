@@ -48,6 +48,10 @@ RSpec.describe Runners::Kubernetes::CreateExecutionInfo, type: :service do
       it "with error" do
         expect(subject.error).to be_nil
       end
+
+      it "with schedule pending" do
+        expect(subject).to_not be_schedule_pending
+      end
     end
   end
 
@@ -68,7 +72,7 @@ RSpec.describe Runners::Kubernetes::CreateExecutionInfo, type: :service do
       subject { described_class.new.perform(pod: pod) }
 
       it "with status" do
-        expect(subject).to be_error
+        expect(subject).to be_pending
       end
 
       it "with exit code" do
@@ -85,6 +89,10 @@ RSpec.describe Runners::Kubernetes::CreateExecutionInfo, type: :service do
 
       it "with error" do
         expect(subject.error).to eq("Unschedulable: 0/28 nodes are available: 26 node(s) didn't match node selector, 4 Insufficient cpu.")
+      end
+
+      it "with schedule pending" do
+        expect(subject).to be_schedule_pending
       end
     end
   end
@@ -112,7 +120,7 @@ RSpec.describe Runners::Kubernetes::CreateExecutionInfo, type: :service do
         subject { described_class.new.perform(pod: pod) }
 
         it "with status" do
-          expect(subject.status).to eq("error")
+          expect(subject).to be_error
         end
 
         it "with exit code" do
@@ -129,6 +137,10 @@ RSpec.describe Runners::Kubernetes::CreateExecutionInfo, type: :service do
 
         it "with error" do
           expect(subject.error).to eq("ImagePullBackOff: Back-off pulling image \"busyboxasdfadsfsd\"")
+        end
+
+        it "with schedule pending" do
+          expect(subject).to_not be_schedule_pending
         end
       end
     end
@@ -173,6 +185,10 @@ RSpec.describe Runners::Kubernetes::CreateExecutionInfo, type: :service do
         it "with error" do
           expect(subject.error).to be_nil
         end
+
+        it "with schedule pending" do
+          expect(subject).to_not be_schedule_pending
+        end
       end
     end
   end
@@ -215,6 +231,10 @@ RSpec.describe Runners::Kubernetes::CreateExecutionInfo, type: :service do
 
       it "with error" do
         expect(subject.error).to be_nil
+      end
+
+      it "with schedule pending" do
+        expect(subject).to_not be_schedule_pending
       end
     end
   end
@@ -262,6 +282,10 @@ RSpec.describe Runners::Kubernetes::CreateExecutionInfo, type: :service do
         it "with error" do
           expect(subject.error).to be_nil
         end
+
+        it "with schedule pending" do
+          expect(subject).to_not be_schedule_pending
+        end
       end
     end
 
@@ -289,7 +313,7 @@ RSpec.describe Runners::Kubernetes::CreateExecutionInfo, type: :service do
         subject { described_class.new.perform(pod: pod) }
 
         it "with status" do
-          expect(subject.status).to eq("error")
+          expect(subject).to be_error
         end
 
         it "with exit code" do
@@ -306,6 +330,10 @@ RSpec.describe Runners::Kubernetes::CreateExecutionInfo, type: :service do
 
         it "with error" do
           expect(subject.error).to eq("Error")
+        end
+
+        it "with schedule pending" do
+          expect(subject).to_not be_schedule_pending
         end
       end
     end

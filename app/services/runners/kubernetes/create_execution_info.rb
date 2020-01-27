@@ -19,7 +19,8 @@ module Runners
           exit_code: container_status&.state&.terminated&.exitCode,
           started_at: started_at,
           finished_at: container_status&.state&.terminated&.finishedAt,
-          error: error_message
+          error: error_message,
+          schedule_pending: schedule_pending?
         )
       end
 
@@ -32,7 +33,7 @@ module Runners
           "success"
         elsif error?
           "error"
-        elsif waiting?
+        elsif waiting? || schedule_pending?
           "pending"
         end
       end
@@ -58,10 +59,14 @@ module Runners
       end
 
       def error?
-        terminated_with_error? || reason_is_error? || schedulable_error_messsage
+        terminated_with_error? || reason_is_error?
       end
 
-      def schedulable_error_messsage
+      def schedule_pending?
+        unschedulable_error_messsage.present?
+      end
+
+      def unschedulable_error_messsage
         return if pod.status&.phase != "Pending"
 
         found = pod&.status&.conditions&.find { |condition| condition.reason == "Unschedulable" }
@@ -69,11 +74,11 @@ module Runners
       end
 
       def error_message
-        return unless error?
-
-        return schedulable_error_messsage if schedulable_error_messsage.present?
-
-        reason.values.compact.join(": ")
+        if error?
+          reason.values.compact.join(": ")
+        elsif unschedulable_error_messsage.present?
+          unschedulable_error_messsage
+        end
       end
 
       def started_at
