@@ -65,6 +65,10 @@ class Node
     )
   end
 
+  def runner_service(service)
+    Runners::ServicesFactory.fabricate(runner: runner, service: service)
+  end
+
   def register_error(error)
     Rails.logger.info("Error connecting to node #{name}: #{error}")
 

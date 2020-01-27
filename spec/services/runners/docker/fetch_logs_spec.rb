@@ -10,8 +10,8 @@ RSpec.describe Runners::Docker::FetchLogs, type: :service do
   let(:container_instance) { double(::Docker::Container, streaming_logs: "test logs") }
 
   before do
-    allow(Runners::ServicesFactory).to receive(:fabricate)
-      .with(runner: node.runner, service: :fetch_task_container)
+    allow(node).to receive(:runner_service)
+      .with(:fetch_task_container)
       .and_return(docker_fetch_task_container_instance)
 
     allow(docker_fetch_task_container_instance).to receive(:perform)

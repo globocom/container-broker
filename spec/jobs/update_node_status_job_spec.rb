@@ -7,8 +7,8 @@ RSpec.describe UpdateNodeStatusJob, type: :job do
   let(:docker_runner_instance) { double(Runners::Docker::UpdateNodeStatus) }
 
   before do
-    allow(Runners::ServicesFactory).to receive(:fabricate)
-      .with(runner: node.runner, service: :update_node_status)
+    allow(node).to receive(:runner_service)
+      .with(:update_node_status)
       .and_return(docker_runner_instance)
   end
 

@@ -14,8 +14,8 @@ RSpec.describe RunTaskJob, type: :job do
   end
 
   before do
-    allow(Runners::ServicesFactory).to receive(:fabricate)
-      .with(runner: node.runner, service: :run_task)
+    allow(node).to receive(:runner_service)
+      .with(:run_task)
       .and_return(create_task_service)
 
     allow(create_task_service).to receive(:perform)

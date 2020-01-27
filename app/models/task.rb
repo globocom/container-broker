@@ -60,7 +60,7 @@ class Task
 
   def get_logs
     if started?
-      Runners::ServicesFactory.fabricate(runner: slot.node.runner, service: :fetch_logs).perform(task: self)
+      slot.node.runner_service(:fetch_logs).perform(task: self)
     else
       logs.try(:data)
     end

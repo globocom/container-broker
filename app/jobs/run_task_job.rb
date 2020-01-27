@@ -11,8 +11,9 @@ class RunTaskJob < ApplicationJob
     task.update!(runner_id: runner_id)
     slot.update!(runner_id: runner_id)
 
-    Runners::ServicesFactory
-      .fabricate(runner: slot.node.runner, service: :run_task)
+    slot
+      .node
+      .runner_service(:run_task)
       .perform(task: task, slot: slot, runner_id: runner_id)
 
     task.mark_as_started!(runner_id: runner_id, slot: slot)

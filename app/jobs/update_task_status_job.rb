@@ -9,9 +9,7 @@ class UpdateTaskStatusJob < ApplicationJob
     Rails.logger.debug("Updating status for task #{task}")
     Rails.logger.debug("Task #{task} is running in slot #{task.slot}")
 
-    execution_info = Runners::ServicesFactory
-                     .fabricate(runner: task.slot.node.runner, service: :fetch_execution_info)
-                     .perform(task: task)
+    execution_info = task.slot.node.runner_service(:fetch_execution_info).perform(task: task)
 
     Rails.logger.debug("Got container #{execution_info.id} with state #{execution_info.status}")
 
@@ -46,9 +44,7 @@ class UpdateTaskStatusJob < ApplicationJob
     return unless task.persist_logs
 
     Rails.logger.debug("Persisting logs for #{task}")
-    container_logs = Runners::ServicesFactory
-                     .fabricate(runner: task.slot.node.runner, service: :fetch_logs)
-                     .perform(task: task)
+    container_logs = task.slot.node.runner_service(:fetch_logs).perform(task: task)
     task.set_logs(container_logs)
   end
 
