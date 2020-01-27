@@ -8,6 +8,8 @@ Fabricator(:node) do
   slots_execution_types { { io: 10, cpu: 5 } }
 end
 
+Fabricator(:node_docker, from: :node)
+
 Fabricator(:node_unstable, from: :node) do
   status "unstable"
 end
