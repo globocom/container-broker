@@ -17,7 +17,7 @@ class UpdateTaskStatusJob < ApplicationJob
 
     unless execution_info.terminated?
       raise InvalidContainerStatusError,
-            "Container status should be exited (current status: #{execution_info.status})"
+            "Runner should be terminated (current status: #{execution_info.status})"
     end
 
     Rails.logger.debug("Container is in status #{execution_info.status} and exit code #{execution_info.exit_code}")
