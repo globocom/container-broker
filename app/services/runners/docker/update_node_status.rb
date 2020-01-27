@@ -37,12 +37,7 @@ module Runners
           else
             Rails.logger.debug("Slot not found for container #{container_names}")
 
-            if Settings.ignore_containers.none? { |name| container_names.any? { |container_name| container_name.include?(name) } }
-              # It is needed to select the container using just any of its names
-              RemoveContainerJob.perform_later(node: node, runner_id: container_names.first)
-            else
-              Rails.logger.debug("Container #{container_names.join(",")} is ignored for removal")
-            end
+            check_and_remove_containers(node: node, container_names: container_names)
           end
         end
 
@@ -66,6 +61,15 @@ module Runners
       def extract_names(container:)
         container.info["Names"].map do |name|
           name.remove(%r{^/})
+        end
+      end
+
+      def check_and_remove_containers(node:, container_names:)
+        if Settings.ignore_containers.none? { |name| container_names.any? { |container_name| container_name.include?(name) } }
+          # It is needed to select the container using just any of its names
+          RemoveContainerJob.perform_later(node: node, runner_id: container_names.first)
+        else
+          Rails.logger.debug("Container #{container_names.join(",")} is ignored for removal")
         end
       end
     end
