@@ -8,6 +8,9 @@ module Runners
       def perform(node:)
         @node = node
 
+        # Other tasks can be started at this time. Because of this it's necessary to load the tasks first and then the containers
+        started_tasks = Task.started.where(:slot.in => node.slots.pluck(:id)).to_a
+
         node.update!(runner_capacity_reached: pending_schedule_pods?)
 
         execution_infos.each do |execution_info|
@@ -27,6 +30,10 @@ module Runners
             RemoveContainerJob.perform_later(node: node, runner_id: runner_id)
           end
         end
+
+        RescheduleTasksForMissingContainers
+          .new(runner_ids: pods.keys, started_tasks: started_tasks)
+          .perform
 
         node.update_last_success
       rescue SocketError, Kubeclient::HttpError => e
