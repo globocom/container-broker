@@ -3,9 +3,10 @@
 require "rails_helper"
 
 RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
-  let(:node) { Fabricate(:node_kubernetes) }
+  let(:node) { Fabricate(:node_kubernetes, runner_capacity_reached: nil) }
   let(:slot_status) { :running }
-  let!(:slot) { Fabricate(:slot, status: slot_status, runner_id: "job_name", node: node) }
+  let(:task) { Fabricate(:task) }
+  let!(:slot) { Fabricate(:slot, status: slot_status, runner_id: "job_name", node: node, current_task: task) }
   let(:kubernetes_client) { double(KubernetesClient) }
   let(:pod_job_name) { "job_name" }
   let(:state) do
@@ -43,6 +44,10 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
     expect(node).to receive(:update_last_success)
 
     subject.perform(node: node)
+  end
+
+  it "mark node as capacity unreached" do
+    expect { subject.perform(node: node) }.to change(node, :runner_capacity_reached).to(false)
   end
 
   context "when Kubeclient raises an HTTP error" do
@@ -152,6 +157,36 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
         it "does not release slot" do
           expect { subject.perform(node: node) }.to_not(change { slot.reload.status })
         end
+      end
+    end
+
+    context "and runner capacity is reached" do
+      let(:pods) do
+        {
+          pod_job_name => Kubeclient::Resource.new(
+            metadata: {
+              labels: {
+                "job-name" => pod_job_name
+              }
+            },
+            status: {
+              phase: "Pending",
+              conditions: [
+                reason: "Unschedulable",
+                message: "0/28 nodes are available: 26 node(s) didn't match node selector, 4 Insufficient cpu."
+              ]
+            }
+          )
+        }
+      end
+
+      it "mark node as capacity reached" do
+        expect { subject.perform(node: node) }.to change(node, :runner_capacity_reached).to(true)
+      end
+
+      it "assigns error in task" do
+        expect { subject.perform(node: node) }.to change { slot.current_task.reload.error }
+          .to("Unschedulable: 0/28 nodes are available: 26 node(s) didn't match node selector, 4 Insufficient cpu.")
       end
     end
 
