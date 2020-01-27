@@ -7,15 +7,10 @@ RSpec.describe Runners::Docker::FetchExecutionInfo, type: :service do
   let(:slot) { Fabricate(:slot_running, node: node) }
   let(:task) { Fabricate(:task, slot: slot) }
   let(:container) { double(Docker::Container) }
-  let(:fetch_task_container_instance) { double(Runners::Docker::FetchTaskContainer) }
   let(:execution_info) { double(Runners::ExecutionInfo) }
 
   before do
-    allow(Runners::ServicesFactory).to receive(:fabricate)
-      .with(runner: :docker, service: :fetch_task_container)
-      .and_return(fetch_task_container_instance)
-
-    allow(fetch_task_container_instance).to receive(:perform)
+    allow_any_instance_of(Runners::Docker::FetchTaskContainer).to receive(:perform)
       .with(task: task)
       .and_return(container)
   end

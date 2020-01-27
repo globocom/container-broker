@@ -19,7 +19,6 @@ module Runners
         node_availability: Runners::Docker::NodeAvailability,
         run_task: Runners::Docker::RunTask,
         kill_slot_container: Runners::Docker::KillSlotContainer,
-        fetch_task_container: Runners::Docker::FetchTaskContainer,
         remove_container: Runners::Docker::RemoveContainer,
         fetch_logs: Runners::Docker::FetchLogs,
         fetch_execution_info: Runners::Docker::FetchExecutionInfo

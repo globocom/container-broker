@@ -6,15 +6,10 @@ RSpec.describe Runners::Docker::FetchLogs, type: :service do
   let(:node) { Fabricate(:node) }
   let(:slot) { Fabricate(:slot, node: node) }
   let(:task) { Fabricate(:task, slot: slot) }
-  let(:docker_fetch_task_container_instance) { double(Runners::Docker::FetchTaskContainer) }
   let(:container_instance) { double(::Docker::Container, streaming_logs: "test logs") }
 
   before do
-    allow(node).to receive(:runner_service)
-      .with(:fetch_task_container)
-      .and_return(docker_fetch_task_container_instance)
-
-    allow(docker_fetch_task_container_instance).to receive(:perform)
+    allow_any_instance_of(Runners::Docker::FetchTaskContainer).to receive(:perform)
       .with(task: task)
       .and_return(container_instance)
   end

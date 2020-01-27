@@ -4,8 +4,8 @@ module Runners
   module Docker
     class FetchExecutionInfo
       def perform(task:)
-        container = ServicesFactory
-                    .fabricate(runner: :docker, service: :fetch_task_container)
+        container = Runners::Docker::FetchTaskContainer
+                    .new
                     .perform(task: task)
 
         CreateExecutionInfo.new.perform(container: container)
