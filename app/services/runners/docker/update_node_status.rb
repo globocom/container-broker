@@ -37,7 +37,7 @@ module Runners
           else
             Rails.logger.debug("Slot not found for container #{container_names}")
 
-            if (Settings.ignore_containers & container_names).none?
+            if Settings.ignore_containers.none? { |name| container_names.any? { |container_name| container_name.include?(name) } }
               # It is needed to select the container using just any of its names
               RemoveContainerJob.perform_later(node: node, runner_id: container_names.first)
             else
@@ -46,7 +46,7 @@ module Runners
           end
         end
 
-        all_container_names = containers.flat_map {|container| extract_names(container: container) }
+        all_container_names = containers.flat_map { |container| extract_names(container: container) }
 
         RescheduleTasksForMissingContainers
           .new(runner_ids: all_container_names, started_tasks: started_tasks)
