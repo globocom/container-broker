@@ -13,11 +13,11 @@ RSpec.describe KubernetesClient do
 
   before do
     allow(Kubeclient::Client).to receive(:new)
-      .with("https://cloud.test/apis/batch", "v1", auth_options: { bearer_token: bearer_token })
+      .with("https://cloud.test/apis/batch", "v1", auth_options: { bearer_token: bearer_token }, ssl_options: { verify_ssl: false })
       .and_return(batch_client)
 
     allow(Kubeclient::Client).to receive(:new)
-      .with("https://cloud.test/api", "v1", auth_options: { bearer_token: bearer_token })
+      .with("https://cloud.test/api", "v1", auth_options: { bearer_token: bearer_token }, ssl_options: { verify_ssl: false })
       .and_return(pod_client)
   end
 
@@ -59,7 +59,7 @@ RSpec.describe KubernetesClient do
 
     it "authenticates in the cluster using the provided token" do
       expect(Kubeclient::Client).to receive(:new)
-        .with("https://cloud.test/apis/batch", "v1", auth_options: { bearer_token: bearer_token })
+        .with("https://cloud.test/apis/batch", "v1", auth_options: { bearer_token: bearer_token }, ssl_options: { verify_ssl: false })
         .and_return(batch_client)
 
       create_job

@@ -109,11 +109,11 @@ class KubernetesClient
   end
 
   def batch_client
-    Kubeclient::Client.new(build_client_uri(path: "/apis/batch"), "v1", auth_options: { bearer_token: bearer_token })
+    Kubeclient::Client.new(build_client_uri(path: "/apis/batch"), "v1", auth_options: { bearer_token: bearer_token }, ssl_options: { verify_ssl: false })
   end
 
   def pod_client
-    Kubeclient::Client.new(build_client_uri(path: "/api"), "v1", auth_options: { bearer_token: bearer_token })
+    Kubeclient::Client.new(build_client_uri(path: "/api"), "v1", auth_options: { bearer_token: bearer_token }, ssl_options: { verify_ssl: false })
   end
 
   def build_client_uri(path:)
