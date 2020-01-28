@@ -17,7 +17,7 @@ module Runners
 
       if Settings.ignore_containers.none? { |ignored_name| runner_ids.any? { |runner_id| runner_id.include?(ignored_name) } }
         # It is needed to select the container using just any of its names
-        RemoveContainerJob.perform_later(node: node, runner_id: runner_ids.first)
+        RemoveRunnerJob.perform_later(node: node, runner_id: runner_ids.first)
       else
         Rails.logger.debug("Container #{runner_ids.join(",")} is ignored for removal")
       end

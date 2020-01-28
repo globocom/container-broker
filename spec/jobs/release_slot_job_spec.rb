@@ -27,7 +27,7 @@ RSpec.describe ReleaseSlotJob, type: :job do
 
   it "schedules container removal from docker" do
     subject.perform(slot: slot, runner_id: runner_id)
-    expect(RemoveContainerJob).to have_been_enqueued.with(node: slot.node, runner_id: runner_id)
+    expect(RemoveRunnerJob).to have_been_enqueued.with(node: slot.node, runner_id: runner_id)
   end
 
   context "when update task status raises and error" do

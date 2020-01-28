@@ -191,7 +191,7 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
     end
 
     it "does not remove container" do
-      expect(RemoveContainerJob).to_not receive(:perform_later)
+      expect(RemoveRunnerJob).to_not receive(:perform_later)
 
       subject.perform(node: node)
     end
@@ -201,7 +201,7 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
     let(:pod_job_name) { "other-job-name" }
 
     it "removes container" do
-      expect(RemoveContainerJob).to receive(:perform_later)
+      expect(RemoveRunnerJob).to receive(:perform_later)
         .with(node: node, runner_id: pod_job_name)
 
       subject.perform(node: node)

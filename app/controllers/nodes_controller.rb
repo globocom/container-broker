@@ -53,7 +53,7 @@ class NodesController < ApplicationController
   end
 
   def kill_containers
-    KillNodeContainers.new(node: @node).perform
+    KillNodeRunners.new(node: @node).perform
 
     head :ok
   end
