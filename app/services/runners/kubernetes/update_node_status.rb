@@ -25,7 +25,7 @@ module Runners
               slot.current_task&.update!(error: execution_info.error) if execution_info.error
               Rails.logger.debug("Pod is not terminated (it is #{execution_info.status}). Ignoring.")
             end
-          elsif Settings.ignore_containers.none? { |name| name.include?(runner_id) }
+          elsif Settings.ignore_containers.none? { |name| runner_id.include?(name) }
             Rails.logger.debug("Slot not found for job #{runner_id}. Removing job and pod.")
             RemoveContainerJob.perform_later(node: node, runner_id: runner_id)
           end
