@@ -22,6 +22,8 @@ class ReleaseSlotJob < ApplicationJob
       slot.release
       Rails.logger.debug("Slot released (#{slot.status})")
     end
+  rescue Runners::RunnerIdNotFoundError => e
+    Rails.logger.debug("Runner #{runner_id} not found (#{e.message}). Task will be reschedule in UpdateNodeStatus.")
   rescue StandardError => e
     Rails.logger.debug("Error in ReleaseSlotJob for #{slot}: #{e}")
     slot.node.register_error(e.message)
