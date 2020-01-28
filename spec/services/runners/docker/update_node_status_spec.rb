@@ -69,16 +69,16 @@ RSpec.describe Runners::Docker::UpdateNodeStatus, type: :service do
     end
 
     context "reschedules tasks when container is missing" do
-      let(:reschedule_tasks_for_missing_containers_service) { double("RescheduleTasksForMissingContainers") }
+      let(:reschedule_tasks_for_missing_containers_service) { double("RescheduleTasksForMissingRunners") }
       let(:started_tasks) { [Fabricate(:running_task, slot: slot)] }
 
       before do
-        allow(RescheduleTasksForMissingContainers).to receive(:new)
+        allow(RescheduleTasksForMissingRunners).to receive(:new)
           .with(started_tasks: started_tasks, runner_ids: contain_exactly("runner-123", "other-container-name"))
           .and_return(reschedule_tasks_for_missing_containers_service)
       end
 
-      it "calls RescheduleTasksForMissingContainers perform" do
+      it "calls RescheduleTasksForMissingRunners perform" do
         expect(reschedule_tasks_for_missing_containers_service).to receive(:perform)
         subject.perform(node: node)
       end

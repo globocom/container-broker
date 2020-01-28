@@ -40,7 +40,7 @@ module Runners
 
         all_container_names = containers.flat_map { |container| extract_names(container: container) }
 
-        RescheduleTasksForMissingContainers
+        RescheduleTasksForMissingRunners
           .new(runner_ids: all_container_names, started_tasks: started_tasks)
           .perform
 

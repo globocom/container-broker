@@ -32,7 +32,7 @@ module Runners
           end
         end
 
-        RescheduleTasksForMissingContainers
+        RescheduleTasksForMissingRunners
           .new(runner_ids: pods.keys, started_tasks: started_tasks)
           .perform
 
