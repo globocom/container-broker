@@ -77,8 +77,9 @@ class KubernetesClient
     batch_client.delete_job(job_name, namespace)
   end
 
-  def delete_pod(job_name:)
-    pod_client.delete_pod(fetch_pod_name(job_name: job_name), namespace)
+  def force_delete_pod(job_name:)
+    pod_client
+      .delete_pod(fetch_pod_name(job_name: job_name), namespace, delete_options: delete_options)
   end
 
   def fetch_pods
@@ -90,6 +91,14 @@ class KubernetesClient
   end
 
   private
+
+  def delete_options
+    Kubeclient::Resource.new(
+      apiVersion: "v1",
+      gracePeriodSeconds: 0,
+      kind: "DeleteOptions"
+    )
+  end
 
   def fetch_pod_name(job_name:)
     job_pod_name = pod_client.get_pods(namespace: namespace, label_selector: "job-name=#{job_name}").first&.metadata&.name

@@ -399,11 +399,17 @@ RSpec.describe KubernetesClient do
   context "deleting pod" do
     let(:job_name) { "job-name-123" }
     let(:pod_name) { "#{job_name}-xyz1" }
+    let(:delete_options) { double(Kubeclient::Resource) }
 
     before do
       allow(pod_client).to receive(:get_pods)
         .with(namespace: namespace, label_selector: "job-name=#{job_name}")
         .and_return(pod_list)
+
+      allow(Kubeclient::Resource).to receive(:new).and_call_original
+      allow(Kubeclient::Resource).to receive(:new)
+        .with(apiVersion: "v1", gracePeriodSeconds: 0, kind: "DeleteOptions")
+        .and_return(delete_options)
     end
 
     context "when pod exists" do
@@ -414,9 +420,9 @@ RSpec.describe KubernetesClient do
       end
 
       it "deletes pod" do
-        expect(pod_client).to receive(:delete_pod).with(pod_name, namespace)
+        expect(pod_client).to receive(:delete_pod).with(pod_name, namespace, delete_options: delete_options)
 
-        subject.delete_pod(job_name: job_name)
+        subject.force_delete_pod(job_name: job_name)
       end
     end
 
@@ -424,7 +430,7 @@ RSpec.describe KubernetesClient do
       let(:pod_list) { [] }
 
       it "raises an error" do
-        expect { subject.delete_pod(job_name: job_name) }
+        expect { subject.force_delete_pod(job_name: job_name) }
           .to raise_error(described_class::PodNotFoundError, "Pod not found for job #{job_name}")
       end
     end
