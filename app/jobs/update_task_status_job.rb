@@ -11,9 +11,10 @@ class UpdateTaskStatusJob < ApplicationJob
 
     execution_info = task.slot.node.runner_service(:fetch_execution_info).perform(task: task)
 
-    Rails.logger.debug("Got container #{execution_info.id} with state #{execution_info.status}")
+    Rails.logger.debug("Got runner #{execution_info.id} with state #{execution_info.status}")
 
     unless execution_info.terminated?
+      Rails.logger.debug("Runner should be terminated but it is #{execution_info.status}. Execution info is #{execution_info.to_h}")
       raise InvalidContainerStatusError,
             "Runner should be terminated (current status: #{execution_info.status})"
     end

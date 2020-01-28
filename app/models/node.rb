@@ -70,7 +70,7 @@ class Node
   end
 
   def register_error(error)
-    Rails.logger.info("Error connecting to node #{name}: #{error}")
+    Rails.logger.info("Registering error in #{self}: #{error}")
 
     update!(last_error: error)
 
