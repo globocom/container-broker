@@ -3,14 +3,18 @@
 module Runners
   module Docker
     class UpdateNodeStatus
+      include UpdateNodeStatusHelper
+
+      attr_reader :node
+
       def perform(node:)
+        @node = node
         Rails.logger.debug("Start updating node status for #{node}")
 
         # Other tasks can be started at this time. Because of this it's necessary to load the tasks first and then the containers
         started_tasks = Task.started.where(:slot.in => node.slots.pluck(:id)).to_a
 
         containers = ::Docker::Container.all({ all: true }, node.docker_connection)
-
         Rails.logger.debug("Got #{containers.count} containers")
 
         containers.each do |container|
@@ -24,20 +28,13 @@ module Runners
 
             if container.info["State"] == "exited"
               Rails.logger.debug("Container #{runner_id} exited")
-              if slot.running?
-                slot.releasing!
-                Rails.logger.debug("Slot was running. Marked as releasing. Slot: #{slot}. Current task: #{slot.current_task}")
-                ReleaseSlotJob.perform_later(slot: MongoidSerializableModel.new(slot), runner_id: runner_id)
-              else
-                Rails.logger.debug("Slot was not running (it was #{slot.status}). Ignoring.")
-              end
+
+              check_slot_release(slot: slot, runner_id: runner_id)
             elsif started_with_error?(container: container, docker_connection: node.docker_connection)
               container.start
             end
           else
-            Rails.logger.debug("Slot not found for container #{container_names}")
-
-            check_and_remove_containers(node: node, container_names: container_names)
+            remove_unknown_runners(node: node, runner_ids: container_names)
           end
         end
 
@@ -61,15 +58,6 @@ module Runners
       def extract_names(container:)
         container.info["Names"].map do |name|
           name.remove(%r{^/})
-        end
-      end
-
-      def check_and_remove_containers(node:, container_names:)
-        if Settings.ignore_containers.none? { |name| container_names.any? { |container_name| container_name.include?(name) } }
-          # It is needed to select the container using just any of its names
-          RemoveContainerJob.perform_later(node: node, runner_id: container_names.first)
-        else
-          Rails.logger.debug("Container #{container_names.join(",")} is ignored for removal")
         end
       end
     end

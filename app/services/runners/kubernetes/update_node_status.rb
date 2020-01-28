@@ -3,6 +3,8 @@
 module Runners
   module Kubernetes
     class UpdateNodeStatus
+      include UpdateNodeStatusHelper
+
       attr_reader :node
 
       def perform(node:)
@@ -20,14 +22,13 @@ module Runners
           if slot
             if execution_info.terminated?
               Rails.logger.debug("Job #{runner_id} Complete")
-              release_slot(slot: slot, runner_id: runner_id) if slot.running?
+              check_slot_release(slot: slot, runner_id: runner_id)
             else
               slot.current_task&.update!(error: execution_info.error) if execution_info.error
               Rails.logger.debug("Pod is not terminated (it is #{execution_info.status}). Ignoring.")
             end
-          elsif Settings.ignore_containers.none? { |name| runner_id.include?(name) }
-            Rails.logger.debug("Slot not found for job #{runner_id}. Removing job and pod.")
-            RemoveContainerJob.perform_later(node: node, runner_id: runner_id)
+          else
+            remove_unknown_runners(node: node, runner_ids: [runner_id])
           end
         end
 
@@ -52,11 +53,6 @@ module Runners
 
       def pending_schedule_pods?
         execution_infos.any?(&:schedule_pending?)
-      end
-
-      def release_slot(slot:, runner_id:)
-        slot.releasing!
-        ReleaseSlotJob.perform_later(slot: MongoidSerializableModel.new(slot), runner_id: runner_id)
       end
     end
   end
