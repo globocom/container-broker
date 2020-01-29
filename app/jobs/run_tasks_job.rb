@@ -6,12 +6,7 @@ class RunTasksJob < ApplicationJob
   def perform(execution_type:)
     @execution_type = execution_type
 
-    locked = lock_job.lock do
-      enqueue_tasks
-      true
-    end
-
-    self.class.set(wait: 10.seconds).perform_later(execution_type: execution_type) unless locked
+    lock_job.lock { enqueue_tasks }
   end
 
   private
