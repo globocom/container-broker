@@ -123,7 +123,7 @@ class Task
   end
 
   def generate_runner_id
-    prefix = name.downcase.gsub(/[^a-z0-9_-]+/, "-")
+    prefix = name.gsub("_", "-").parameterize
     random_suffix = SecureRandom.alphanumeric(8).downcase
 
     "#{prefix}-#{random_suffix}"

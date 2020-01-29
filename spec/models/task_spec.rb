@@ -112,4 +112,32 @@ RSpec.describe Task, type: :model do
       end
     end
   end
+
+  context "generating runner id" do
+    subject(:task) { Fabricate(:task, name: " Test - with Spaces, _ underlines and special chars.") }
+
+    it "starts with an alphanumeric char" do
+      expect(task.generate_runner_id).to start_with(/\w/)
+    end
+
+    it "ends with an alphanumeric char" do
+      expect(task.generate_runner_id).to end_with(/\w/)
+    end
+
+    it "cannot include upper case letters" do
+      expect(task.generate_runner_id).to_not match(/[A-Z]/)
+    end
+
+    it "cannot include spaces" do
+      expect(task.generate_runner_id).to_not include(" ")
+    end
+
+    it "cannot include underline" do
+      expect(task.generate_runner_id).to_not include("_")
+    end
+
+    it "need to be a DNS compatible name" do
+      expect(task.generate_runner_id).to match(/[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)
+    end
+  end
 end
