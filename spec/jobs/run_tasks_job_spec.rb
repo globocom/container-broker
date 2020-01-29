@@ -19,7 +19,6 @@ RSpec.describe RunTasksJob, type: :service do
       allow(described_class).to receive(:set).with(wait: 10.seconds).and_return(described_class)
     end
 
-
     it "reschedules the job" do
       expect(described_class).to receive(:perform_later).with(execution_type: execution_type)
 
