@@ -11,7 +11,7 @@ class LockSlot
   def perform
     return unless first_available
 
-    LockManager.new(type: self.class.to_s, id: "", expire: 10.seconds, wait: true).lock do
+    LockManager.new(type: self.class.to_s, id: execution_type, expire: 10.seconds, wait: true).lock do
       first_available.tap do |slot|
         slot&.attaching!
       end
