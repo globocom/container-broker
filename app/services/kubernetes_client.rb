@@ -118,6 +118,6 @@ class KubernetesClient
 
   def build_client_uri(path:)
     parsed_uri = URI.parse(uri)
-    URI::Generic.build(host: parsed_uri.host, scheme: parsed_uri.scheme, path: path).to_s
+    URI::Generic.build(host: parsed_uri.host, port: parsed_uri.port, scheme: parsed_uri.scheme, path: path).to_s
   end
 end
