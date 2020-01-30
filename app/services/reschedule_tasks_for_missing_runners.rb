@@ -13,7 +13,7 @@ class RescheduleTasksForMissingRunners
       task = started_tasks_group_by_runner_id[runner_id]
       Rails.logger.debug("Retry task #{task} because container #{runner_id} does not exists")
       slot = task.slot
-      task.mark_as_retry
+      task.mark_as_retry(error: "Task retryied because runner #{runner_id} is missing")
       slot&.release
     end
   end
