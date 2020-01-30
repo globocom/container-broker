@@ -21,7 +21,7 @@ module Runners
 
           if slot
             if execution_info.terminated?
-              Rails.logger.debug("Job #{runner_id} Complete")
+              Rails.logger.debug("Pod #{runner_id} Complete")
               check_slot_release(slot: slot, runner_id: runner_id)
             else
               slot.current_task&.update!(error: execution_info.error) if execution_info.error

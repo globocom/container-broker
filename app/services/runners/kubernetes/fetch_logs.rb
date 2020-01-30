@@ -12,9 +12,9 @@ module Runners
           .slot
           .node
           .kubernetes_client
-          .fetch_job_logs(job_name: task.runner_id)
+          .fetch_pod_logs(pod_name: task.runner_id)
           .body
-      rescue Kubeclient::ResourceNotFoundError, KubernetesClient::PodNotFoundError => e
+      rescue KubernetesClient::PodNotFoundError => e
         raise Runners::RunnerIdNotFoundError, e.message
       rescue Kubeclient::HttpError => e
         raise e unless HTTP_ERRORS_TO_IGNORE.include?(e.error_code)

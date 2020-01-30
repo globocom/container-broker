@@ -3,8 +3,7 @@
 require "rails_helper"
 RSpec.describe KubernetesClient do
   subject(:kubernetes_client) { described_class.new(uri: uri, bearer_token: bearer_token, namespace: namespace) }
-  let(:batch_client) { double(Kubeclient::Client, create_job: nil) }
-  let(:pod_client) { double(Kubeclient::Client) }
+  let(:pod_client) { double(Kubeclient::Client, create_pod: nil) }
 
   let(:uri) { "https://cloud.test" }
   let(:bearer_token) { SecureRandom.base64 }
@@ -13,16 +12,12 @@ RSpec.describe KubernetesClient do
 
   before do
     allow(Kubeclient::Client).to receive(:new)
-      .with("https://cloud.test/apis/batch", "v1", auth_options: { bearer_token: bearer_token }, ssl_options: { verify_ssl: false })
-      .and_return(batch_client)
-
-    allow(Kubeclient::Client).to receive(:new)
-      .with("https://cloud.test/api", "v1", auth_options: { bearer_token: bearer_token }, ssl_options: { verify_ssl: false })
+      .with("https://cloud.test:443/api", "v1", auth_options: { bearer_token: bearer_token }, ssl_options: { verify_ssl: false })
       .and_return(pod_client)
   end
 
-  context "creating jobs" do
-    let(:job_name) { "create-folder-123" }
+  context "creating pods" do
+    let(:pod_name) { "create-folder-123" }
     let(:image) { "busybox" }
     let(:cmd) { "ls" }
     let(:internal_mounts) do
@@ -46,9 +41,9 @@ RSpec.describe KubernetesClient do
       allow(Kubeclient::Resource).to receive(:new).and_return(resource)
     end
 
-    def create_job
-      kubernetes_client.create_job(
-        job_name: job_name,
+    def create_pod
+      kubernetes_client.create_pod(
+        pod_name: pod_name,
         image: image,
         cmd: cmd,
         internal_mounts: internal_mounts,
@@ -59,104 +54,71 @@ RSpec.describe KubernetesClient do
 
     it "authenticates in the cluster using the provided token" do
       expect(Kubeclient::Client).to receive(:new)
-        .with("https://cloud.test/apis/batch", "v1", auth_options: { bearer_token: bearer_token }, ssl_options: { verify_ssl: false })
-        .and_return(batch_client)
+        .with("https://cloud.test:443/api", "v1", auth_options: { bearer_token: bearer_token }, ssl_options: { verify_ssl: false })
+        .and_return(pod_client)
 
-      create_job
+      create_pod
     end
 
     it "creates the resource" do
       expect(Kubeclient::Resource).to receive(:new).with(
         metadata: {
-          name: "create-folder-123", namespace: "my-namespace"
+          name: "create-folder-123",
+          namespace: "my-namespace"
         },
         spec: {
-          backoffLimit: 0,
-          template: {
-            spec:
+          containers: [
             {
-              containers: [
-                {
-                  name: "create-folder-123",
-                  image: "busybox",
-                  command: ["sh", "-c", "ls"],
-                  resources: {
-                    requests: {
-                      cpu: 1
-                    }
-                  },
-                  volumeMounts: {
-                    name: "nfs-ef",
-                    mountPath: "/tmp/ef-shared"
-                  }
+              name: "create-folder-123",
+              image: "busybox",
+              command: ["sh", "-c", "ls"],
+              resources: {
+                requests: {
+                  cpu: 1
                 }
-              ],
-              restartPolicy: "Never",
-              nodeSelector: {
-                "node-role.kubernetes.io/ef" => ""
-
               },
-              tolerations: [
-                {
-                  key: "node-role.kubernetes.io/ef",
-                  effect: "NoSchedule"
-                }
-              ],
-              volumes: {
+              volumeMounts: {
                 name: "nfs-ef",
-                nfs: {
-                  server: "efactory.cmfdnc01",
-                  path: "/dev/project"
-                }
+                mountPath: "/tmp/ef-shared"
               }
+            }
+          ],
+          restartPolicy: "Never",
+          nodeSelector: {
+            "node-role.kubernetes.io/ef" => ""
+
+          },
+          tolerations: [
+            {
+              key: "node-role.kubernetes.io/ef",
+              effect: "NoSchedule"
+            }
+          ],
+          volumes: {
+            name: "nfs-ef",
+            nfs: {
+              server: "efactory.cmfdnc01",
+              path: "/dev/project"
             }
           }
         }
       )
 
-      create_job
+      create_pod
     end
 
-    it "creates the job in kubernetes cluster using the created resource" do
-      expect(batch_client).to receive(:create_job).with(resource)
+    it "creates the pod in kubernetes cluster using the created resource" do
+      expect(pod_client).to receive(:create_pod).with(resource)
 
-      create_job
-    end
-  end
-
-  context "getting jobs statuses" do
-    let(:job_name) { "create-folder-12345" }
-    let(:job_list) do
-      [
-        Kubeclient::Resource.new(metadata: { name: "job1" }, status: { startTime: Time.zone.now - 2, completionTime: Time.zone.now - 1, succeeded: 1 }),
-        Kubeclient::Resource.new(metadata: { name: "job2" }, status: { startTime: Time.zone.now - 2, completionTime: Time.zone.now - 1, succeeded: 1 }),
-        Kubeclient::Resource.new(metadata: { name: "job3" }, status: { startTime: Time.zone.now - 2, failed: 1 })
-      ]
-    end
-
-    before do
-      allow(batch_client).to receive(:get_jobs).and_return(job_list)
-    end
-
-    it "gets all jobs status" do
-      expect(subject.fetch_jobs_status).to match(
-        "job1" => have_attributes(startTime: be_a(Time), completionTime: be_a(Time), succeeded: 1),
-        "job2" => have_attributes(startTime: be_a(Time), completionTime: be_a(Time), succeeded: 1),
-        "job3" => have_attributes(startTime: be_a(Time), failed: 1)
-      )
+      create_pod
     end
   end
 
   context "getting pod" do
-    let(:job_name) { "create-folder-12345" }
-    let(:pod_name) { "#{job_name}-xyz1" }
+    let(:pod_name) { "create-folder-12345-xyz1" }
     let(:pod) { Kubeclient::Resource.new(kind: "Pod") }
 
     before do
-      allow(pod_client).to receive(:get_pods)
-        .with(namespace: namespace, label_selector: "job-name=#{job_name}")
-        .and_return(pod_list)
-
       allow(pod_client).to receive(:get_pod)
         .with(pod_name, namespace)
         .and_return(pod)
@@ -170,16 +132,22 @@ RSpec.describe KubernetesClient do
       end
 
       it "returns the pod" do
-        expect(subject.fetch_pod(job_name: job_name)).to eq(pod)
+        expect(subject.fetch_pod(pod_name: pod_name)).to eq(pod)
       end
     end
 
     context "when the pod does not exist" do
       let(:pod_list) { [] }
 
+      before do
+        allow(pod_client).to receive(:get_pod)
+          .with(pod_name, namespace)
+          .and_raise(Kubeclient::ResourceNotFoundError.new(404, "Not found", nil))
+      end
+
       it "raises an error" do
-        expect { subject.fetch_job_logs(job_name: job_name) }
-          .to raise_error(described_class::PodNotFoundError, "Pod not found for job #{job_name}")
+        expect { subject.fetch_pod(pod_name: pod_name) }
+          .to raise_error(described_class::PodNotFoundError, "Pod not found #{pod_name}")
       end
     end
   end
@@ -189,9 +157,7 @@ RSpec.describe KubernetesClient do
       [
         Kubeclient::Resource.new(
           metadata: {
-            labels: {
-              "job-name" => "job1"
-            }
+            name: "pod1"
           },
           status: {
             containerStatuses: [
@@ -211,9 +177,7 @@ RSpec.describe KubernetesClient do
         ),
         Kubeclient::Resource.new(
           metadata: {
-            labels: {
-              "job-name" => "job2"
-            }
+            name: "pod2"
           },
           status: {
             containerStatuses: [
@@ -230,9 +194,7 @@ RSpec.describe KubernetesClient do
         ),
         Kubeclient::Resource.new(
           metadata: {
-            labels: {
-              "job-name" => "job3"
-            }
+            name: "pod3"
           },
           status: {
             containerStatuses: [
@@ -253,9 +215,9 @@ RSpec.describe KubernetesClient do
       allow(pod_client).to receive(:get_pods).and_return(pod_list)
     end
 
-    it "gets all pods status grouped by job name" do
+    it "gets all pods status grouped by pod name" do
       expect(subject.fetch_pods).to match(
-        "job1" => have_attributes(
+        "pod1" => have_attributes(
           status: have_attributes(
             containerStatuses: [
               have_attributes(
@@ -268,7 +230,7 @@ RSpec.describe KubernetesClient do
             ]
           )
         ),
-        "job2" => have_attributes(
+        "pod2" => have_attributes(
           status: have_attributes(
             containerStatuses: [
               have_attributes(
@@ -282,7 +244,7 @@ RSpec.describe KubernetesClient do
             ]
           )
         ),
-        "job3" => have_attributes(
+        "pod3" => have_attributes(
           status: have_attributes(
             containerStatuses: [
               have_attributes(
@@ -299,46 +261,32 @@ RSpec.describe KubernetesClient do
     end
   end
 
-  context "getting job logs" do
-    let(:job_name) { "create-folder-12345" }
-    let(:pod_name) { "#{job_name}-xyz1" }
+  context "getting pod logs" do
+    let(:pod_name) { "command" }
     let(:log) { "Logs here" }
 
-    before do
-      allow(pod_client).to receive(:get_pods)
-        .with(namespace: namespace, label_selector: "job-name=#{job_name}")
-        .and_return(pod_list)
-
-      allow(pod_client).to receive(:get_pod_log)
-        .with(pod_name, namespace)
-        .and_return(log)
-    end
-
     context "when pod exists" do
-      let(:pod_list) do
-        [
-          Kubeclient::Resource.new(metadata: { name: pod_name })
-        ]
-      end
-
-      it "gets the pod associated with the job" do
-        expect(pod_client).to receive(:get_pods)
-          .with(namespace: namespace, label_selector: "job-name=#{job_name}").and_return(pod_list)
-
-        subject.fetch_job_logs(job_name: job_name)
+      before do
+        allow(pod_client).to receive(:get_pod_log)
+          .with(pod_name, namespace)
+          .and_return(log)
       end
 
       it "returns the log" do
-        expect(subject.fetch_job_logs(job_name: job_name)).to eq(log)
+        expect(subject.fetch_pod_logs(pod_name: pod_name)).to eq(log)
       end
     end
 
     context "when the pod does not exist" do
-      let(:pod_list) { [] }
+      before do
+        allow(pod_client).to receive(:get_pod_log)
+          .with(pod_name, namespace)
+          .and_raise(Kubeclient::ResourceNotFoundError.new(404, "Not Found", nil))
+      end
 
       it "raises an error" do
-        expect { subject.fetch_job_logs(job_name: job_name) }
-          .to raise_error(described_class::PodNotFoundError, "Pod not found for job #{job_name}")
+        expect { subject.fetch_pod_logs(pod_name: pod_name) }
+          .to raise_error(described_class::PodNotFoundError, "Pod not found #{pod_name}")
       end
     end
   end
@@ -372,40 +320,11 @@ RSpec.describe KubernetesClient do
     end
   end
 
-  context "deleting job" do
-    let(:job_name) { "job-name" }
-
-    context "when job exists" do
-      it "deletes job" do
-        expect(batch_client).to receive(:delete_job).with(job_name, namespace)
-
-        subject.delete_job(job_name: job_name)
-      end
-    end
-
-    context "when job does not exist" do
-      before do
-        allow(batch_client).to receive(:delete_job)
-          .with(job_name, namespace)
-          .and_raise(Kubeclient::ResourceNotFoundError.new(404, "Not found", nil))
-      end
-
-      it "raises the error" do
-        expect { subject.delete_job(job_name: job_name) }.to raise_error(Kubeclient::ResourceNotFoundError)
-      end
-    end
-  end
-
   context "deleting pod" do
-    let(:job_name) { "job-name-123" }
-    let(:pod_name) { "#{job_name}-xyz1" }
+    let(:pod_name) { "command-xyz1" }
     let(:delete_options) { double(Kubeclient::Resource) }
 
     before do
-      allow(pod_client).to receive(:get_pods)
-        .with(namespace: namespace, label_selector: "job-name=#{job_name}")
-        .and_return(pod_list)
-
       allow(Kubeclient::Resource).to receive(:new).and_call_original
       allow(Kubeclient::Resource).to receive(:new)
         .with(apiVersion: "v1", gracePeriodSeconds: 0, kind: "DeleteOptions")
@@ -413,25 +332,23 @@ RSpec.describe KubernetesClient do
     end
 
     context "when pod exists" do
-      let(:pod_list) do
-        [
-          Kubeclient::Resource.new(metadata: { name: pod_name })
-        ]
-      end
-
       it "deletes pod" do
         expect(pod_client).to receive(:delete_pod).with(pod_name, namespace, delete_options: delete_options)
 
-        subject.force_delete_pod(job_name: job_name)
+        subject.force_delete_pod(pod_name: pod_name)
       end
     end
 
     context "when the pod does not exist" do
-      let(:pod_list) { [] }
+      before do
+        allow(pod_client).to receive(:delete_pod)
+          .with(pod_name, namespace, delete_options: delete_options)
+          .and_raise(Kubeclient::ResourceNotFoundError.new(404, "Not found", nil))
+      end
 
       it "raises an error" do
-        expect { subject.force_delete_pod(job_name: job_name) }
-          .to raise_error(described_class::PodNotFoundError, "Pod not found for job #{job_name}")
+        expect { subject.force_delete_pod(pod_name: pod_name) }
+          .to raise_error(described_class::PodNotFoundError, "Pod not found #{pod_name}")
       end
     end
   end

@@ -6,33 +6,33 @@ RSpec.describe Runners::Kubernetes::RunTask do
   let(:task) { Fabricate(:task, name: "Test task #1") }
   let(:node) { Fabricate(:node_kubernetes) }
   let(:slot) { Fabricate(:slot_attaching, node: node) }
-  let(:job_name) { "job-name" }
-  let(:kubernetes_client) { double(KubernetesClient, create_job: job_name) }
+  let(:pod_name) { "pod-name" }
+  let(:kubernetes_client) { double(KubernetesClient, create_pod: pod_name) }
 
   before do
     allow(node).to receive(:kubernetes_client).and_return(kubernetes_client)
-    allow(kubernetes_client).to receive(:create_job).and_return(job_name)
+    allow(kubernetes_client).to receive(:create_pod).and_return(pod_name)
   end
 
-  it "calls create_job in the kubernetes client" do
-    expect(kubernetes_client).to receive(:create_job)
+  it "calls create_pod in the kubernetes client" do
+    expect(kubernetes_client).to receive(:create_pod)
 
-    subject.perform(task: task, slot: slot, runner_id: job_name)
+    subject.perform(task: task, slot: slot, runner_id: pod_name)
   end
 
-  context "creates job with parameters" do
-    before { subject.perform(task: task, slot: slot, runner_id: job_name) }
+  context "creates pod with parameters" do
+    before { subject.perform(task: task, slot: slot, runner_id: pod_name) }
 
-    it "with job_name" do
-      expect(kubernetes_client).to have_received(:create_job).with(
+    it "with pod_name" do
+      expect(kubernetes_client).to have_received(:create_pod).with(
         hash_including(
-          job_name: job_name
+          pod_name: pod_name
         )
       )
     end
 
     it "with image" do
-      expect(kubernetes_client).to have_received(:create_job).with(
+      expect(kubernetes_client).to have_received(:create_pod).with(
         hash_including(
           image: task.image
         )
@@ -40,7 +40,7 @@ RSpec.describe Runners::Kubernetes::RunTask do
     end
 
     it "with cmd" do
-      expect(kubernetes_client).to have_received(:create_job).with(
+      expect(kubernetes_client).to have_received(:create_pod).with(
         hash_including(
           cmd: task.cmd
         )
@@ -48,7 +48,7 @@ RSpec.describe Runners::Kubernetes::RunTask do
     end
 
     it "with node_selector" do
-      expect(kubernetes_client).to have_received(:create_job).with(
+      expect(kubernetes_client).to have_received(:create_pod).with(
         hash_including(
           node_selector: node.kubernetes_config.node_selector
         )
@@ -57,7 +57,7 @@ RSpec.describe Runners::Kubernetes::RunTask do
 
     context "when task has storage mount" do
       it "with internal mounts" do
-        expect(kubernetes_client).to have_received(:create_job).with(
+        expect(kubernetes_client).to have_received(:create_pod).with(
           hash_including(
             internal_mounts: [
               {
@@ -70,7 +70,7 @@ RSpec.describe Runners::Kubernetes::RunTask do
       end
 
       it "with external mounts" do
-        expect(kubernetes_client).to have_received(:create_job).with(
+        expect(kubernetes_client).to have_received(:create_pod).with(
           hash_including(
             external_mounts: [
               {
@@ -90,12 +90,12 @@ RSpec.describe Runners::Kubernetes::RunTask do
       let(:task) { Fabricate(:task, ingest_storage_mount: nil) }
 
       it "without internal mounts" do
-        expect(kubernetes_client).to have_received(:create_job)
+        expect(kubernetes_client).to have_received(:create_pod)
           .with(hash_including(internal_mounts: []))
       end
 
       it "without external mounts" do
-        expect(kubernetes_client).to have_received(:create_job)
+        expect(kubernetes_client).to have_received(:create_pod)
           .with(hash_including(external_mounts: []))
       end
     end
@@ -104,28 +104,28 @@ RSpec.describe Runners::Kubernetes::RunTask do
   context "when the creation fails" do
     context "and is a node connectivity problem" do
       before do
-        allow(kubernetes_client).to receive(:create_job).and_raise(SocketError, "Error connecting with kubernetes")
+        allow(kubernetes_client).to receive(:create_pod).and_raise(SocketError, "Error connecting with kubernetes")
       end
 
       it "raises NodeConnectionError" do
-        expect { subject.perform(task: task, slot: slot, runner_id: job_name) }.to raise_error(Node::NodeConnectionError, "SocketError: Error connecting with kubernetes")
+        expect { subject.perform(task: task, slot: slot, runner_id: pod_name) }.to raise_error(Node::NodeConnectionError, "SocketError: Error connecting with kubernetes")
       end
     end
 
     context "and is other error" do
       before do
-        allow(kubernetes_client).to receive(:create_job).and_raise(StandardError, "Error parsing the task command")
+        allow(kubernetes_client).to receive(:create_pod).and_raise(StandardError, "Error parsing the task command")
       end
 
       it "raises the same error" do
-        expect { subject.perform(task: task, slot: slot, runner_id: job_name) }.to raise_error(StandardError, "Error parsing the task command")
+        expect { subject.perform(task: task, slot: slot, runner_id: pod_name) }.to raise_error(StandardError, "Error parsing the task command")
       end
     end
   end
 
   context "when task starts without errors" do
-    it "returns job name" do
-      expect(subject.perform(task: task, slot: slot, runner_id: job_name)).to start_with(job_name)
+    it "returns pod name" do
+      expect(subject.perform(task: task, slot: slot, runner_id: pod_name)).to start_with(pod_name)
     end
   end
 end

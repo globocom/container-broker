@@ -14,7 +14,7 @@ module Runners
         @pod = pod
 
         Runners::ExecutionInfo.new(
-          id: pod&.metadata&.labels&.dig(:"job-name"),
+          id: pod&.metadata&.name,
           status: status,
           exit_code: container_status&.state&.terminated&.exitCode,
           started_at: started_at,

@@ -12,20 +12,20 @@ RSpec.describe Runners::Kubernetes::FetchLogs, type: :service do
   before do
     allow(node).to receive(:kubernetes_client).and_return(kubernetes_client)
 
-    allow(kubernetes_client).to receive(:fetch_job_logs)
-      .with(job_name: task.runner_id)
+    allow(kubernetes_client).to receive(:fetch_pod_logs)
+      .with(pod_name: task.runner_id)
       .and_return(response)
   end
 
-  it "fetches job logs" do
+  it "fetches pod logs" do
     expect(subject.perform(task: task)).to eq("logs")
   end
 
   context "when receiving an error" do
     context "and it's bad request" do
       before do
-        allow(kubernetes_client).to receive(:fetch_job_logs)
-          .with(job_name: task.runner_id)
+        allow(kubernetes_client).to receive(:fetch_pod_logs)
+          .with(pod_name: task.runner_id)
           .and_raise(Kubeclient::HttpError.new(400, "message", nil))
       end
 
@@ -36,8 +36,8 @@ RSpec.describe Runners::Kubernetes::FetchLogs, type: :service do
 
     context "and it's other error" do
       before do
-        allow(kubernetes_client).to receive(:fetch_job_logs)
-          .with(job_name: task.runner_id)
+        allow(kubernetes_client).to receive(:fetch_pod_logs)
+          .with(pod_name: task.runner_id)
           .and_raise(Kubeclient::HttpError.new(404, "message", nil))
       end
 

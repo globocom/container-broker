@@ -6,9 +6,9 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
   let(:node) { Fabricate(:node_kubernetes, runner_capacity_reached: nil) }
   let(:slot_status) { :running }
   let(:task) { Fabricate(:task) }
-  let!(:slot) { Fabricate(:slot, status: slot_status, runner_id: "job_name", node: node, current_task: task) }
+  let!(:slot) { Fabricate(:slot, status: slot_status, runner_id: "pod_name", node: node, current_task: task) }
   let(:kubernetes_client) { double(KubernetesClient) }
-  let(:pod_job_name) { "job_name" }
+  let(:pod_name) { "pod_name" }
   let(:state) do
     {
       running: {
@@ -18,11 +18,9 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
   end
   let(:pods) do
     {
-      pod_job_name => Kubeclient::Resource.new(
+      pod_name => Kubeclient::Resource.new(
         metadata: {
-          labels: {
-            "job-name" => pod_job_name
-          }
+          name: pod_name
         },
         status: {
           containerStatuses: [
@@ -75,7 +73,7 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
   end
 
   context "when slot exists" do
-    context "when job is not completed" do
+    context "when pod is not completed" do
       let(:state) do
         {
           running: {
@@ -86,13 +84,13 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
 
       it "does not release slot" do
         expect(ReleaseSlotJob).not_to receive(:perform_later)
-          .with(hash_including(runner_id: "job_name"))
+          .with(hash_including(runner_id: "pod_name"))
 
         subject.perform(node: node)
       end
     end
 
-    context "when job is succeeded" do
+    context "when pod is succeeded" do
       let(:state) do
         {
           terminated: {
@@ -111,7 +109,7 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
 
         it "performs ReleaseSlotJob" do
           expect(ReleaseSlotJob).to receive(:perform_later)
-            .with(hash_including(runner_id: "job_name"))
+            .with(hash_including(runner_id: "pod_name"))
 
           subject.perform(node: node)
         end
@@ -126,7 +124,7 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
       end
     end
 
-    context "when job is failed" do
+    context "when pod is failed" do
       let(:state) do
         {
           terminated: {
@@ -145,7 +143,7 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
 
         it "performs ReleaseSlotJob" do
           expect(ReleaseSlotJob).to receive(:perform_later)
-            .with(hash_including(runner_id: "job_name"))
+            .with(hash_including(runner_id: "pod_name"))
 
           subject.perform(node: node)
         end
@@ -163,11 +161,9 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
     context "and runner capacity is reached" do
       let(:pods) do
         {
-          pod_job_name => Kubeclient::Resource.new(
+          pod_name => Kubeclient::Resource.new(
             metadata: {
-              labels: {
-                "job-name" => pod_job_name
-              }
+              name: pod_name
             },
             status: {
               phase: "Pending",
@@ -190,7 +186,7 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
       end
     end
 
-    it "does not remove container" do
+    it "does not remove runner" do
       expect(RemoveRunnerJob).to_not receive(:perform_later)
 
       subject.perform(node: node)
@@ -198,11 +194,11 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
   end
 
   context "when slot does not exist" do
-    let(:pod_job_name) { "other-job-name" }
+    let(:pod_name) { "other-pod-name" }
 
-    it "removes container" do
+    it "removes runner" do
       expect(RemoveRunnerJob).to receive(:perform_later)
-        .with(node: node, runner_id: pod_job_name)
+        .with(node: node, runner_id: pod_name)
 
       subject.perform(node: node)
     end

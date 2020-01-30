@@ -16,78 +16,66 @@ class KubernetesClient
   end
 
   # rubocop:disable Metrics/ParameterLists
-  def create_job(job_name:, image:, cmd:, internal_mounts: [], external_mounts: [], node_selector:)
-    job = Kubeclient::Resource.new(
+  def create_pod(pod_name:, image:, cmd:, internal_mounts: [], external_mounts: [], node_selector:)
+    pod = Kubeclient::Resource.new(
       metadata: {
-        name: job_name,
+        name: pod_name,
         namespace: namespace
       },
       spec: {
-        backoffLimit: 0,
-        template: {
-          spec: {
-            containers: [
-              {
-                name: job_name,
-                image: image,
-                command: ["sh", "-c", cmd],
-                resources: {
-                  requests: { cpu: 1 }
-                },
-                volumeMounts: internal_mounts
-              }
-            ],
-            restartPolicy: "Never",
-            nodeSelector: { node_selector => "" },
-            tolerations: [
-              {
-                key: node_selector,
-                effect: "NoSchedule"
-              }
-            ],
-            volumes: external_mounts
+        containers: [
+          {
+            name: pod_name,
+            image: image,
+            command: ["sh", "-c", cmd],
+            resources: {
+              requests: { cpu: 1 }
+            },
+            volumeMounts: internal_mounts
           }
-        }
+        ],
+        restartPolicy: "Never",
+        nodeSelector: { node_selector => "" },
+        tolerations: [
+          {
+            key: node_selector,
+            effect: "NoSchedule"
+          }
+        ],
+        volumes: external_mounts
       }
     )
 
-    batch_client.create_job(job)
+    pod_client.create_pod(pod)
 
-    job_name
+    pod_name
   end
   # rubocop:enable Metrics/ParameterLists
 
-  def fetch_job_logs(job_name:)
-    pod_client.get_pod_log(fetch_pod_name(job_name: job_name), namespace)
+  def fetch_pod_logs(pod_name:)
+    handle_exception(pod_name) { pod_client.get_pod_log(pod_name, namespace) }
   end
 
-  def fetch_pod(job_name:)
-    pod_client.get_pod(fetch_pod_name(job_name: job_name), namespace)
+  def fetch_pod(pod_name:)
+    handle_exception(pod_name) { pod_client.get_pod(pod_name, namespace) }
   end
 
-  def fetch_jobs_status
-    batch_client
-      .get_jobs(namespace: namespace)
-      .each_with_object({}) do |job, result|
-        result[job.metadata.name] = job.status
-      end
-  end
-
-  def delete_job(job_name:)
-    batch_client.delete_job(job_name, namespace)
-  end
-
-  def force_delete_pod(job_name:)
-    pod_client
-      .delete_pod(fetch_pod_name(job_name: job_name), namespace, delete_options: delete_options)
+  def force_delete_pod(pod_name:)
+    handle_exception(pod_name) { pod_client.delete_pod(pod_name, namespace, delete_options: delete_options) }
   end
 
   def fetch_pods
     pod_client
       .get_pods(namespace: namespace)
       .each_with_object({}) do |pod, result|
-        result[pod.metadata.labels["job-name"]] = pod
+        result[pod.metadata.name] = pod
       end
+  end
+
+  def handle_exception(pod_name)
+    yield
+  rescue Kubeclient::ResourceNotFoundError
+    raise PodNotFoundError, "Pod not found #{pod_name}"
   end
 
   private
@@ -98,18 +86,6 @@ class KubernetesClient
       gracePeriodSeconds: 0,
       kind: "DeleteOptions"
     )
-  end
-
-  def fetch_pod_name(job_name:)
-    job_pod_name = pod_client.get_pods(namespace: namespace, label_selector: "job-name=#{job_name}").first&.metadata&.name
-
-    raise PodNotFoundError, "Pod not found for job #{job_name}" unless job_pod_name
-
-    job_pod_name
-  end
-
-  def batch_client
-    Kubeclient::Client.new(build_client_uri(path: "/apis/batch"), "v1", auth_options: { bearer_token: bearer_token }, ssl_options: { verify_ssl: false })
   end
 
   def pod_client

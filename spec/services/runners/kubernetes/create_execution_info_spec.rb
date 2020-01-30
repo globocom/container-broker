@@ -10,9 +10,7 @@ RSpec.describe Runners::Kubernetes::CreateExecutionInfo, type: :service do
     let(:pod) do
       Kubeclient::Resource.new(
         metadata: {
-          labels: {
-            "job-name": "id"
-          }
+          name: "id"
         }
       )
     end
@@ -21,7 +19,7 @@ RSpec.describe Runners::Kubernetes::CreateExecutionInfo, type: :service do
     it { is_expected.to eq("id") }
   end
 
-  context "when job was not started" do
+  context "when pod was not started" do
     let(:pod) do
       Kubeclient::Resource.new
     end
@@ -55,7 +53,7 @@ RSpec.describe Runners::Kubernetes::CreateExecutionInfo, type: :service do
     end
   end
 
-  context "when job has a schedulable error message" do
+  context "when pod has a schedulable error message" do
     let(:pod) do
       Kubeclient::Resource.new(
         status: {
@@ -97,7 +95,7 @@ RSpec.describe Runners::Kubernetes::CreateExecutionInfo, type: :service do
     end
   end
 
-  context "when job is pending" do
+  context "when pod is pending" do
     context "and has an error reason" do
       let(:pod) do
         Kubeclient::Resource.new(
@@ -193,7 +191,7 @@ RSpec.describe Runners::Kubernetes::CreateExecutionInfo, type: :service do
     end
   end
 
-  context "when job is running" do
+  context "when pod is running" do
     let(:pod) do
       Kubeclient::Resource.new(
         status: {
@@ -239,7 +237,7 @@ RSpec.describe Runners::Kubernetes::CreateExecutionInfo, type: :service do
     end
   end
 
-  context "when job was completed" do
+  context "when pod was completed" do
     context "and it's successfully" do
       let(:pod) do
         Kubeclient::Resource.new(
