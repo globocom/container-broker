@@ -178,4 +178,32 @@ RSpec.describe Runners::Docker::CreateExecutionInfo, type: :service do
       end
     end
   end
+
+  context "when the state is just a status string" do
+    let(:container) do
+      double(
+        ::Docker::Container,
+        info: {
+          "id" => "id",
+          "State" => state
+        }
+      )
+    end
+
+    context "running" do
+      let(:state) { "running" }
+
+      it "considers the state as the status" do
+        expect(described_class.new.perform(container: container)).to be_running
+      end
+    end
+
+    context "exited" do
+      let(:state) { "exited" }
+
+      it "considers the state as the status" do
+        expect(described_class.new.perform(container: container)).to be_exited
+      end
+    end
+  end
 end

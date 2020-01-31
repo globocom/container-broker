@@ -8,14 +8,21 @@ module Runners
       def perform(container:)
         @container = container
 
-        Runners::ExecutionInfo.new(
+        exeuction_info_data = {
           id: container.info["id"],
-          status: status,
-          exit_code: state["ExitCode"],
-          started_at: state["StartedAt"],
-          finished_at: state["FinishedAt"],
-          error: state["Error"]
-        )
+          status: status
+        }
+
+        if full_state_present?
+          exeuction_info_data.merge!(
+            exit_code: state["ExitCode"],
+            started_at: state["StartedAt"],
+            finished_at: state["FinishedAt"],
+            error: state["Error"]
+          )
+        end
+
+        Runners::ExecutionInfo.new(exeuction_info_data)
       end
 
       private
@@ -29,19 +36,21 @@ module Runners
           "success"
         elsif terminated_with_error?
           "error"
+        elsif terminated?
+          "exited"
         end
       end
 
       def waiting?
-        state["Status"] == "created"
+        state_status == "created"
       end
 
       def running?
-        state["Status"] == "running"
+        state_status == "running"
       end
 
       def terminated?
-        state["Status"] == "exited"
+        state_status == "exited"
       end
 
       def terminated_with_success?
@@ -52,8 +61,20 @@ module Runners
         terminated? && state["ExitCode"]&.positive?
       end
 
+      def full_state_present?
+        state.is_a?(Hash)
+      end
+
       def state
         container.info["State"]
+      end
+
+      def state_status
+        if full_state_present?
+          state["Status"]
+        else
+          state
+        end
       end
     end
   end
