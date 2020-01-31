@@ -22,5 +22,22 @@ module Runners
         Rails.logger.debug("Container #{runner_ids.join(",")} is ignored for removal")
       end
     end
+
+    def send_metrics(node:, execution_infos:)
+      runners_count = execution_infos
+                      .group_by(&:status)
+                      .transform_keys { |k| "#{k}_runners".to_sym }
+                      .transform_values(&:count)
+
+      data = {
+        hostname: node.hostname,
+        runner_type: node.runner,
+        capacity_reached: node.runner_capacity_reached,
+        schedule_pending: execution_infos.count(&:schedule_pending?),
+        total_runners: execution_infos.count
+      }
+
+      Metrics.new("runner_capacity").count(data.merge(runners_count))
+    end
   end
 end

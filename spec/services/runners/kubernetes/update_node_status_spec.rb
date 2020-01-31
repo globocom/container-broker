@@ -191,4 +191,64 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
       subject.perform(node: node)
     end
   end
+
+  context "metrics" do
+    let(:pods) do
+      {
+        "pod-1" => Kubeclient::Resource.new(
+          metadata: {
+            name: pod_name
+          },
+          status: {
+            containerStatuses: [
+              {
+                state: {
+                  running: {
+                    startedAt: "2020-01-21T21:20:32Z"
+                  }
+                }
+              }
+            ]
+          }
+        ),
+        "pod-2" => Kubeclient::Resource.new(
+          metadata: {
+            name: "other-pod"
+          },
+          status: {
+            containerStatuses: [
+              {
+                state: {
+                  terminated: {
+                    exitCode: 0,
+                    reason: "Completed",
+                    startedAt: "2020-01-21T21:20:32Z",
+                    finishedAt: "2020-01-21T21:20:32Z"
+                  }
+                }
+              }
+            ]
+          }
+        )
+      }
+    end
+
+    let(:metrics) { double }
+
+    before { allow(Metrics).to receive(:new).with("runner_capacity").and_return(metrics) }
+
+    it "sends metrics with running count" do
+      expect(metrics).to receive(:count).with(
+        hostname: node.hostname,
+        runner_type: "kubernetes",
+        capacity_reached: false,
+        schedule_pending: 0,
+        total_runners: 2,
+        running_runners: 1,
+        success_runners: 1
+      )
+
+      subject.perform(node: node)
+    end
+  end
 end

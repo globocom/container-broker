@@ -36,6 +36,8 @@ module Runners
           .new(runner_ids: pods.keys, started_tasks: started_tasks)
           .perform
 
+        send_metrics(node: node, execution_infos: execution_infos)
+
         node.update_last_success
       rescue KubernetesClient::NetworkError => e
         Rails.logger.debug("Error #{e.class}: #{e}")
