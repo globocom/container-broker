@@ -4,8 +4,8 @@ require "rails_helper"
 
 RSpec.describe RescheduleTasksForMissingRunners, type: :service do
   let(:runner_id) { "123" }
-  let(:node) { Fabricate(:node, slots: [slot]) }
-  let(:slot) { Fabricate(:slot_running, runner_id: runner_id) }
+  let(:node) { Fabricate(:node, name: "node-0") }
+  let(:slot) { Fabricate(:slot_running, runner_id: runner_id, name: "slot-0", node: node) }
   let!(:started_task) { Fabricate(:running_task, runner_id: runner_id, slot: slot) }
 
   context "when container exists" do
@@ -39,6 +39,40 @@ RSpec.describe RescheduleTasksForMissingRunners, type: :service do
         described_class.new(started_tasks: [started_task], runner_ids: runner_ids).perform
         slot.reload
       end.to change(slot, :status).to("idle")
+    end
+
+    context "and sentry is enabled" do
+      before do
+        Settings.sentry.enabled = true
+      end
+
+      it "sends an event" do
+        expect(Raven).to receive(:capture_exception).with(
+          "Task retryied because runner #{runner_id} is missing",
+          extra: {
+            runner: node.runner,
+            runner_id: runner_id,
+            slot: {
+              id: slot.id,
+              name: slot.name,
+              status: slot.status,
+              runner_id: slot.runner_id
+            },
+            node: {
+              id: node.id,
+              name: node.name,
+              status: node.status
+            },
+            task: {
+              id: started_task.id,
+              name: started_task.name,
+              status: started_task.status
+            }
+          }
+        )
+
+        described_class.new(started_tasks: [started_task], runner_ids: runner_ids).perform
+      end
     end
   end
 end

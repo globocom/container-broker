@@ -11,14 +11,48 @@ class RescheduleTasksForMissingRunners
   def perform
     tasks_without_runner.each do |runner_id|
       task = started_tasks_group_by_runner_id[runner_id]
-      Rails.logger.debug("Retry task #{task} because runner #{runner_id} does not exist")
+      message = "Task retryied because runner #{runner_id} is missing"
+      Rails.logger.debug(message)
+
+      report_event(message: message, task: task, runner_id: runner_id)
+
       slot = task.slot
-      task.mark_as_retry(error: "Task retryied because runner #{runner_id} is missing")
+      task.mark_as_retry(error: message)
       slot&.release
     end
   end
 
   private
+
+  def report_event(message:, task:, runner_id:)
+    return unless Settings.sentry.enabled
+
+    slot = task&.slot
+    node = slot&.node
+    Raven.capture_exception(
+      message,
+      extra: {
+        runner: slot&.node&.runner,
+        runner_id: runner_id,
+        slot: {
+          id: slot&.id,
+          name: slot&.name,
+          status: slot&.status,
+          runner_id: slot&.runner_id
+        },
+        node: {
+          id: node&.id,
+          name: node&.name,
+          status: node&.status
+        },
+        task: {
+          id: task.id,
+          name: task.name,
+          status: task.status
+        }
+      }
+    )
+  end
 
   def tasks_without_runner
     started_tasks_group_by_runner_id.keys.map(&:to_s) - runner_ids
