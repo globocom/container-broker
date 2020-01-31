@@ -104,11 +104,11 @@ RSpec.describe Runners::Kubernetes::RunTask do
   context "when the creation fails" do
     context "and is a node connectivity problem" do
       before do
-        allow(kubernetes_client).to receive(:create_pod).and_raise(SocketError, "Error connecting with kubernetes")
+        allow(kubernetes_client).to receive(:create_pod).and_raise(KubernetesClient::NetworkError, "Error connecting with kubernetes")
       end
 
       it "raises NodeConnectionError" do
-        expect { subject.perform(task: task, slot: slot, runner_id: pod_name) }.to raise_error(Node::NodeConnectionError, "SocketError: Error connecting with kubernetes")
+        expect { subject.perform(task: task, slot: slot, runner_id: pod_name) }.to raise_error(Node::NodeConnectionError, "KubernetesClient::NetworkError: Error connecting with kubernetes")
       end
     end
 

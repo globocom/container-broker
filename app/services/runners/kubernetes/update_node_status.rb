@@ -37,7 +37,7 @@ module Runners
           .perform
 
         node.update_last_success
-      rescue SocketError, Kubeclient::HttpError => e
+      rescue KubernetesClient::NetworkError => e
         Rails.logger.debug("Error #{e.class}: #{e}")
         node.register_error(e.message)
       end

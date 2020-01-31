@@ -50,23 +50,11 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
 
   context "when Kubeclient raises an HTTP error" do
     before do
-      allow(kubernetes_client).to receive(:fetch_pods).and_raise(Kubeclient::HttpError.new(nil, "error_message", nil))
+      allow(kubernetes_client).to receive(:fetch_pods).and_raise(KubernetesClient::NetworkError, "error_message")
     end
 
     it "registers error" do
       expect(node).to receive(:register_error).with("error_message")
-
-      subject.perform(node: node)
-    end
-  end
-
-  context "when SocketError is raised" do
-    before do
-      allow(kubernetes_client).to receive(:fetch_pods).and_raise(SocketError.new("error_message_socket"))
-    end
-
-    it "registers error" do
-      expect(node).to receive(:register_error).with("error_message_socket")
 
       subject.perform(node: node)
     end

@@ -3,24 +3,18 @@
 module Runners
   module Kubernetes
     class FetchLogs
-      HTTP_ERRORS_TO_IGNORE = [
-        400
-      ].freeze
-
       def perform(task:)
         task
           .slot
           .node
           .kubernetes_client
           .fetch_pod_logs(pod_name: task.runner_id)
-          .body
       rescue KubernetesClient::PodNotFoundError => e
         raise Runners::RunnerIdNotFoundError, e.message
-      rescue Kubeclient::HttpError => e
-        raise e unless HTTP_ERRORS_TO_IGNORE.include?(e.error_code)
+      rescue KubernetesClient::LogsNotFoundError
+        Rails.logger.error("Error on fetching kubernetes pod logs")
 
-        Rails.logger.error("Error on fetching kubernetes pod logs - #{e.error_code} - #{e.message}")
-        ""
+        "Logs not found"
       end
     end
   end

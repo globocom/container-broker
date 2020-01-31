@@ -7,7 +7,7 @@ module Runners
 
       def perform(task:, slot:, runner_id:)
         create_pod(task: task, node: slot.node, runner_id: runner_id)
-      rescue SocketError => e then
+      rescue KubernetesClient::NetworkError => e then
         raise Node::NodeConnectionError, "#{e.class}: #{e.message}"
       end
 

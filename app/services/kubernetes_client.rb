@@ -2,6 +2,10 @@
 
 class KubernetesClient
   class PodNotFoundError < StandardError; end
+  class NetworkError < StandardError; end
+  class LogsNotFoundError < StandardError; end
+
+  LOG_UNAVAILABLE_HTTP_ERROR = 400
 
   attr_reader :uri, :bearer_token, :namespace
 
@@ -12,48 +16,56 @@ class KubernetesClient
   end
 
   def api_info
-    pod_client.api
+    handle_exception { pod_client.api }
   end
 
   # rubocop:disable Metrics/ParameterLists
   def create_pod(pod_name:, image:, cmd:, internal_mounts: [], external_mounts: [], node_selector:)
-    pod = Kubeclient::Resource.new(
-      metadata: {
-        name: pod_name,
-        namespace: namespace
-      },
-      spec: {
-        containers: [
-          {
-            name: pod_name,
-            image: image,
-            command: ["sh", "-c", cmd],
-            resources: {
-              requests: { cpu: 1 }
-            },
-            volumeMounts: internal_mounts
-          }
-        ],
-        restartPolicy: "Never",
-        nodeSelector: { node_selector => "" },
-        tolerations: [
-          {
-            key: node_selector,
-            effect: "NoSchedule"
-          }
-        ],
-        volumes: external_mounts
-      }
-    )
+    handle_exception do
+      pod = Kubeclient::Resource.new(
+        metadata: {
+          name: pod_name,
+          namespace: namespace
+        },
+        spec: {
+          containers: [
+            {
+              name: pod_name,
+              image: image,
+              command: ["sh", "-c", cmd],
+              resources: {
+                requests: { cpu: 1 }
+              },
+              volumeMounts: internal_mounts
+            }
+          ],
+          restartPolicy: "Never",
+          nodeSelector: { node_selector => "" },
+          tolerations: [
+            {
+              key: node_selector,
+              effect: "NoSchedule"
+            }
+          ],
+          volumes: external_mounts
+        }
+      )
 
-    pod_client.create_pod(pod)
+      pod_client.create_pod(pod)
 
-    pod_name
+      pod_name
+    end
   end
   # rubocop:enable Metrics/ParameterLists
 
   def fetch_pod_logs(pod_name:)
-    handle_exception(pod_name) { pod_client.get_pod_log(pod_name, namespace) }
+    handle_exception(pod_name) do
+      pod_client.get_pod_log(pod_name, namespace).body
+    rescue Kubeclient::HttpError => e
+      raise Kubeclient::LogsNotFoundError if e.error_code == LOG_UNAVAILABLE_HTTP_ERROR
+
+      raise
+    end
   end
 
   def fetch_pod(pod_name:)
@@ -65,17 +77,21 @@ class KubernetesClient
   end
 
   def fetch_pods
-    pod_client
-      .get_pods(namespace: namespace)
-      .each_with_object({}) do |pod, result|
-        result[pod.metadata.name] = pod
-      end
+    handle_exception do
+      pod_client
+        .get_pods(namespace: namespace)
+        .each_with_object({}) do |pod, result|
+          result[pod.metadata.name] = pod
+        end
+    end
   end
 
-  def handle_exception(pod_name)
+  def handle_exception(pod_name = nil)
     yield
   rescue Kubeclient::ResourceNotFoundError
     raise PodNotFoundError, "Pod not found #{pod_name}"
+  rescue Kubeclient::HttpError, SocketError, OpenSSL::SSL::SSLError => e
+    raise NetworkError, "#{e.class}: #{e.message}"
   end
 
   private

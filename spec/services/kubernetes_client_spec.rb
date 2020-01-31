@@ -263,17 +263,18 @@ RSpec.describe KubernetesClient do
 
   context "getting pod logs" do
     let(:pod_name) { "command" }
-    let(:log) { "Logs here" }
+    let(:logs) { "Logs here" }
+    let(:response) { double(body: logs) }
 
     context "when pod exists" do
       before do
         allow(pod_client).to receive(:get_pod_log)
           .with(pod_name, namespace)
-          .and_return(log)
+          .and_return(response)
       end
 
       it "returns the log" do
-        expect(subject.fetch_pod_logs(pod_name: pod_name)).to eq(log)
+        expect(subject.fetch_pod_logs(pod_name: pod_name)).to eq(logs)
       end
     end
 
@@ -315,7 +316,7 @@ RSpec.describe KubernetesClient do
       before { allow(pod_client).to receive(:api).and_raise(SocketError) }
 
       it "raises the error" do
-        expect { subject.api_info }.to raise_error(SocketError)
+        expect { subject.api_info }.to raise_error(KubernetesClient::NetworkError)
       end
     end
   end
