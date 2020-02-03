@@ -42,7 +42,7 @@ module Runners
       end
 
       def container_name(container:)
-        name = (container.info["Name"] || container.info["Names"].first)
+        name = container.info["Name"] || container.info["Names"].first
 
         name.remove(%r{^/})
       end
