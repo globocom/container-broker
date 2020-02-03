@@ -28,7 +28,7 @@ module Runners
               Rails.logger.debug("Pod is not terminated (it is #{execution_info.status}). Ignoring.")
             end
           else
-            remove_unknown_runners(node: node, runner_id: runner_id)
+            remove_unknown_runner(node: node, runner_id: runner_id)
           end
         end
 

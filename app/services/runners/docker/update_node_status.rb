@@ -31,7 +31,7 @@ module Runners
               container.start
             end
           else
-            remove_unknown_runners(node: node, runner_id: execution_info.id)
+            remove_unknown_runner(node: node, runner_id: execution_info.id)
           end
 
           execution_info

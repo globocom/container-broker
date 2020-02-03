@@ -12,7 +12,7 @@ module Runners
       end
     end
 
-    def remove_unknown_runners(node:, runner_id:)
+    def remove_unknown_runner(node:, runner_id:)
       Rails.logger.debug("Slot not found for container #{runner_id}")
 
       if Settings.ignore_containers.none? { |ignored_name| runner_id.start_with?(ignored_name) }
