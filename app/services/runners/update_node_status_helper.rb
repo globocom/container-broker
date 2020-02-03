@@ -15,7 +15,7 @@ module Runners
     def remove_unknown_runners(node:, runner_id:)
       Rails.logger.debug("Slot not found for container #{runner_id}")
 
-      if Settings.ignore_containers.none? { |ignored_name| runner_id.include?(ignored_name) }
+      if Settings.ignore_containers.none? { |ignored_name| runner_id.start_with?(ignored_name) }
         # It is needed to select the container using just any of its names
         RemoveRunnerJob.perform_later(node: node, runner_id: runner_id)
       else
