@@ -4,7 +4,7 @@ class StatusController < ApplicationController
   LIMIT_TASKS = 200
 
   def nodes
-    render json: Node.includes(:slots), each_serializer: StatusPanelNodeSerializer
+    render json: Node.includes(:slots).order(name: :asc), each_serializer: StatusPanelNodeSerializer
   end
 
   def tasks
