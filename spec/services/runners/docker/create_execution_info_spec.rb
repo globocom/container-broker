@@ -23,8 +23,36 @@ RSpec.describe Runners::Docker::CreateExecutionInfo, type: :service do
     subject { described_class.new.perform(container: container) }
 
     context "creates pending execution info" do
-      it "with id" do
-        expect(subject.id).to eq(container_name)
+      context "with id" do
+        context "when the names are an array" do
+          let(:container) do
+            double(
+              ::Docker::Container,
+              info: {
+                "Names" => ["/container-name"]
+              }
+            )
+          end
+
+          it "uses the first name removing the leading slash" do
+            expect(subject.id).to eq(container_name)
+          end
+        end
+
+        context "when the name is a single field" do
+          let(:container) do
+            double(
+              ::Docker::Container,
+              info: {
+                "Name" => "/container-name"
+              }
+            )
+          end
+
+          it "uses the name removing the leading slash" do
+            expect(subject.id).to eq(container_name)
+          end
+        end
       end
 
       it "with status" do

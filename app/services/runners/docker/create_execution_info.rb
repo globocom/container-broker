@@ -9,7 +9,7 @@ module Runners
         @container = container
 
         exeuction_info_data = {
-          id: container.info["Names"].first.remove(%r{^/}),
+          id: container_name(container: container),
           status: status
         }
 
@@ -39,6 +39,12 @@ module Runners
         elsif terminated?
           "exited"
         end
+      end
+
+      def container_name(container:)
+        name = (container.info["Name"] || container.info["Names"].first)
+
+        name.remove(%r{^/})
       end
 
       def waiting?
