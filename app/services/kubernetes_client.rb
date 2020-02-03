@@ -90,7 +90,7 @@ class KubernetesClient
     yield
   rescue Kubeclient::ResourceNotFoundError
     raise PodNotFoundError, "Pod not found #{pod_name}"
-  rescue Kubeclient::HttpError, SocketError, OpenSSL::SSL::SSLError => e
+  rescue Kubeclient::HttpError, SocketError, Errno::ECONNREFUSED, OpenSSL::SSL::SSLError => e
     raise NetworkError, "#{e.class}: #{e.message}"
   end
 
