@@ -8,13 +8,13 @@ module Runners
       def perform(container:)
         @container = container
 
-        exeuction_info_data = {
+        execution_info_data = {
           id: container_name(container: container),
           status: status
         }
 
         if full_state_present?
-          exeuction_info_data.merge!(
+          execution_info_data.merge!(
             exit_code: state["ExitCode"],
             started_at: state["StartedAt"],
             finished_at: state["FinishedAt"],
@@ -22,7 +22,7 @@ module Runners
           )
         end
 
-        Runners::ExecutionInfo.new(exeuction_info_data)
+        Runners::ExecutionInfo.new(execution_info_data)
       end
 
       private
