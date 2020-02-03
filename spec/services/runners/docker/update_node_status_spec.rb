@@ -13,16 +13,15 @@ RSpec.describe Runners::Docker::UpdateNodeStatus, type: :service do
 
   context "for all containers" do
     let(:containers) { [container] }
-    let(:runner_id) { SecureRandom.hex }
     let(:container_creation_date) { 2.minutes.ago.to_s.to_i }
     let(:runner_id) { "runner-123" }
     let(:container) do
       double(
         "Docker::Container",
-        id: runner_id,
+        id: SecureRandom.hex,
         info: {
           "State" => container_state,
-          "Names" => ["other-container-name", "/runner-123"],
+          "Names" => [runner_id],
           "Created" => container_creation_date
         }
       )
@@ -32,7 +31,7 @@ RSpec.describe Runners::Docker::UpdateNodeStatus, type: :service do
 
     let!(:slot) { Fabricate(:slot_running, node: node, runner_id: runner_id) }
 
-    context "when a slot is found with that container id" do
+    context "when a slot is found with that container name" do
       context "and the container status is exited" do
         let(:container_state) { "exited" }
 
@@ -70,16 +69,36 @@ RSpec.describe Runners::Docker::UpdateNodeStatus, type: :service do
 
     context "reschedules tasks when container is missing" do
       let(:reschedule_tasks_for_missing_containers_service) { double("RescheduleTasksForMissingRunners") }
-      let(:started_tasks) { [Fabricate(:running_task, slot: slot)] }
+      let!(:started_tasks) { [Fabricate(:running_task, slot: slot)] }
 
       before do
         allow(RescheduleTasksForMissingRunners).to receive(:new)
-          .with(started_tasks: started_tasks, runner_ids: contain_exactly("runner-123", "other-container-name"))
+          .with(started_tasks: started_tasks, runner_ids: [runner_id])
           .and_return(reschedule_tasks_for_missing_containers_service)
       end
 
       it "calls RescheduleTasksForMissingRunners perform" do
         expect(reschedule_tasks_for_missing_containers_service).to receive(:perform)
+        subject.perform(node: node)
+      end
+    end
+
+    context "sends metrics" do
+      let(:container_state) { "exited" }
+      let(:metrics) { double(Metrics) }
+
+      before { allow(Metrics).to receive(:new).with("runners").and_return(metrics) }
+
+      it "sends metrics with running count" do
+        expect(metrics).to receive(:count).with(
+          hostname: node.hostname,
+          runner_type: "docker",
+          capacity_reached: false,
+          schedule_pending: 0,
+          total_runners: 1,
+          exited_runners: 1
+        )
+
         subject.perform(node: node)
       end
     end

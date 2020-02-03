@@ -28,7 +28,7 @@ module Runners
               Rails.logger.debug("Pod is not terminated (it is #{execution_info.status}). Ignoring.")
             end
           else
-            remove_unknown_runners(node: node, runner_ids: [runner_id])
+            remove_unknown_runners(node: node, runner_id: runner_id)
           end
         end
 
@@ -36,9 +36,9 @@ module Runners
           .new(runner_ids: pods.keys, started_tasks: started_tasks)
           .perform
 
-        send_metrics(node: node, execution_infos: execution_infos)
-
         node.update_last_success
+
+        send_metrics(node: node, execution_infos: execution_infos)
       rescue KubernetesClient::NetworkError => e
         Rails.logger.debug("Error #{e.class}: #{e}")
         node.register_error(e.message)

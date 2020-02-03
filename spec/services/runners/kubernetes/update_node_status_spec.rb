@@ -235,7 +235,7 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
 
     let(:metrics) { double }
 
-    before { allow(Metrics).to receive(:new).with("runner_capacity").and_return(metrics) }
+    before { allow(Metrics).to receive(:new).with("runners").and_return(metrics) }
 
     it "sends metrics with running count" do
       expect(metrics).to receive(:count).with(

@@ -12,14 +12,14 @@ module Runners
       end
     end
 
-    def remove_unknown_runners(node:, runner_ids:)
-      Rails.logger.debug("Slot not found for container #{runner_ids}")
+    def remove_unknown_runners(node:, runner_id:)
+      Rails.logger.debug("Slot not found for container #{runner_id}")
 
-      if Settings.ignore_containers.none? { |ignored_name| runner_ids.any? { |runner_id| runner_id.include?(ignored_name) } }
+      if Settings.ignore_containers.none? { |ignored_name| runner_id.include?(ignored_name) }
         # It is needed to select the container using just any of its names
-        RemoveRunnerJob.perform_later(node: node, runner_id: runner_ids.first)
+        RemoveRunnerJob.perform_later(node: node, runner_id: runner_id)
       else
-        Rails.logger.debug("Container #{runner_ids.join(",")} is ignored for removal")
+        Rails.logger.debug("Container #{runner_id} is ignored for removal")
       end
     end
 
@@ -37,7 +37,7 @@ module Runners
         total_runners: execution_infos.count
       }
 
-      Metrics.new("runner_capacity").count(data.merge(runners_count))
+      Metrics.new("runners").count(data.merge(runners_count))
     end
   end
 end

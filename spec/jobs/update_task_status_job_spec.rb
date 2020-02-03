@@ -10,7 +10,7 @@ RSpec.describe UpdateTaskStatusJob, type: :job do
   let(:task_status) { "running" }
   let(:docker_connection) { double("Docker::Connection") }
   let(:runner_id) { "11223344" }
-  let(:container) { double("Docker::Container", id: runner_id, info: container_info) }
+  let(:container) { double("Docker::Container", id: SecureRandom.hex, info: container_info) }
   let(:container_status) { "exited" }
   let(:container_exit_code) { 0 }
   let(:container_error) { "" }
@@ -18,6 +18,7 @@ RSpec.describe UpdateTaskStatusJob, type: :job do
   let(:container_finished_at) { "2018-04-23T10:12:47.4534537Z" }
   let(:container_info) do
     {
+      "Names" => [runner_id],
       "State" => {
         "Status" => container_status,
         "ExitCode" => container_exit_code,

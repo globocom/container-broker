@@ -9,7 +9,7 @@ module Runners
                     .perform(task: task)
 
         CreateExecutionInfo.new.perform(container: container)
-      rescue Docker::Error::NotFoundError => e
+      rescue ::Docker::Error::NotFoundError => e
         raise Runners::RunnerIdNotFoundError, e.message
       end
     end

@@ -33,11 +33,11 @@ RSpec.describe Runners::ExecutionInfo do
     it { is_expected.to be_terminated }
 
     it "raises error when try to get success" do
-      expect { subject.success? }.to raise_error(Runners::UnknownCompletionStatus)
+      expect { subject.success? }.to raise_error(Runners::UnknownCompletionInformation)
     end
 
     it "raises error when try to get error" do
-      expect { subject.error? }.to raise_error(Runners::UnknownCompletionStatus)
+      expect { subject.error? }.to raise_error(Runners::UnknownCompletionInformation)
     end
   end
 end

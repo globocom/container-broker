@@ -9,7 +9,7 @@ module Runners
         @container = container
 
         exeuction_info_data = {
-          id: container.info["id"],
+          id: container.info["Names"].first.remove(%r{^/}),
           status: status
         }
 

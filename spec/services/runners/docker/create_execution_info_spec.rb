@@ -5,6 +5,7 @@ require "rails_helper"
 RSpec.describe Runners::Docker::CreateExecutionInfo, type: :service do
   let(:started_at) { Time.current }
   let(:finished_at) { Time.current + 5.minutes }
+  let(:container_name) { "container-name" }
 
   context "when container was created" do
     let(:container) do
@@ -12,6 +13,7 @@ RSpec.describe Runners::Docker::CreateExecutionInfo, type: :service do
         ::Docker::Container,
         info: {
           "id" => "id",
+          "Names" => [container_name],
           "State" => {
             "Status" => "created"
           }
@@ -22,7 +24,7 @@ RSpec.describe Runners::Docker::CreateExecutionInfo, type: :service do
 
     context "creates pending execution info" do
       it "with id" do
-        expect(subject.id).to eq("id")
+        expect(subject.id).to eq(container_name)
       end
 
       it "with status" do
@@ -53,6 +55,7 @@ RSpec.describe Runners::Docker::CreateExecutionInfo, type: :service do
         ::Docker::Container,
         info: {
           "id" => "id",
+          "Names" => [container_name],
           "State" => {
             "Status" => "running",
             "StartedAt" => started_at
@@ -64,7 +67,7 @@ RSpec.describe Runners::Docker::CreateExecutionInfo, type: :service do
 
     context "creates running execution info" do
       it "with id" do
-        expect(subject.id).to eq("id")
+        expect(subject.id).to eq(container_name)
       end
 
       it "with status" do
@@ -96,6 +99,7 @@ RSpec.describe Runners::Docker::CreateExecutionInfo, type: :service do
           ::Docker::Container,
           info: {
             "id" => "id",
+            "Names" => [container_name],
             "State" => {
               "Status" => "exited",
               "StartedAt" => started_at,
@@ -109,7 +113,7 @@ RSpec.describe Runners::Docker::CreateExecutionInfo, type: :service do
 
       context "creates success execution info" do
         it "with id" do
-          expect(subject.id).to eq("id")
+          expect(subject.id).to eq(container_name)
         end
 
         it "with status" do
@@ -140,6 +144,7 @@ RSpec.describe Runners::Docker::CreateExecutionInfo, type: :service do
           ::Docker::Container,
           info: {
             "id" => "id",
+            "Names" => [container_name],
             "State" => {
               "Status" => "exited",
               "StartedAt" => started_at,
@@ -153,7 +158,7 @@ RSpec.describe Runners::Docker::CreateExecutionInfo, type: :service do
 
       context "creates error execution info" do
         it "with id" do
-          expect(subject.id).to eq("id")
+          expect(subject.id).to eq(container_name)
         end
 
         it "with status" do
@@ -185,6 +190,7 @@ RSpec.describe Runners::Docker::CreateExecutionInfo, type: :service do
         ::Docker::Container,
         info: {
           "id" => "id",
+          "Names" => [container_name],
           "State" => state
         }
       )
@@ -202,7 +208,11 @@ RSpec.describe Runners::Docker::CreateExecutionInfo, type: :service do
       let(:state) { "exited" }
 
       it "considers the state as the status" do
-        expect(described_class.new.perform(container: container)).to be_exited
+        expect(described_class.new.perform(container: container)).to be_terminated
+      end
+
+      it "returns the exited status" do
+        expect(described_class.new.perform(container: container).status).to eq("exited")
       end
     end
   end
