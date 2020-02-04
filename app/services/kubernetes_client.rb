@@ -62,7 +62,7 @@ class KubernetesClient
     handle_exception(pod_name) do
       pod_client.get_pod_log(pod_name, namespace).body
     rescue Kubeclient::HttpError => e
-      raise Kubeclient::LogsNotFoundError if e.error_code == LOG_UNAVAILABLE_HTTP_ERROR
+      raise LogsNotFoundError if e.error_code == LOG_UNAVAILABLE_HTTP_ERROR
 
       raise
     end

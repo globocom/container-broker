@@ -290,6 +290,19 @@ RSpec.describe KubernetesClient do
           .to raise_error(described_class::PodNotFoundError, "Pod not found #{pod_name}")
       end
     end
+
+    context "when the pod logs does not exist" do
+      before do
+        allow(pod_client).to receive(:get_pod_log)
+          .with(pod_name, namespace)
+          .and_raise(Kubeclient::HttpError.new(400, "No logs", nil))
+      end
+
+      it "raises LogsNotFoundError" do
+        expect { subject.fetch_pod_logs(pod_name: pod_name) }
+          .to raise_error(described_class::LogsNotFoundError)
+      end
+    end
   end
 
   context "getting the cluster availability" do
