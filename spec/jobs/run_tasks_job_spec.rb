@@ -7,25 +7,6 @@ RSpec.describe RunTasksJob, type: :service do
   let!(:task) { Fabricate(:task, execution_type: execution_type) }
   let!(:slot) { Fabricate(:slot_idle, execution_type: execution_type) }
 
-  context "when job is locked" do
-    let(:lock_manager_job) { double(LockManager) }
-
-    before do
-      allow(LockManager).to receive(:new)
-        .with(type: described_class, id: execution_type, expire: 1.minute, wait: false)
-        .and_return(lock_manager_job)
-      allow(lock_manager_job).to receive(:lock).and_return(false)
-
-      allow(described_class).to receive(:set).with(wait: 10.seconds).and_return(described_class)
-    end
-
-    it "does not enqueue the task" do
-      subject.perform(execution_type: execution_type)
-
-      expect(RunTaskJob).to_not have_been_enqueued.with(task: task, slot: slot)
-    end
-  end
-
   context "when job is unlocked" do
     context "with no available nodes" do
       before do
@@ -33,7 +14,7 @@ RSpec.describe RunTasksJob, type: :service do
       end
 
       it "does not fetch pending tasks" do
-        expect_any_instance_of(LockTask).to_not receive(:call)
+        expect_any_instance_of(LockTask).to_not receive(:perform)
 
         subject.perform(execution_type: execution_type)
       end
@@ -45,8 +26,8 @@ RSpec.describe RunTasksJob, type: :service do
       context "and no pending tasks" do
         before do
           allow(LockTask).to receive(:new).with(execution_type: execution_type).and_return(fetch_task_service)
-          allow(fetch_task_service).to receive(:call).and_return(nil)
-          allow(fetch_task_service).to receive(:first_pending).and_return(nil)
+          allow(fetch_task_service).to receive(:perform).and_return(nil)
+          allow(fetch_task_service).to receive(:any_pending?).and_return(false)
         end
 
         it "does not check the slots" do

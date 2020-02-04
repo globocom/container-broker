@@ -16,7 +16,7 @@ RSpec.describe LockSlot, type: :service do
     subject { described_class.new(execution_type: execution_type) }
 
     it "returns the correct slot" do
-      expect(subject.first_available).to eq(slot1_1)
+      expect(subject.perform).to eq(slot1_1)
     end
 
     it "allocates slot" do
@@ -34,7 +34,7 @@ RSpec.describe LockSlot, type: :service do
     subject { described_class.new(execution_type: execution_type) }
 
     it "returns nil" do
-      expect(subject.first_available).to be_nil
+      expect(subject.perform).to be_nil
     end
 
     it "allocates slot" do
@@ -50,7 +50,7 @@ RSpec.describe LockSlot, type: :service do
     subject { described_class.new(execution_type: execution_type, node: node2) }
 
     it "returns a slot of specified node" do
-      expect(subject.first_available).to eq(slot2_1)
+      expect(subject.perform).to eq(slot2_1)
     end
 
     it "allocates slot" do
