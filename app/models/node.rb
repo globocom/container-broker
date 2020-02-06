@@ -76,9 +76,15 @@ class Node
 
     if available?
       unstable!
-    elsif unstable? && unstable_period_expired?
-      unavailable!
-      MigrateTasksFromDeadNodeJob.perform_later(node: self)
+      Rails.logger.debug("#{self} marked as unstable")
+    elsif unstable?
+      if unstable_period_expired?
+        unavailable!
+        Rails.logger.debug("#{self} marked as unavailable because the unstable period has expired (last success was at #{last_success_at}). Migrating all tasks.")
+        MigrateTasksFromDeadNodeJob.perform_later(node: self)
+      else
+        Rails.logger.debug("#{self} still unstable until the limit period be expired (last success was at #{last_success_at})")
+      end
     end
   end
 
