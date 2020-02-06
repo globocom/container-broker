@@ -21,6 +21,8 @@ class MigrateTasksFromDeadNodeJob < ApplicationJob
           Rails.logger.debug("Slot does not have current task")
         end
 
+        MigrateRunner.new(runner_id: slot.runner_id).migrate
+
         Rails.logger.debug("Releasing #{slot}")
         slot.release
         Rails.logger.debug("#{slot} released")

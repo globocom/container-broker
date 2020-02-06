@@ -7,6 +7,11 @@ class ReleaseSlotJob < ApplicationJob
   def perform(slot:, container_id: nil, runner_id: container_id)
     Rails.logger.debug("ReleaseSlotJob for #{slot} and container #{runner_id}")
 
+    if MigrateRunner.new(runner_id: runner_id).migrated?
+      Rails.logger.debug("Ignores release slot for #{slot} because it's migrated")
+      return
+    end
+
     check_same_runner_id(slot: slot, runner_id: runner_id)
 
     UpdateTaskStatusJob.perform_now(slot.current_task.reload)

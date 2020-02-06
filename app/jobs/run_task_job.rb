@@ -6,6 +6,9 @@ class RunTaskJob < ApplicationJob
   def perform(task:, slot:)
     Rails.logger.debug("Performing RunTaskJob for #{task} #{slot}")
 
+    raise "Invalid task status - #{task}" unless task.starting?
+    raise "Invalid slot status - #{slot}" unless slot.attaching?
+
     runner_id = task.generate_runner_id
 
     task.update!(runner_id: runner_id)

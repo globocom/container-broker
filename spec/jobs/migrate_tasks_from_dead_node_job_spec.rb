@@ -7,10 +7,17 @@ RSpec.describe MigrateTasksFromDeadNodeJob, type: :job do
   let(:slot) { Fabricate(:slot, node: node, status: "running", execution_type: "test") }
   let(:task) { Fabricate(:task, slot: slot, status: task_status) }
   let(:task_status) { "waiting" }
+  let(:migrate_runner_instance) { double(MigrateRunner, migrate: nil) }
 
   let(:perform) { subject.perform(node: node) }
 
-  before { slot.update(current_task: task) }
+  before do
+    slot.update(current_task: task)
+
+    allow(MigrateRunner).to receive(:new)
+      .with(runner_id: slot.runner_id)
+      .and_return(migrate_runner_instance)
+  end
 
   context "for started tasks" do
     let(:task_status) { "started" }
@@ -40,5 +47,11 @@ RSpec.describe MigrateTasksFromDeadNodeJob, type: :job do
 
   it "releases slot" do
     expect { perform }.to change(slot, :status).to("idle")
+  end
+
+  it "performs migrate runner id" do
+    expect(migrate_runner_instance).to receive(:migrate)
+
+    perform
   end
 end

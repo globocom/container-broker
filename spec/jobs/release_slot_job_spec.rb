@@ -94,4 +94,16 @@ RSpec.describe ReleaseSlotJob, type: :job do
       expect { subject.perform(slot: slot, runner_id: runner_id) }.to_not have_enqueued_job(RunTasksJob)
     end
   end
+
+  context "when the runner id is migrated" do
+    let(:runner_id) { SecureRandom.uuid }
+
+    before { MigrateRunner.new(runner_id: runner_id).migrate }
+
+    it "does not call UpdateTaskStatusJob" do
+      expect(UpdateTaskStatusJob).to_not receive(:perform_now)
+
+      subject.perform(slot: slot, runner_id: runner_id)
+    end
+  end
 end

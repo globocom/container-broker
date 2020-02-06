@@ -48,7 +48,7 @@ RSpec.describe RescheduleTasksForMissingRunners, type: :service do
 
       it "sends an event" do
         expect(Raven).to receive(:capture_exception).with(
-          "Task retryied because runner #{runner_id} is missing",
+          "Task retryied because runner #{runner_id} is missing (#{started_task} #{slot})",
           extra: {
             runner: node.runner,
             runner_id: runner_id,
