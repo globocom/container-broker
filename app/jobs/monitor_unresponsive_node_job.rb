@@ -8,8 +8,8 @@ class MonitorUnresponsiveNodeJob < ApplicationJob
       node.runner_service(:node_availability).perform(node: node)
 
       Rails.logger.debug("Marking #{node} as available again")
-      node.available!
-      node.update!(last_error: nil)
+      node.register_success
+
       RunTasksForAllExecutionTypesJob.perform_later
     end
   rescue StandardError => e

@@ -39,7 +39,7 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
   end
 
   it "updates node last success" do
-    expect(node).to receive(:update_last_success)
+    expect(node).to receive(:register_success)
 
     subject.perform(node: node)
   end

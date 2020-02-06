@@ -92,8 +92,10 @@ class Node
     last_success_at && last_success_at < Settings.node_unavailable_after_seconds.seconds.ago
   end
 
-  def update_last_success
+  def register_success
+    Rails.logger.debug("Registering success in #{self}")
     update!(last_success_at: Time.zone.now)
+    available!
   end
 
   def to_s

@@ -36,7 +36,7 @@ module Runners
           .new(runner_ids: pods.keys, started_tasks: started_tasks)
           .perform
 
-        node.update_last_success
+        node.register_success
 
         send_metrics(node: node, execution_infos: execution_infos)
       rescue KubernetesClient::NetworkError => e
