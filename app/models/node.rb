@@ -97,7 +97,7 @@ class Node
   end
 
   def to_s
-    "Node #{name} #{uuid} #{runner} #{status}"
+    "Node #{name} #{uuid} #{runner} (#{status})"
   end
 
   def run_with_lock_no_wait

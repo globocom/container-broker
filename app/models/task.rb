@@ -119,7 +119,7 @@ class Task
   end
 
   def to_s
-    "Task #{name} #{uuid} (#{status})"
+    "Task #{name} #{uuid} (#{status} runner_id: #{runner_id})"
   end
 
   def generate_runner_id
