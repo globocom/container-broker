@@ -38,11 +38,11 @@ RSpec.describe Runners::Kubernetes::RemoveRunner, type: :service do
 
     context "when a network error happens" do
       before do
-        allow(kubernetes_client).to receive(:force_delete_pod).and_raise(KubernetesClient::NetworkError)
+        allow(kubernetes_client).to receive(:force_delete_pod).and_raise(KubernetesClient::NetworkError, "error")
       end
 
-      it "raises the error" do
-        expect { subject.perform(node: node, runner_id: runner_id) }.to raise_error(KubernetesClient::NetworkError)
+      it "persists error in node" do
+        expect { subject.perform(node: node, runner_id: runner_id) }.to change(node, :last_error).to("error")
       end
     end
   end

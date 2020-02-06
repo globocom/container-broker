@@ -10,6 +10,8 @@ module Runners
           Rails.logger.debug("Pod #{runner_id} removed")
         rescue KubernetesClient::PodNotFoundError
           Rails.logger.debug("Pod #{runner_id} already removed")
+        rescue KubernetesClient::NetworkError => e
+          node.register_error(e.message)
         end
       end
     end
