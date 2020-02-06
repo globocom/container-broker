@@ -10,7 +10,7 @@ module Runners
           .new
           .perform(task: task)
           .streaming_logs(stdout: true, stderr: true, tail: 1_000)
-      rescue Docker::Error::NotFoundError => e
+      rescue ::Docker::Error::NotFoundError => e
         raise Runners::RunnerIdNotFoundError, e.message
       end
     end
