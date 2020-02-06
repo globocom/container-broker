@@ -6,6 +6,8 @@ class MonitorUnresponsiveNodeJob < ApplicationJob
   def perform(node:)
     node.run_with_lock_no_wait do
       node.runner_service(:node_availability).perform(node: node)
+
+      Rails.logger.debug("Marking #{node} as available again")
       node.available!
       node.update!(last_error: nil)
       RunTasksForAllExecutionTypesJob.perform_later
