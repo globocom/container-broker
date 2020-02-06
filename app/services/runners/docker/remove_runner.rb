@@ -10,7 +10,7 @@ module Runners
         container.delete
       rescue ::Docker::Error::NotFoundError, ::Docker::Error::ConflictError => e
         Rails.logger.info("Container #{runner_id} already removed - #{e.message} (e.class)")
-      rescue Excon::Error => e
+      rescue Excon::Error, ::Docker::Error::TimeoutError => e then
         node.register_error(e.message)
       end
     end
