@@ -94,6 +94,12 @@ class Node
     "Node #{name} #{uuid} #{runner}"
   end
 
+  def run_with_lock_no_wait
+    LockManager.new(type: self.class.to_s, id: id, wait: false, expire: 5.minutes).lock do
+      yield
+    end
+  end
+
   private
 
   def execution_types_format

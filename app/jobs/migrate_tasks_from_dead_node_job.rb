@@ -9,7 +9,7 @@ class MigrateTasksFromDeadNodeJob < ApplicationJob
       return
     end
 
-    LockManager.new(type: self.class.to_s, id: node.id, wait: false, expire: 1.minute).lock do
+    node.run_with_lock_no_wait do
       Rails.logger.debug("Migrating tasks from #{node}")
       node.slots.reject(&:idle?).each do |slot|
         Rails.logger.debug("Migrating task for #{slot}")
