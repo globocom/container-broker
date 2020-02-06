@@ -99,7 +99,9 @@ class Node
   end
 
   def to_s
-    "Node #{name} #{uuid} #{runner} (#{status})"
+    last_success = ", last success at #{last_success_at}" unless available?
+
+    "Node #{name} #{uuid} #{runner} (#{status}#{last_success})"
   end
 
   def run_with_lock_no_wait
