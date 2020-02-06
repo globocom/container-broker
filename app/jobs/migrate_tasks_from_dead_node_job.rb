@@ -4,6 +4,11 @@ class MigrateTasksFromDeadNodeJob < ApplicationJob
   queue_as :default
 
   def perform(node:)
+    if node.available?
+      Rails.logger.debug("Not migrating tasks because #{node} returned to available status")
+      return
+    end
+
     LockManager.new(type: self.class.to_s, id: node.id, wait: false, expire: 1.minute).lock do
       Rails.logger.debug("Migrating tasks from #{node}")
       node.slots.reject(&:idle?).each do |slot|

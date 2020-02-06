@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe MigrateTasksFromDeadNodeJob, type: :job do
-  let(:node) { Fabricate(:node) }
+  let(:node) { Fabricate(:node, status: "unavailable") }
   let(:slot) { Fabricate(:slot, node: node, status: "running", execution_type: "test") }
   let(:task) { Fabricate(:task, slot: slot, status: task_status) }
   let(:task_status) { "waiting" }
