@@ -11,7 +11,7 @@ class RescheduleTasksForMissingRunners
   def perform
     tasks_without_runner.each do |runner_id|
       task = started_tasks_group_by_runner_id[runner_id]
-      message = "Task retryied because runner #{runner_id} is missing"
+      message = "Task retryied because runner #{runner_id} is missing (#{task} #{task.slot})"
       Rails.logger.debug(message)
 
       report_event(message: message, task: task, runner_id: runner_id)

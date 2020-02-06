@@ -46,6 +46,6 @@ class Slot
   end
 
   def to_s
-    "Slot #{name} #{uuid} (#{status})"
+    "Slot #{name} #{uuid} (#{status} runner_id: #{runner_id})"
   end
 end
