@@ -35,13 +35,11 @@ class Slot
   end
 
   def mark_as_running(current_task:, runner_id:)
-    update!(current_task: current_task, runner_id: runner_id)
-    running!
+    update!(status: :running, current_task: current_task, runner_id: runner_id)
   end
 
   def release
-    update!(runner_id: nil, current_task: nil)
-    idle!
+    update!(status: :idle, runner_id: nil, current_task: nil)
     RunTasksJob.perform_later(execution_type: execution_type)
   end
 
