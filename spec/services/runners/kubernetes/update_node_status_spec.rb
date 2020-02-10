@@ -34,7 +34,7 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
   end
 
   before do
-    allow(node).to receive(:kubernetes_client).and_return(kubernetes_client)
+    allow_any_instance_of(Runners::Kubernetes::CreateClient).to receive(:perform).with(node: node).and_return(kubernetes_client)
     allow(kubernetes_client).to receive(:fetch_pods).and_return(pods)
   end
 

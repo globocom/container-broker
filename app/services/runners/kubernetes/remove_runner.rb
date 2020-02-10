@@ -6,7 +6,7 @@ module Runners
       def perform(node:, runner_id:)
         Rails.logger.debug("Deleting pod")
         begin
-          node.kubernetes_client.force_delete_pod(pod_name: runner_id)
+          CreateClient.new.perform(node: node).force_delete_pod(pod_name: runner_id)
           Rails.logger.debug("Pod #{runner_id} removed")
         rescue KubernetesClient::PodNotFoundError
           Rails.logger.debug("Pod #{runner_id} already removed")

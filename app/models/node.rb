@@ -55,16 +55,6 @@ class Node
     ::Docker::Connection.new(hostname, connect_timeout: 10, read_timeout: 10, write_timeout: 10)
   end
 
-  def kubernetes_client
-    raise(InvalidRunner, "Node must be a kubernetes runner") unless kubernetes?
-
-    KubernetesClient.new(
-      uri: hostname,
-      bearer_token: kubernetes_config.bearer_token,
-      namespace: kubernetes_config.namespace
-    )
-  end
-
   def runner_service(service)
     Runners::ServicesFactory.fabricate(runner: runner, service: service)
   end

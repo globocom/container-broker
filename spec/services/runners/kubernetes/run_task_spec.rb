@@ -10,7 +10,7 @@ RSpec.describe Runners::Kubernetes::RunTask do
   let(:kubernetes_client) { double(KubernetesClient, create_pod: pod_name) }
 
   before do
-    allow(node).to receive(:kubernetes_client).and_return(kubernetes_client)
+    allow_any_instance_of(Runners::Kubernetes::CreateClient).to receive(:perform).with(node: node).and_return(kubernetes_client)
     allow(kubernetes_client).to receive(:create_pod).and_return(pod_name)
   end
 

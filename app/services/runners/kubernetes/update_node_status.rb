@@ -47,10 +47,9 @@ module Runners
       private
 
       def pods
-        @pods ||= node
-                  .kubernetes_client
-                  .fetch_pods
-                  .tap { |pods| Rails.logger.debug("Fetched #{pods.count} pods") }
+        @pods ||= CreateClient.new.perform(node: node)
+                              .fetch_pods
+                              .tap { |pods| Rails.logger.debug("Fetched #{pods.count} pods") }
       end
 
       def execution_infos

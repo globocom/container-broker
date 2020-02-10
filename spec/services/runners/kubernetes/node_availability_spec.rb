@@ -7,7 +7,7 @@ RSpec.describe Runners::Kubernetes::NodeAvailability, type: :service do
   let(:kubernetes_client) { double(KubernetesClient) }
 
   before do
-    allow(node).to receive(:kubernetes_client).and_return(kubernetes_client)
+    allow_any_instance_of(Runners::Kubernetes::CreateClient).to receive(:perform).with(node: node).and_return(kubernetes_client)
   end
 
   it "fetches api info" do

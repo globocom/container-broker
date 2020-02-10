@@ -4,11 +4,7 @@ module Runners
   module Kubernetes
     class FetchLogs
       def perform(task:)
-        task
-          .slot
-          .node
-          .kubernetes_client
-          .fetch_pod_logs(pod_name: task.runner_id)
+        CreateClient.new.perform(node: task.slot.node).fetch_pod_logs(pod_name: task.runner_id)
       rescue KubernetesClient::PodNotFoundError => e
         raise Runners::RunnerIdNotFoundError, e.message
       rescue KubernetesClient::LogsNotFoundError

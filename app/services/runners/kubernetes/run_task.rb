@@ -12,7 +12,7 @@ module Runners
       end
 
       def create_pod(task:, node:, runner_id:)
-        node.kubernetes_client.create_pod(
+        CreateClient.new.perform(node: node).create_pod(
           pod_name: runner_id,
           image: task.image,
           cmd: task.cmd,

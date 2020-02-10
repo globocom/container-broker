@@ -4,7 +4,7 @@ module Runners
   module Kubernetes
     class NodeAvailability
       def perform(node:)
-        node.kubernetes_client.api_info
+        CreateClient.new.perform(node: node).api_info
       end
     end
   end

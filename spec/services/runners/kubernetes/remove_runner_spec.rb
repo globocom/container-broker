@@ -8,8 +8,7 @@ RSpec.describe Runners::Kubernetes::RemoveRunner, type: :service do
   let(:runner_id) { "xx-6ryfnh38" }
 
   before do
-    allow(node).to receive(:kubernetes_client)
-      .and_return(kubernetes_client)
+    allow_any_instance_of(Runners::Kubernetes::CreateClient).to receive(:perform).with(node: node).and_return(kubernetes_client)
 
     allow(kubernetes_client).to receive(:force_delete_pod)
       .with(pod_name: runner_id)

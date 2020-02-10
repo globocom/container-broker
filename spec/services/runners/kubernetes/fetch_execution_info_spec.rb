@@ -11,7 +11,8 @@ RSpec.describe Runners::Kubernetes::FetchExecutionInfo, type: :service do
   let(:pod) { Kubeclient::Resource.new(metadata: { name: pod_name }) }
 
   before do
-    allow(node).to receive(:kubernetes_client).and_return(kubernetes_client_instance)
+    allow_any_instance_of(Runners::Kubernetes::CreateClient).to receive(:perform).with(node: node).and_return(kubernetes_client_instance)
+
     allow(kubernetes_client_instance).to receive(:fetch_pod)
       .with(pod_name: pod_name)
       .and_return(pod)

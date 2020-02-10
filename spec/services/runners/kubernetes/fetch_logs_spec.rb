@@ -10,7 +10,7 @@ RSpec.describe Runners::Kubernetes::FetchLogs, type: :service do
   let(:kubernetes_client) { double(KubernetesClient) }
 
   before do
-    allow(node).to receive(:kubernetes_client).and_return(kubernetes_client)
+    allow_any_instance_of(Runners::Kubernetes::CreateClient).to receive(:perform).with(node: node).and_return(kubernetes_client)
 
     allow(kubernetes_client).to receive(:fetch_pod_logs)
       .with(pod_name: task.runner_id)
