@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class Node
-  class InvalidRunner < StandardError; end
   class NodeConnectionError < StandardError; end
 
   include Mongoid::Document
@@ -47,12 +46,6 @@ class Node
 
   def destroy_slots
     slots.destroy_all
-  end
-
-  def docker_connection
-    raise(InvalidRunner, "Node must be a docker runner") unless docker?
-
-    ::Docker::Connection.new(hostname, connect_timeout: 10, read_timeout: 10, write_timeout: 10)
   end
 
   def runner_service(service)

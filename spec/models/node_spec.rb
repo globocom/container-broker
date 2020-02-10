@@ -11,12 +11,6 @@ RSpec.describe Node, type: :model do
     it { is_expected.to be_docker }
   end
 
-  context "when node is docker" do
-    it "has a docker connection" do
-      expect(node.docker_connection).to be_a(::Docker::Connection)
-    end
-  end
-
   context "registering error" do
     context "when node was available" do
       subject { Fabricate.build(:node, status: "available", last_error: nil) }

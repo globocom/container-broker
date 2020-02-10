@@ -15,7 +15,7 @@ RSpec.describe Runners::Docker::RemoveRunner, type: :service do
   end
 
   before do
-    allow(node).to receive(:docker_connection).and_return(docker_connection)
+    allow_any_instance_of(Runners::Docker::CreateConnection).to receive(:perform).and_return(docker_connection)
     allow(Docker::Container).to receive(:get).with(runner_id, { all: true }, docker_connection) do
       container
     end

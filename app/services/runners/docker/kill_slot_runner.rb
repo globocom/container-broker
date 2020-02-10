@@ -7,7 +7,7 @@ module Runners
         return unless slot.runner_id.present?
 
         ::Docker::Container
-          .get(slot.runner_id, {}, slot.node.docker_connection)
+          .get(slot.runner_id, {}, CreateConnection.new.perform(node: slot.node))
           .kill!
       rescue ::Docker::Error::NotFoundError => e
         Rails.logger.info("Container #{slot.runner_id} already removed - #{e.message} (e.class)")

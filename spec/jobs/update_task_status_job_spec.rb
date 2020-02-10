@@ -34,8 +34,8 @@ RSpec.describe UpdateTaskStatusJob, type: :job do
   end
 
   before do
+    allow_any_instance_of(Runners::Docker::CreateConnection).to receive(:perform).and_return(docker_connection)
     allow(Docker::Container).to receive(:get).with(runner_id, { all: true }, docker_connection).and_return(container)
-    allow(node).to receive(:docker_connection).and_return(docker_connection)
   end
 
   context "when container exited" do

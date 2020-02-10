@@ -5,7 +5,7 @@ module Runners
     class RemoveRunner
       def perform(node:, runner_id:)
         Rails.logger.info("Removing container #{runner_id} from node #{node}")
-        container = ::Docker::Container.get(runner_id, { all: true }, node.docker_connection)
+        container = ::Docker::Container.get(runner_id, { all: true }, CreateConnection.new.perform(node: node))
         container.kill if container.info["State"]["Status"] == "running"
         container.delete
       rescue ::Docker::Error::NotFoundError, ::Docker::Error::ConflictError => e

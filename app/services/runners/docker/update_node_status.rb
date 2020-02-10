@@ -27,7 +27,7 @@ module Runners
               Rails.logger.debug("Container #{execution_info.id} exited")
 
               check_slot_release(slot: slot, runner_id: execution_info.id)
-            elsif started_with_error?(container: container, docker_connection: node.docker_connection)
+            elsif started_with_error?(container: container, docker_connection: CreateConnection.new.perform(node: node))
               container.start
             end
           else
@@ -51,7 +51,7 @@ module Runners
       private
 
       def containers
-        @containers ||= ::Docker::Container.all({ all: true }, node.docker_connection)
+        @containers ||= ::Docker::Container.all({ all: true }, CreateConnection.new.perform(node: node))
       end
 
       def started_with_error?(container:, docker_connection:)

@@ -10,7 +10,7 @@ RSpec.describe Runners::Docker::FetchTaskContainer, type: :service do
   let(:docker_connection) { double("Docker::Connection") }
 
   before do
-    allow(node).to receive(:docker_connection).and_return(docker_connection)
+    allow_any_instance_of(Runners::Docker::CreateConnection).to receive(:perform).and_return(docker_connection)
   end
 
   it "performs Docker::Container.get" do

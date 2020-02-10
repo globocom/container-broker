@@ -27,12 +27,12 @@ module Runners
       private
 
       def pull_image(task:, slot:)
-        return if ::Docker::Image.exist?(task.image, {}, slot.node.docker_connection)
+        return if ::Docker::Image.exist?(task.image, {}, CreateConnection.new.perform(node: slot.node))
 
         image_name, image_tag = task.image.split(":")
         image_tag ||= "latest"
 
-        ::Docker::Image.create({ "fromImage" => image_name, "tag" => image_tag }, nil, slot.node.docker_connection)
+        ::Docker::Image.create({ "fromImage" => image_name, "tag" => image_tag }, nil, CreateConnection.new.perform(node: slot.node))
       end
 
       def create_container(task:, slot:, name:)
@@ -51,7 +51,7 @@ module Runners
             "Entrypoint" => [],
             "Cmd" => ["sh", "-c", task.cmd]
           },
-          slot.node.docker_connection
+          CreateConnection.new.perform(node: slot.node)
         )
       end
     end

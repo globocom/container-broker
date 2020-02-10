@@ -4,7 +4,7 @@ module Runners
   module Docker
     class NodeAvailability
       def perform(node:)
-        ::Docker.info(node.docker_connection)
+        ::Docker.info(CreateConnection.new.perform(node: node))
       end
     end
   end

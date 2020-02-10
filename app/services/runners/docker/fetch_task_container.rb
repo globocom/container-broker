@@ -7,7 +7,7 @@ module Runners
         ::Docker::Container.get(
           task.runner_id,
           { all: true },
-          task.slot.node.docker_connection
+          CreateConnection.new.perform(node: task.slot.node)
         )
       end
     end
