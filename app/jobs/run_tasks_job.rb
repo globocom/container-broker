@@ -6,7 +6,7 @@ class RunTasksJob < ApplicationJob
   def perform(execution_type:)
     @execution_type = execution_type
 
-    lock_job.lock { enqueue_tasks }
+    enqueue_tasks
   end
 
   private
@@ -24,20 +24,16 @@ class RunTasksJob < ApplicationJob
     end
   end
 
-  def lock_job
-    LockManager.new(type: self.class, id: execution_type, expire: 1.minute, wait: false)
-  end
-
   def lock_slot
     LockSlot.new(execution_type: execution_type).perform
   end
 
   def lock_task
-    lock_task_service.call
+    lock_task_service.perform
   end
 
   def have_pending_tasks?
-    lock_task_service.first_pending
+    lock_task_service.any_pending?
   end
 
   def lock_task_service

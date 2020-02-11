@@ -203,10 +203,10 @@ RSpec.describe "Nodes", type: :request do
   context "POST /nodes/:uuid/kill_containers" do
     let!(:node) { Fabricate(:node, accept_new_tasks: true) }
 
-    let(:kill_containers_service) { double("KillNodeContainers") }
+    let(:kill_containers_service) { double("KillNodeRunners") }
 
     before do
-      allow(KillNodeContainers).to receive(:new).with(node: node).and_return(kill_containers_service)
+      allow(KillNodeRunners).to receive(:new).with(node: node).and_return(kill_containers_service)
     end
 
     it "kills all node containers" do

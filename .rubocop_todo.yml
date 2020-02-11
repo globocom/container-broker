@@ -26,7 +26,7 @@ Lint/ParenthesesAsGroupedExpression:
 
 # Offense count: 8
 Metrics/AbcSize:
-  Max: 69
+  Max: 70
 
 # Offense count: 2
 # Configuration parameters: CountComments, ExcludedMethods.
@@ -60,13 +60,6 @@ Naming/AccessorMethodName:
     - 'app/models/task.rb'
 
 # Offense count: 1
-# Configuration parameters: EnforcedStyleForLeadingUnderscores.
-# SupportedStylesForLeadingUnderscores: disallowed, required, optional
-Naming/MemoizedInstanceVariableName:
-  Exclude:
-    - 'app/jobs/update_node_status_job.rb'
-
-# Offense count: 1
 # Configuration parameters: NamePrefix, NamePrefixBlacklist, NameWhitelist, MethodDefinitionMacros.
 # NamePrefix: is_, has_, have_
 # NamePrefixBlacklist: is_, has_, have_
@@ -81,8 +74,6 @@ Naming/PredicateName:
 # Configuration parameters: MinBodyLength.
 Style/GuardClause:
   Exclude:
-    - 'app/jobs/run_task_job.rb'
-    - 'app/jobs/update_task_status_job.rb'
     - 'app/serializers/status_panel_task_serializer.rb'
     - 'app/services/lock_manager.rb'
     - 'app/services/lock_task.rb'

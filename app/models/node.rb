@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Node
+  class NodeConnectionError < StandardError; end
+
   include Mongoid::Document
   include Mongoid::Uuid
   include Mongoid::Timestamps
@@ -9,17 +11,19 @@ class Node
 
   field :name, type: String
   field :hostname, type: String
-  field :available, type: Boolean, default: true
   field :last_error, type: String
   field :last_success_at, type: DateTime
   field :accept_new_tasks, type: Boolean, default: true
+  field :runner_capacity_reached, type: Boolean, default: false
   field :slots_execution_types, type: Hash, default: {}
+  field :runner_config, type: Hash, default: {}
 
   enumerable :status, %w[available unstable unavailable], default: "unavailable", after_change: :status_change
+  enumerable :runner_provider, %w[docker kubernetes], default: :docker
 
   has_many :slots
 
-  scope :accepting_new_tasks, -> { where(accept_new_tasks: true) }
+  scope :accepting_new_tasks, -> { where(accept_new_tasks: true, :runner_capacity_reached.in => [nil, false]) }
 
   validates :hostname, presence: true
   validates :slots_execution_types, presence: true
@@ -41,20 +45,26 @@ class Node
     slots.destroy_all
   end
 
-  def docker_connection
-    Docker::Connection.new(hostname, connect_timeout: 10, read_timeout: 10, write_timeout: 10)
+  def runner_service(service)
+    Runners::ServicesFactory.fabricate(runner: runner_provider, service: service)
   end
 
   def register_error(error)
-    Rails.logger.info("Error connecting to node #{name}: #{error}")
+    Rails.logger.info("Registering error in #{self}: #{error}")
 
     update!(last_error: error)
 
     if available?
       unstable!
-    elsif unstable? && unstable_period_expired?
-      unavailable!
-      MigrateTasksFromDeadNodeJob.perform_later(node: self)
+      Rails.logger.debug("#{self} marked as unstable")
+    elsif unstable?
+      if unstable_period_expired?
+        unavailable!
+        Rails.logger.debug("#{self} marked as unavailable because the unstable period has expired (last success was at #{last_success_at}). Migrating all tasks.")
+        MigrateTasksFromDeadNodeJob.perform_later(node: self)
+      else
+        Rails.logger.debug("#{self} still unstable until the limit period be expired (last success was at #{last_success_at})")
+      end
     end
   end
 
@@ -62,12 +72,22 @@ class Node
     last_success_at && last_success_at < Settings.node_unavailable_after_seconds.seconds.ago
   end
 
-  def update_last_success
+  def register_success
+    Rails.logger.debug("Registering success in #{self}")
     update!(last_success_at: Time.zone.now)
+    available!
   end
 
   def to_s
-    "Node #{name} #{uuid}"
+    last_success = ", last success at #{last_success_at}" unless available?
+
+    "Node #{name} #{uuid} #{runner_provider} (#{status}#{last_success})"
+  end
+
+  def run_with_lock_no_wait
+    LockManager.new(type: self.class.to_s, id: id, wait: false, expire: 5.minutes).lock do
+      yield
+    end
   end
 
   private

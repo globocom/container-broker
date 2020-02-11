@@ -5,7 +5,8 @@ require "rails_helper"
 RSpec.describe Task, type: :model do
   let(:now) { Time.zone.now }
   let(:execution_type) { "test-type1" }
-  subject { Fabricate(:task, execution_type: execution_type) }
+  let(:slot) { Fabricate(:slot) }
+  subject { Fabricate(:task, execution_type: execution_type, slot: slot) }
 
   context "for new tasks" do
     it "saves creation date" do
@@ -79,6 +80,64 @@ RSpec.describe Task, type: :model do
       it "does not calculate duration" do
         expect(subject.seconds_running).to be_nil
       end
+    end
+  end
+
+  context "for gettings logs" do
+    context "and task has started" do
+      let(:docker_fetch_logs_instance) { double(Runners::Docker::FetchLogs) }
+
+      before do
+        subject.started!
+
+        allow(Runners::ServicesFactory).to receive(:fabricate)
+          .with(runner: subject.slot.node.runner_provider, service: :fetch_logs)
+          .and_return(docker_fetch_logs_instance)
+      end
+
+      it "fetches logs" do
+        expect(docker_fetch_logs_instance).to receive(:perform).with(task: subject)
+
+        subject.get_logs
+      end
+    end
+
+    context "and task has not started" do
+      before do
+        subject.set_logs("test log")
+      end
+
+      it "fetches logs" do
+        expect(subject.get_logs).to eq("test log")
+      end
+    end
+  end
+
+  context "generating runner id" do
+    subject(:task) { Fabricate(:task, name: " Test - with Spaces, _ underlines and special chars.") }
+
+    it "starts with an alphanumeric char" do
+      expect(task.generate_runner_id).to start_with(/\w/)
+    end
+
+    it "ends with an alphanumeric char" do
+      expect(task.generate_runner_id).to end_with(/\w/)
+    end
+
+    it "cannot include upper case letters" do
+      expect(task.generate_runner_id).to_not match(/[A-Z]/)
+    end
+
+    it "cannot include spaces" do
+      expect(task.generate_runner_id).to_not include(" ")
+    end
+
+    it "cannot include underline" do
+      expect(task.generate_runner_id).to_not include("_")
+    end
+
+    it "need to be a DNS compatible name" do
+      expect(task.generate_runner_id).to match(/[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)
     end
   end
 end

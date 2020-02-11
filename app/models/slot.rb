@@ -10,10 +10,14 @@ class Slot
 
   field :name, type: String
   field :execution_type, type: String
-  field :container_id, type: String
+  field :runner_id, type: String
   belongs_to :current_task, class_name: "Task", optional: true
 
   belongs_to :node, optional: true
+
+  index(runner_id: 1)
+  index(node_id: 1)
+  index(execution_type: 1, status: 1)
 
   validates :execution_type, presence: true
   validates :execution_type, format: {
@@ -27,18 +31,23 @@ class Slot
     idle?
   end
 
-  def mark_as_running(current_task:, container_id:)
-    update!(current_task: current_task, container_id: container_id)
-    running!
+  # TODO: Remove this getter after first deploy
+  def runner_id
+    return super if Rails.env.test?
+
+    super || attributes["runner_id"]
+  end
+
+  def mark_as_running(current_task:, runner_id:)
+    update!(status: :running, current_task: current_task, runner_id: runner_id)
   end
 
   def release
-    update!(container_id: nil, current_task: nil)
-    idle!
+    update!(status: :idle, runner_id: nil, current_task: nil)
     RunTasksJob.perform_later(execution_type: execution_type)
   end
 
   def to_s
-    "Slot #{name} #{uuid} (#{status})"
+    "Slot #{name} #{uuid} (#{status} runner_id: #{runner_id})"
   end
 end

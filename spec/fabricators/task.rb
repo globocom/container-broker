@@ -2,10 +2,11 @@
 
 Fabricator(:task) do
   name "task-name"
-  container_id { SecureRandom.hex(32) }
+  runner_id { SecureRandom.hex(32) }
   image "busybox:1.25"
   cmd "sleep 5"
   storage_mount "/tmp"
+  ingest_storage_mount "/opt/ef-shared"
   status "waiting"
   slot nil
   exit_code nil

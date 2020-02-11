@@ -68,3 +68,10 @@
 
 ### Tsuru
 Command: `tsuru app-deploy -a container-broker-dev`
+
+## Development
+
+### Expose Docker HTTP API on MacOSX:
+```shell
+socat TCP-LISTEN:2376,reuseaddr,fork UNIX-CONNECT:/var/run/docker.sock
+```

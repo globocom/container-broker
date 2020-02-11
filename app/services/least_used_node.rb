@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class LeastUsedNode
+  attr_reader :execution_type
+
   def initialize(execution_type:)
     @execution_type = execution_type
   end
@@ -16,14 +18,27 @@ class LeastUsedNode
   end
 
   def nodes_by_usage
-    @nodes_by_usage ||= Node
-                        .accepting_new_tasks
-                        .includes(:slots)
-                        .available
-                        .select { |node| node.available_slot_with_execution_type(@execution_type).present? }
-                        .group_by do |node|
-      slots = node.slots.where(execution_type: @execution_type)
-      SlotsUsagePercentage.new(slots).perform
-    end
+    @nodes_by_usage ||=
+      nodes
+      .filter { |node| slots(node.id).to_a.filter(&:idle?).any? }
+      .group_by { |node| SlotsUsagePercentage.new(slots(node.id)).perform }
+  end
+
+  def nodes
+    @nodes ||=
+      Node
+      .accepting_new_tasks
+      .available
+  end
+
+  def slots(node_id)
+    @slots ||=
+      Slot
+      .only(:id, :node_id, :status)
+      .where(:node_id.in => nodes.map(&:id))
+      .where(execution_type: execution_type)
+      .group_by(&:node_id)
+
+    @slots[node_id]
   end
 end

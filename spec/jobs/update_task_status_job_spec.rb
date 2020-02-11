@@ -6,11 +6,11 @@ RSpec.describe UpdateTaskStatusJob, type: :job do
   let(:node) { Fabricate(:node) }
   let(:slot) { Fabricate(:slot_idle, node: node, execution_type: "test") }
   let(:task_persist_logs) { false }
-  let(:task) { Fabricate(:task, slot: slot, container_id: container_id, status: task_status, persist_logs: task_persist_logs) }
+  let(:task) { Fabricate(:task, slot: slot, runner_id: runner_id, status: task_status, persist_logs: task_persist_logs) }
   let(:task_status) { "running" }
   let(:docker_connection) { double("Docker::Connection") }
-  let(:container_id) { "11223344" }
-  let(:container) { double("Docker::Container", id: container_id, info: container_info) }
+  let(:runner_id) { "11223344" }
+  let(:container) { double("Docker::Container", id: SecureRandom.hex, info: container_info) }
   let(:container_status) { "exited" }
   let(:container_exit_code) { 0 }
   let(:container_error) { "" }
@@ -18,6 +18,7 @@ RSpec.describe UpdateTaskStatusJob, type: :job do
   let(:container_finished_at) { "2018-04-23T10:12:47.4534537Z" }
   let(:container_info) do
     {
+      "Names" => [runner_id],
       "State" => {
         "Status" => container_status,
         "ExitCode" => container_exit_code,
@@ -33,8 +34,8 @@ RSpec.describe UpdateTaskStatusJob, type: :job do
   end
 
   before do
-    allow(Docker::Container).to receive(:get).with(container_id, { all: true }, docker_connection).and_return(container)
-    allow(node).to receive(:docker_connection).and_return(docker_connection)
+    allow_any_instance_of(Runners::Docker::CreateConnection).to receive(:perform).and_return(docker_connection)
+    allow(Docker::Container).to receive(:get).with(runner_id, { all: true }, docker_connection).and_return(container)
   end
 
   context "when container exited" do
@@ -110,7 +111,7 @@ RSpec.describe UpdateTaskStatusJob, type: :job do
       let(:task_persist_logs) { true }
 
       before do
-        allow(container).to receive(:streaming_logs).with(stdout: true, stderr: true, tail: 100).and_return(logs)
+        allow(container).to receive(:streaming_logs).with(stdout: true, stderr: true, tail: 1_000).and_return(logs)
       end
 
       it "persist container logs to Task" do

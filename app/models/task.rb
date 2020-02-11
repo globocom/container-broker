@@ -7,7 +7,7 @@ class Task
   include MongoidEnumerable
 
   field :name, type: String
-  field :container_id, type: String # do not remove - needed for update status after completion
+  field :runner_id, type: String
   field :image, type: String
   field :execution_type, type: String
   field :cmd, type: String
@@ -47,27 +47,36 @@ class Task
     message: Constants::ExecutionType::INVALID_FORMAT_MESSAGE
   }
 
+  # TODO: Remove this getter after first deploy
+  def runner_id
+    return super if Rails.env.test?
+
+    super || attributes["runner_id"]
+  end
+
   def set_logs(logs)
-    self.logs = BSON::Binary.new(logs, :generic)
+    self.logs = BSON::Binary.new(logs.dup, :generic)
   end
 
   def get_logs
     if started?
-      FetchTaskContainer.new.call(task: self).streaming_logs(stdout: true, stderr: true, tail: 1_000)
+      slot.node.runner_service(:fetch_logs).perform(task: self)
     else
       logs.try(:data)
     end
   end
 
-  def mark_as_started!
-    update!(started_at: Time.zone.now)
+  def mark_as_started!(runner_id:, slot:)
+    update!(started_at: Time.zone.now, runner_id: runner_id, slot: slot)
 
     started!
   end
 
-  def mark_as_retry
+  def mark_as_retry(error: nil)
+    update!(error: error)
+
     if try_count < Settings.task_retry_count
-      update(try_count: try_count + 1, slot: nil)
+      update(try_count: try_count + 1, slot: nil, runner_id: nil)
       retry!
       RunTasksJob.perform_later(execution_type: execution_type)
     else
@@ -92,15 +101,7 @@ class Task
   end
 
   def seconds_running
-    if completed? || failed?
-      calculate_second_span(started_at, finished_at)
-    elsif started?
-      calculate_second_span(started_at, Time.zone.now.to_datetime)
-    end
-  end
-
-  def calculate_second_span(start, finish)
-    ((finish - start) * 1.day.seconds).to_i if finish.present? && start.present?
+    milliseconds_running&.div(1000)
   end
 
   def calculate_millisecond_span(start, finish)
@@ -118,6 +119,13 @@ class Task
   end
 
   def to_s
-    "Task #{name} #{uuid} (#{status})"
+    "Task #{name} #{uuid} (#{status} runner_id: #{runner_id})"
+  end
+
+  def generate_runner_id
+    prefix = name.gsub("_", "-").parameterize
+    random_suffix = SecureRandom.alphanumeric(8).downcase
+
+    "#{prefix}-#{random_suffix}"
   end
 end

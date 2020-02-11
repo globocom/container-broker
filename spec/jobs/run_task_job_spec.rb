@@ -4,168 +4,86 @@ require "rails_helper"
 
 RSpec.describe RunTaskJob, type: :job do
   let(:node) { Fabricate(:node) }
-  let(:task) do
-    Task.create!(
-      name: "task-name",
-      image: "#{image}:#{image_tag}",
-      cmd: "-i input.txt -metadata comment='Encoded by Globo.com' output.mp4",
-      storage_mount: "/tmp/workdir",
-      ingest_storage_mount: "/ingest",
-      execution_type: "test"
-    )
+  let(:task) { Fabricate(:task, status: "starting") }
+  let(:slot) { Fabricate(:slot_attaching, node: node) }
+  let(:create_task_service) { double }
+  let(:runner_id) { SecureRandom.hex }
+
+  def perform
+    subject.perform(task: task, slot: slot)
   end
-
-  let(:slot) { Fabricate(:slot_attaching, node: node, execution_type: "test") }
-  let(:image) { "busybox" }
-  let(:image_tag) { "3.1" }
-
-  let(:perform) { subject.perform(task: task, slot: slot) }
-  let(:container) { double("Docker::Container", id: "11223344") }
 
   before do
-    allow(Docker::Image).to receive(:create)
-    allow(Docker::Container).to receive(:create) { container }
-    allow(Docker::Image).to receive(:exist?)
-    allow(container).to receive(:start)
+    allow(node).to receive(:runner_service)
+      .with(:run_task)
+      .and_return(create_task_service)
+
+    allow(create_task_service).to receive(:perform)
+      .with(task: task, slot: slot, runner_id: runner_id)
+      .and_return(runner_id)
+
+    allow(task).to receive(:generate_runner_id).and_return(runner_id)
   end
 
-  shared_examples "releases slot and retry the task" do
-    it "releases the slot" do
-      perform
-      expect(slot).to be_idle
-    end
-
-    it "marks task to retry" do
-      perform
-      expect(task).to be_retry
-    end
-
-    it "increments retry count" do
-      expect { perform }.to change(task, :try_count).by(1)
-    end
-  end
-
-  context "when node is unavailable" do
-    before do
-      allow(Docker::Image).to receive(:create).and_raise(Excon::Error, "Error connecting to docker")
-    end
-
-    it "mark node as unavailable" do
-      perform
-      expect(node).to_not be_available
-    end
-
-    include_examples "releases slot and retry the task"
-
-    context "sets task error message" do
-      context "standard errors" do
-        it "sets simple error message" do
-          expect { perform }.to change(task, :error).to("Docker connection error: Error connecting to docker")
-        end
+  context "when run task returns an error" do
+    shared_examples "releases slot and task" do
+      it "releases the slot" do
+        perform
+        expect(slot).to be_idle
       end
 
-      context "errors with response bodies" do
-        before do
-          allow(Docker::Image).to receive(:create).and_raise(Excon::Error::HTTPStatus.new("Error connecting to docker", nil, double(body: "Error details")))
-        end
+      it "marks task to retry" do
+        perform
+        expect(task).to be_retry
+      end
 
-        it "sets message with error details from response body" do
-          expect { perform }.to change(task, :error).to("Docker connection error: Error connecting to docker\nError details")
-        end
+      it "increments retry count" do
+        expect { perform }.to change(task, :try_count).by(1)
+      end
+
+      it "sets error message in the task" do
+        expect { perform }.to change(task, :error).to(error_message)
       end
     end
-  end
 
-  context "when docker image does not exists in registry" do
-    before do
-      allow(Docker::Image).to receive(:create).and_raise(Docker::Error::NotFoundError)
-    end
+    context "and the error is related with the specific node" do
+      let(:error_message) { "Error connecting to docker" }
 
-    include_examples "releases slot and retry the task"
-
-    it "sets task error message" do
-      expect { perform }.to change(task, :error).to("Docker image not found: Docker::Error::NotFoundError")
-    end
-  end
-
-  context "when docker image does not exists locally in machine" do
-    before do
-      allow(Docker::Image).to receive(:exist?).with(task.image, hash, a_kind_of(Docker::Connection)).and_return(false)
-    end
-
-    it "creates image in machine" do
-      expect(Docker::Image).to receive(:create).with({ "fromImage" => image, "tag" => image_tag }, nil, a_kind_of(Docker::Connection))
-      perform
-    end
-  end
-
-  context "when node is available and image exists" do
-    let(:container_create_options) do
-      {
-        "Image" => "#{image}:#{image_tag}",
-        "HostConfig" => {
-          "Binds" => [
-            "/tmp/ef-shared:/tmp/workdir",
-            "/opt/ef-shared:/ingest"
-          ],
-          "NetworkMode" => ""
-        },
-        "Entrypoint" => [],
-        "Cmd" => ["sh", "-c", "-i input.txt -metadata comment='Encoded by Globo.com' output.mp4"]
-      }
-    end
-
-    context "and image exists locally in machine" do
       before do
-        allow(Docker::Image).to receive(:exist?).with(task.image, kind_of(Hash), a_kind_of(Docker::Connection)).and_return(true)
+        allow(create_task_service).to receive(:perform).and_raise(Node::NodeConnectionError, error_message)
       end
 
-      it "does not call image create" do
-        expect(Docker::Image).to_not receive(:create)
+      it "marks node as unstable" do
         perform
+        expect(node).to be_unstable
       end
+
+      include_examples "releases slot and task"
     end
 
-    context "and command is invalid" do
+    context "and the error is related to the task" do
+      let(:error_message) { "Invalid image name" }
+
       before do
-        allow(container).to receive(:start).and_raise(Docker::Error::ClientError, "executable file not found")
+        allow(create_task_service).to receive(:perform).and_raise(StandardError, error_message)
       end
 
-      it "saves the error in task" do
+      it "does not mark node as unstable" do
         perform
-        expect(task.error).to eq("executable file not found")
+        expect(node).to be_available
       end
 
-      it "saves container_id in task" do
-        perform
-        expect(task.container_id).to eq(container.id)
-      end
+      include_examples "releases slot and task"
     end
+  end
 
-    it "creates the image" do
-      expect(Docker::Image).to receive(:create).with({ "fromImage" => image, "tag" => image_tag }, nil, kind_of(Docker::Connection))
-
-      perform
-    end
-
-    it "creates the container" do
-      expect(Docker::Container).to receive(:create).with(container_create_options, kind_of(Docker::Connection))
-
-      perform
-    end
-
-    it "starts the container" do
-      expect(container).to receive(:start)
-
-      perform
-    end
-
-    it "updates task container_id" do
-      expect { perform }.to change(task, :container_id).to(container.id)
+  context "when run task succeeds" do
+    it "updates task runner_id" do
+      expect { perform }.to change(task, :runner_id).to(runner_id)
     end
 
     it "updates task status" do
-      expect { perform }.to change(task, :status).to("started")
+      expect { perform }.to change { task.reload.status }.to("started")
     end
 
     it "updates task started_at" do
@@ -188,8 +106,8 @@ RSpec.describe RunTaskJob, type: :job do
       expect { perform }.to change(slot, :current_task).to(task)
     end
 
-    it "updates slot container_id" do
-      expect { perform }.to change(slot, :container_id).to(container.id)
+    it "updates slot runner_id" do
+      expect { perform }.to change(slot, :runner_id).to(runner_id)
     end
   end
 end

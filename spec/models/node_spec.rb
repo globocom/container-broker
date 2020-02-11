@@ -3,7 +3,13 @@
 require "rails_helper"
 
 RSpec.describe Node, type: :model do
-  subject { Fabricate.build(:node) }
+  subject(:node) { Fabricate.build(:node) }
+
+  context "creating a node without setting a runner" do
+    subject { Node.new }
+
+    it { is_expected.to be_docker }
+  end
 
   context "registering error" do
     context "when node was available" do

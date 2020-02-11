@@ -7,22 +7,24 @@ class LockTask
     @execution_type = execution_type
   end
 
-  def call
-    if first_pending
-      task = nil
-      LockManager.new(type: "get_free_task", id: "", expire: 30.seconds, wait: true).lock do
-        task = first_pending
-        task&.starting!
-      end
+  def perform
+    task = all_pending
+           .find_one_and_update(
+             {
+               "$set" => { status: "starting" }
+             }, return_document: :after
+           )
+    return unless task
 
-      persist_metrics(task) if task
+    task.reload
 
-      task
-    end
+    persist_metrics(task)
+
+    task
   end
 
-  def first_pending
-    all_pending.first
+  def any_pending?
+    all_pending.any?
   end
 
   private

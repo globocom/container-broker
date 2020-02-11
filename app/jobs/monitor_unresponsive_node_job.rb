@@ -4,12 +4,17 @@ class MonitorUnresponsiveNodeJob < ApplicationJob
   queue_as :default
 
   def perform(node:)
-    Docker.info(node.docker_connection)
-    node.available!
-    node.update(last_error: nil)
-    RunTasksForAllExecutionTypesJob.perform_later
+    node.run_with_lock_no_wait do
+      node.runner_service(:node_availability).perform(node: node)
+
+      Rails.logger.debug("Marking #{node} as available again")
+      node.register_success
+
+      RunTasksForAllExecutionTypesJob.perform_later
+    end
   rescue StandardError => e
-    node.register_error(e.message)
+    node.register_error("#{e.class}: #{e.message}")
+
     Rails.logger.info("#{node} still unresponsive")
   end
 end
