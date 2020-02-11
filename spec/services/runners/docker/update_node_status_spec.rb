@@ -65,6 +65,44 @@ RSpec.describe Runners::Docker::UpdateNodeStatus, type: :service do
           expect(ReleaseSlotJob).to_not have_been_enqueued.with(slot: slot)
         end
       end
+
+      context "and the container status is created" do
+        let(:container_state) { "created" }
+        let(:docker_connection) { double(::Docker::Connection) }
+
+        before do
+          allow(Docker::Container).to receive(:get)
+            .with(container.id, docker_connection)
+            .and_return(
+              double(
+                info: {
+                  "State" => {
+                    "ExitCode" => exit_code
+                  }
+                }
+              )
+            )
+          allow_any_instance_of(Runners::Docker::CreateConnection).to receive(:perform).with(node: node).and_return(docker_connection)
+        end
+
+        context "and it has exit code zero" do
+          let(:exit_code) { 0 }
+
+          it "does not try to start the container again" do
+            expect(container).to_not receive(:start)
+            subject.perform(node: node)
+          end
+        end
+
+        context "and it has exit code different than zero" do
+          let(:exit_code) { 127 }
+
+          it "tries to start the container again" do
+            expect(container).to receive(:start)
+            subject.perform(node: node)
+          end
+        end
+      end
     end
 
     context "reschedules tasks when container is missing" do
