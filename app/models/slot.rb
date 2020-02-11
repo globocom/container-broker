@@ -15,6 +15,10 @@ class Slot
 
   belongs_to :node, optional: true
 
+  index(runner_id: 1)
+  index(node_id: 1)
+  index(execution_type: 1, status: 1)
+
   validates :execution_type, presence: true
   validates :execution_type, format: {
     with: Constants::ExecutionType::FORMAT,
