@@ -18,7 +18,7 @@ module Runners
           cmd: task.cmd,
           internal_mounts: internal_mounts(task: task),
           external_mounts: external_mounts(task: task, node: node),
-          node_selector: node.kubernetes_config.node_selector
+          node_selector: node.runner_config["node_selector"]
         )
       end
 
@@ -40,8 +40,8 @@ module Runners
           {
             name: NFS_NAME,
             nfs: {
-              server: node.kubernetes_config.nfs_server,
-              path: node.kubernetes_config.nfs_path
+              server: node.runner_config["nfs_server"],
+              path: node.runner_config["nfs_path"]
             }
           }
         ]

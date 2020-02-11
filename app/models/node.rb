@@ -16,21 +16,18 @@ class Node
   field :accept_new_tasks, type: Boolean, default: true
   field :runner_capacity_reached, type: Boolean, default: false
   field :slots_execution_types, type: Hash, default: {}
+  field :runner_config, type: Hash, default: {}
 
   enumerable :status, %w[available unstable unavailable], default: "unavailable", after_change: :status_change
   enumerable :runner, %w[docker kubernetes], default: :docker
 
   has_many :slots
-  embeds_one :kubernetes_config
 
   scope :accepting_new_tasks, -> { where(accept_new_tasks: true, :runner_capacity_reached.in => [nil, false]) }
 
   validates :hostname, presence: true
   validates :slots_execution_types, presence: true
   validate :execution_types_format
-
-  validates :kubernetes_config, presence: true, if: :kubernetes?
-  validates :kubernetes_config, absence: true, unless: :kubernetes?
 
   def usage_per_execution_type
     NodeUsagePercentagePerExecutionType.new(self).perform

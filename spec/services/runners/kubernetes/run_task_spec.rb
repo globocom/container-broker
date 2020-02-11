@@ -50,7 +50,7 @@ RSpec.describe Runners::Kubernetes::RunTask do
     it "with node_selector" do
       expect(kubernetes_client).to have_received(:create_pod).with(
         hash_including(
-          node_selector: node.kubernetes_config.node_selector
+          node_selector: node.runner_config["node_selector"]
         )
       )
     end
@@ -76,8 +76,8 @@ RSpec.describe Runners::Kubernetes::RunTask do
               {
                 name: described_class::NFS_NAME,
                 nfs: {
-                  server: node.kubernetes_config.nfs_server,
-                  path: node.kubernetes_config.nfs_path
+                  server: node.runner_config["nfs_server"],
+                  path: node.runner_config["nfs_path"]
                 }
               }
             ]

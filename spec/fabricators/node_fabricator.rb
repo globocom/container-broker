@@ -17,13 +17,13 @@ end
 
 Fabricator(:node_kubernetes, from: :node) do
   runner :kubernetes
-  kubernetes_config do
+  runner_config do
     {
-      namespace: "videos-ingest",
-      bearer_token: SecureRandom.base64,
-      nfs_path: "/dev/nfs",
-      nfs_server: "nfs.test",
-      node_selector: "ef"
+      "namespace" => "videos-ingest",
+      "bearer_token" => SecureRandom.base64,
+      "nfs_path" => "/dev/nfs",
+      "nfs_server" => "nfs.test",
+      "node_selector" => "ef"
     }
   end
 end

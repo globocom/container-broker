@@ -4,23 +4,33 @@ RSpec.describe Runners::Kubernetes::CreateClient do
   context "for a kubernetes node" do
     let(:node) { Fabricate(:node_kubernetes) }
 
-    context "creates a kubernetes client" do
-      it "with hostname" do
-        expect(KubernetesClient).to receive(:new).with(hash_including(uri: node.hostname))
+    context "when configuration is valid" do
+      context "creates a kubernetes client" do
+        it "with hostname" do
+          expect(KubernetesClient).to receive(:new).with(hash_including(uri: node.hostname))
 
-        subject.perform(node: node)
+          subject.perform(node: node)
+        end
+
+        it "with bearer token" do
+          expect(KubernetesClient).to receive(:new).with(hash_including(bearer_token: node.runner_config["bearer_token"]))
+
+          subject.perform(node: node)
+        end
+
+        it "with namespace" do
+          expect(KubernetesClient).to receive(:new).with(hash_including(namespace: node.runner_config["namespace"]))
+
+          subject.perform(node: node)
+        end
       end
+    end
 
-      it "with bearer token" do
-        expect(KubernetesClient).to receive(:new).with(hash_including(bearer_token: node.kubernetes_config.bearer_token))
+    context "when configuration is not valid" do
+      before { node.runner_config.delete(node.runner_config.keys.sample) }
 
-        subject.perform(node: node)
-      end
-
-      it "with namespace" do
-        expect(KubernetesClient).to receive(:new).with(hash_including(namespace: node.kubernetes_config.namespace))
-
-        subject.perform(node: node)
+      it "raises an error" do
+        expect { subject.perform(node: node) }.to raise_error(Runners::InvalidConfig)
       end
     end
   end
