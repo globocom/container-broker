@@ -55,7 +55,7 @@ module Runners
       end
 
       def started_with_error?(container:, docker_connection:)
-        container.info["State"] == "created" && ::Docker::Container.get(container.id, docker_connection).info["State"]["ExitCode"].positive?
+        container.info["State"] == "created" && ::Docker::Container.get(container.id, { all: true }, docker_connection).info["State"]["ExitCode"].positive?
       end
     end
   end

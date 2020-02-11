@@ -72,7 +72,7 @@ RSpec.describe Runners::Docker::UpdateNodeStatus, type: :service do
 
         before do
           allow(Docker::Container).to receive(:get)
-            .with(container.id, docker_connection)
+            .with(container.id, { all: true }, docker_connection)
             .and_return(
               double(
                 info: {
