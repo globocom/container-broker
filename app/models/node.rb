@@ -19,7 +19,7 @@ class Node
   field :runner_config, type: Hash, default: {}
 
   enumerable :status, %w[available unstable unavailable], default: "unavailable", after_change: :status_change
-  enumerable :runner, %w[docker kubernetes], default: :docker
+  enumerable :runner_provider, %w[docker kubernetes], default: :docker
 
   has_many :slots
 
@@ -46,7 +46,7 @@ class Node
   end
 
   def runner_service(service)
-    Runners::ServicesFactory.fabricate(runner: runner, service: service)
+    Runners::ServicesFactory.fabricate(runner: runner_provider, service: service)
   end
 
   def register_error(error)
@@ -81,7 +81,7 @@ class Node
   def to_s
     last_success = ", last success at #{last_success_at}" unless available?
 
-    "Node #{name} #{uuid} #{runner} (#{status}#{last_success})"
+    "Node #{name} #{uuid} #{runner_provider} (#{status}#{last_success})"
   end
 
   def run_with_lock_no_wait

@@ -16,7 +16,7 @@ Fabricator(:node_unstable, from: :node) do
 end
 
 Fabricator(:node_kubernetes, from: :node) do
-  runner :kubernetes
+  runner_provider :kubernetes
   runner_config do
     {
       "namespace" => "videos-ingest",

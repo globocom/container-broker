@@ -91,7 +91,7 @@ RSpec.describe Task, type: :model do
         subject.started!
 
         allow(Runners::ServicesFactory).to receive(:fabricate)
-          .with(runner: subject.slot.node.runner, service: :fetch_logs)
+          .with(runner: subject.slot.node.runner_provider, service: :fetch_logs)
           .and_return(docker_fetch_logs_instance)
       end
 

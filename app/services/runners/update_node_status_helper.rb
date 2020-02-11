@@ -31,7 +31,7 @@ module Runners
 
       data = {
         hostname: node.hostname,
-        runner_type: node.runner,
+        runner_type: node.runner_provider,
         capacity_reached: node.runner_capacity_reached,
         schedule_pending: execution_infos.count(&:schedule_pending?),
         total_runners: execution_infos.count

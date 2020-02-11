@@ -32,7 +32,7 @@ class RescheduleTasksForMissingRunners
     Raven.capture_exception(
       message,
       extra: {
-        runner: slot&.node&.runner,
+        runner: slot&.node&.runner_provider,
         runner_id: runner_id,
         slot: {
           id: slot&.id,
