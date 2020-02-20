@@ -47,13 +47,6 @@ class Task
     message: Constants::ExecutionType::INVALID_FORMAT_MESSAGE
   }
 
-  # TODO: Remove this getter after first deploy
-  def runner_id
-    return super if Rails.env.test?
-
-    super || attributes["runner_id"]
-  end
-
   def set_logs(logs)
     self.logs = BSON::Binary.new(logs.dup, :generic)
   end

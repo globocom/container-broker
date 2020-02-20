@@ -31,13 +31,6 @@ class Slot
     idle?
   end
 
-  # TODO: Remove this getter after first deploy
-  def runner_id
-    return super if Rails.env.test?
-
-    super || attributes["runner_id"]
-  end
-
   def mark_as_running(current_task:, runner_id:)
     update!(status: :running, current_task: current_task, runner_id: runner_id)
   end

@@ -4,7 +4,7 @@ class ReleaseSlotJob < ApplicationJob
   class InvalidSlotContainerId < StandardError; end
   queue_as :default
 
-  def perform(slot:, container_id: nil, runner_id: container_id)
+  def perform(slot:, runner_id:)
     Rails.logger.debug("ReleaseSlotJob for #{slot} and container #{runner_id}")
 
     if MigrateRunner.new(runner_id: runner_id).migrated?
