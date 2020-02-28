@@ -23,32 +23,6 @@ RSpec.describe AddTaskTagsJob, type: :job do
     it "does not create new tags" do
       expect { perform }.to_not change(TaskTag, :count)
     end
-
-    context "and value is not present in tag" do
-      let(:task_tags_hash) do
-        {
-          "media_type" => "subtitle"
-        }
-      end
-
-      it "creates the new value" do
-        perform
-        expect(TaskTag.find_by(name: "media_type").values).to contain_exactly("video", "audio", "subtitle")
-      end
-    end
-
-    context "and value is already present in tag" do
-      let(:task_tags_hash) do
-        {
-          "media_type" => "video"
-        }
-      end
-
-      it "does not create new value" do
-        perform
-        expect(TaskTag.find_by(name: "media_type").values).to contain_exactly("video", "audio")
-      end
-    end
   end
 
   context "when tag does not exist" do
@@ -61,11 +35,6 @@ RSpec.describe AddTaskTagsJob, type: :job do
     it "create new task tag" do
       perform
       expect(TaskTag.where(name: "api_id")).to_not be_empty
-    end
-
-    it "with the value as the first value" do
-      perform
-      expect(TaskTag.find_by(name: "api_id")).to have_attributes(values: ["123456"])
     end
   end
 end

@@ -8,18 +8,11 @@ class RemoveUnusedTagsJob < ApplicationJob
   end
 
   def remove_unreferenced_tags
-    TaskTag.each do |task_tag|
-      if any_task_referencing_tag?(task_tag)
-        remove_unreferenced_tag_values(task_tag)
-      else
-        task_tag.destroy!
-      end
-    end
-  end
-
-  def remove_unreferenced_tag_values(task_tag)
-    remaining_values = Task.distinct(tag_expression(task_tag))
-    task_tag.update!(values: remaining_values)
+    TaskTag
+      .all
+      .to_a
+      .reject { |task_tag| any_task_referencing_tag?(task_tag) }
+      .each(&:destroy!)
   end
 
   def tag_expression(task_tag)
