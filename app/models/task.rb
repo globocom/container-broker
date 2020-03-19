@@ -33,6 +33,8 @@ class Task
   index(status: 1)
   index("tags.api_id" => 1)
   index("tags.event_id" => 1)
+  index("tags.slug" => 1)
+  index("tags.action" => 1)
 
   before_validation :normalize_tags
   before_create { |task| task.created_at = Time.zone.now }
