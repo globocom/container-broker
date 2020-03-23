@@ -27,6 +27,9 @@ class Slot
 
   scope :working, -> { where(:status.in => %w[attaching running releasing]) }
 
+  # TODO: remove after idle status migrated to available
+  scope :available, -> { where(:status.in => %w[available idle]) }
+
   def mark_as_running(current_task:, runner_id:)
     update!(status: :running, current_task: current_task, runner_id: runner_id)
   end
