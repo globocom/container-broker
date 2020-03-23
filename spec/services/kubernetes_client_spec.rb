@@ -39,6 +39,8 @@ RSpec.describe KubernetesClient do
 
     before do
       allow(Kubeclient::Resource).to receive(:new).and_return(resource)
+      allow(Settings.kubernetes).to receive(:requests).and_return(OpenStruct.new(cpu: 1, memory: 2))
+      allow(Settings.kubernetes).to receive(:limits).and_return(OpenStruct.new(cpu: 3, memory: 4))
     end
 
     def create_pod
@@ -74,7 +76,12 @@ RSpec.describe KubernetesClient do
               command: ["sh", "-c", "ls"],
               resources: {
                 requests: {
-                  cpu: 1
+                  cpu: 1,
+                  memory: 2
+                },
+                limits: {
+                  cpu: 3,
+                  memory: 4
                 }
               },
               volumeMounts: {

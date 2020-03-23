@@ -13,3 +13,10 @@ cors_origins:
   - http://localhost:3000
 
 
+kubernetes:
+  requests:
+    memory: <%= ENV.fetch("KUBERNETES_REQUESTS_MEMORY", "4G") %>
+    cpu: <%= ENV.fetch("KUBERNETES_REQUESTS_CPU", 4) %>
+  limits:
+    memory: <%= ENV.fetch("KUBERNETES_LIMITS_MEMORY", "8G") %>
+    cpu: <%= ENV.fetch("KUBERNETES_LIMITS_CPU", 8) %>
