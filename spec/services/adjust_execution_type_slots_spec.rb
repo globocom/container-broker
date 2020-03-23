@@ -39,7 +39,7 @@ RSpec.describe AdjustExecutionTypeSlots, type: :service do
   context "when slots need to be decremented" do
     context "and there are are io idle slots enough" do
       let(:amount_io) { 0 }
-      let!(:slots) { Fabricate.times(2, :slot_idle, node: node, execution_type: "io") }
+      let!(:slots) { Fabricate.times(2, :slot_available, node: node, execution_type: "io") }
 
       it "decrements slots to desired number" do
         expect do
@@ -65,7 +65,7 @@ RSpec.describe AdjustExecutionTypeSlots, type: :service do
 
       context "and there are some idle slots" do
         before do
-          Fabricate(:slot_idle, node: node, execution_type: "io")
+          Fabricate(:slot_available, node: node, execution_type: "io")
           Fabricate(:slot_running, node: node, execution_type: "io")
         end
 

@@ -19,21 +19,21 @@ RSpec.describe CollectLoadMetrics, type: :service do
 
   context "when to send slots count metrics" do
     before do
-      Fabricate(:slot, status: :idle, execution_type: "cpu")
-      Fabricate(:slot, status: :idle, execution_type: "cpu")
-      Fabricate(:slot, status: :idle, execution_type: "io")
+      Fabricate(:slot, status: :available, execution_type: "cpu")
+      Fabricate(:slot, status: :available, execution_type: "cpu")
+      Fabricate(:slot, status: :available, execution_type: "io")
       Fabricate(:slot, status: :running, execution_type: "network")
-      Fabricate(:slot, status: :idle, execution_type: "extra", node: Fabricate(:node_unstable))
+      Fabricate(:slot, status: :available, execution_type: "extra", node: Fabricate(:node_unstable))
     end
 
-    it "sends for cpu execution type and idle status" do
-      expect(slots_metrics_instance).to receive(:count).with(execution_type: "cpu", status: "idle", amount: 2)
+    it "sends for cpu execution type and available status" do
+      expect(slots_metrics_instance).to receive(:count).with(execution_type: "cpu", status: "available", amount: 2)
 
       subject.perform
     end
 
-    it "sends for io execution type and idle status" do
-      expect(slots_metrics_instance).to receive(:count).with(execution_type: "io", status: "idle", amount: 1)
+    it "sends for io execution type and available status" do
+      expect(slots_metrics_instance).to receive(:count).with(execution_type: "io", status: "available", amount: 1)
 
       subject.perform
     end
@@ -45,7 +45,7 @@ RSpec.describe CollectLoadMetrics, type: :service do
     end
 
     it "does not send to node unstable" do
-      expect(slots_metrics_instance).to_not receive(:count).with(execution_type: "extra", status: "idle", amount: 1)
+      expect(slots_metrics_instance).to_not receive(:count).with(execution_type: "extra", status: "available", amount: 1)
 
       subject.perform
     end
@@ -80,9 +80,9 @@ RSpec.describe CollectLoadMetrics, type: :service do
 
   context "when to send slots usage percent" do
     before do
-      Fabricate(:slot, status: :idle, execution_type: "cpu")
+      Fabricate(:slot, status: :available, execution_type: "cpu")
       Fabricate(:slot, status: :running, execution_type: "cpu")
-      Fabricate(:slot, status: :idle, execution_type: "io")
+      Fabricate(:slot, status: :available, execution_type: "io")
     end
 
     it "sends for cpu execution type" do

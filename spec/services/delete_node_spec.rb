@@ -7,7 +7,7 @@ RSpec.describe DeleteNode, type: :service do
 
   subject { described_class.new(node: node) }
 
-  before { Fabricate(:slot_idle, node: node) }
+  before { Fabricate(:slot_available, node: node) }
 
   context "when node is not accepting tasks" do
     let(:node) { Fabricate(:node, accept_new_tasks: false) }

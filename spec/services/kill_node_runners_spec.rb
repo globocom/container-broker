@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe KillNodeRunners do
   let(:node) { Fabricate(:node) }
   let(:running_slot) { Fabricate(:slot_running, node: node) }
-  let(:idle_slot) { Fabricate(:slot_idle, node: node) }
+  let(:idle_slot) { Fabricate(:slot_available, node: node) }
   let(:attaching_slot) { Fabricate(:slot_attaching, node: node) }
   let(:releasing_slot) { Fabricate(:slot_releasing, node: node) }
   let(:slot) { "<defined-in-each-context>" }
