@@ -6,13 +6,13 @@ class SlotsUsagePercentage
   end
 
   def perform
-    (((@slots.size - idle_slots.size).to_f / @slots.size) * 100)
+    (((@slots.size - available_slots.size).to_f / @slots.size) * 100)
       .round(2)
   end
 
   private
 
-  def idle_slots
-    @slots.select(&:idle?)
+  def available_slots
+    @slots.select(&:available?)
   end
 end

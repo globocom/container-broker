@@ -9,8 +9,8 @@ RSpec.describe LockSlot, type: :service do
   let(:node2) { Fabricate(:node) }
 
   context "with available slots for execution_type" do
-    let!(:slot1_1) { Fabricate(:slot_idle, node: node1, execution_type: execution_type) }
-    let!(:slot2_1) { Fabricate(:slot_idle, node: node2, execution_type: execution_type) }
+    let!(:slot1_1) { Fabricate(:slot_available, node: node1, execution_type: execution_type) }
+    let!(:slot2_1) { Fabricate(:slot_available, node: node2, execution_type: execution_type) }
     let!(:slot2_2) { Fabricate(:slot_running, node: node2, execution_type: execution_type) }
 
     subject { described_class.new(execution_type: execution_type) }
@@ -43,8 +43,8 @@ RSpec.describe LockSlot, type: :service do
   end
 
   context "with a node is specified" do
-    let!(:slot1_1) { Fabricate(:slot_idle, node: node1, execution_type: execution_type) }
-    let!(:slot2_1) { Fabricate(:slot_idle, node: node2, execution_type: execution_type) }
+    let!(:slot1_1) { Fabricate(:slot_available, node: node1, execution_type: execution_type) }
+    let!(:slot2_1) { Fabricate(:slot_available, node: node2, execution_type: execution_type) }
     let!(:slot2_2) { Fabricate(:slot_running, node: node2, execution_type: execution_type) }
 
     subject { described_class.new(execution_type: execution_type, node: node2) }

@@ -18,7 +18,7 @@ class RunTasksJob < ApplicationJob
         Rails.logger.debug "Perform_later RunTaskJob for #{slot} #{task}"
         RunTaskJob.perform_later(slot: slot, task: task)
       else
-        slot.idle!
+        slot.available!
         break
       end
     end

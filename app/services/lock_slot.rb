@@ -13,7 +13,7 @@ class LockSlot
 
     selected_node
       .slots
-      .idle
+      .available
       .where(execution_type: execution_type)
       .find_one_and_update(
         {

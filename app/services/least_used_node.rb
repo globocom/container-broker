@@ -20,7 +20,7 @@ class LeastUsedNode
   def nodes_by_usage
     @nodes_by_usage ||=
       nodes
-      .filter { |node| slots(node.id).to_a.filter(&:idle?).any? }
+      .filter { |node| slots(node.id).to_a.filter(&:available?).any? }
       .group_by { |node| SlotsUsagePercentage.new(slots(node.id)).perform }
   end
 
