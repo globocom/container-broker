@@ -2,12 +2,12 @@
 
 Fabricator(:slot) do
   node
-  status "idle"
+  status "available"
   execution_type "execution-type"
 end
 
-Fabricator(:slot_idle, from: :slot) do
-  status "idle"
+Fabricator(:slot_available, from: :slot) do
+  status "available"
   runner_id nil
   execution_type "execution-type"
 end

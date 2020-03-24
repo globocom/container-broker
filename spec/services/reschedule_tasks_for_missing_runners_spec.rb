@@ -38,7 +38,7 @@ RSpec.describe RescheduleTasksForMissingRunners, type: :service do
       expect do
         described_class.new(started_tasks: [started_task], runner_ids: runner_ids).perform
         slot.reload
-      end.to change(slot, :status).to("idle")
+      end.to change(slot, :status).to("available")
     end
 
     context "and sentry is enabled" do

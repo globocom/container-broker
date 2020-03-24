@@ -6,7 +6,7 @@ class Slot
   include GlobalID::Identification
   include MongoidEnumerable
 
-  enumerable :status, %w[idle attaching running releasing]
+  enumerable :status, %w[available attaching running releasing]
 
   field :name, type: String
   field :execution_type, type: String
@@ -27,16 +27,15 @@ class Slot
 
   scope :working, -> { where(:status.in => %w[attaching running releasing]) }
 
-  def available?
-    idle?
-  end
+  # TODO: remove after idle status migrated to available
+  scope :available, -> { where(:status.in => %w[available idle]) }
 
   def mark_as_running(current_task:, runner_id:)
     update!(status: :running, current_task: current_task, runner_id: runner_id)
   end
 
   def release
-    update!(status: :idle, runner_id: nil, current_task: nil)
+    update!(status: :available, runner_id: nil, current_task: nil)
     RunTasksJob.perform_later(execution_type: execution_type)
   end
 

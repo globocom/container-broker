@@ -11,7 +11,7 @@ class MigrateTasksFromDeadNodeJob < ApplicationJob
 
     node.run_with_lock_no_wait do
       Rails.logger.debug("Migrating tasks from #{node}")
-      node.slots.reject(&:idle?).each do |slot|
+      node.slots.reject(&:available?).each do |slot|
         Rails.logger.debug("Migrating task for #{slot}")
         current_task = slot.current_task
         if current_task

@@ -38,7 +38,7 @@ class Node
   end
 
   def available_slots
-    slots.idle
+    slots.available
   end
 
   def destroy_slots

@@ -73,7 +73,7 @@ RSpec.describe ReleaseSlotJob, type: :job do
     let(:slot_removed) { false }
 
     it "releases the slot" do
-      expect { subject.perform(slot: slot, runner_id: runner_id) }.to change(slot, :status).to("idle")
+      expect { subject.perform(slot: slot, runner_id: runner_id) }.to change(slot, :status).to("available")
     end
 
     it "enqueues new tasks" do

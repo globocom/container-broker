@@ -198,6 +198,12 @@ GEM
       uuid (>= 2.3, < 3)
     mongoid_enumerable (0.2.1)
       mongoid (>= 4.0)
+    mongoid_rails_migrations (1.2.1)
+      activesupport (>= 4.2.0)
+      bundler (>= 1.0.0)
+      mongoid (>= 4.0.0)
+      rails (>= 4.2.0)
+      railties (>= 4.2.0)
     multi_json (1.13.1)
     multipart-post (2.0.0)
     nenv (0.3.0)
@@ -378,6 +384,7 @@ DEPENDENCIES
   mongoid
   mongoid-uuid
   mongoid_enumerable
+  mongoid_rails_migrations
   puma (~> 3.7)
   rack-cors
   rails (~> 5.1.6)

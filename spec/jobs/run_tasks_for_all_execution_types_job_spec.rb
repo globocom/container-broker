@@ -4,9 +4,9 @@ require "rails_helper"
 
 RSpec.describe RunTasksForAllExecutionTypesJob, type: :job do
   before do
-    Fabricate(:slot_idle, execution_type: "cpu")
-    Fabricate(:slot_idle, execution_type: "cpu")
-    Fabricate(:slot_idle, execution_type: "io")
+    Fabricate(:slot_available, execution_type: "cpu")
+    Fabricate(:slot_available, execution_type: "cpu")
+    Fabricate(:slot_available, execution_type: "io")
   end
 
   it "enqueues RunTasksJob for cpu" do

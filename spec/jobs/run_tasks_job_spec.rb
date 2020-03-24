@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe RunTasksJob, type: :service do
   let(:execution_type) { "cpu" }
   let!(:task) { Fabricate(:task, execution_type: execution_type) }
-  let!(:slot) { Fabricate(:slot_idle, execution_type: execution_type) }
+  let!(:slot) { Fabricate(:slot_available, execution_type: execution_type) }
 
   context "when job is unlocked" do
     context "with no available nodes" do

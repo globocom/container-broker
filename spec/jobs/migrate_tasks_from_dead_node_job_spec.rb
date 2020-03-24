@@ -46,7 +46,7 @@ RSpec.describe MigrateTasksFromDeadNodeJob, type: :job do
   end
 
   it "releases slot" do
-    expect { perform }.to change(slot, :status).to("idle")
+    expect { perform }.to change(slot, :status).to("available")
   end
 
   it "performs migrate runner id" do

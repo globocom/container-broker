@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.describe UpdateTaskStatusJob, type: :job do
   let(:node) { Fabricate(:node) }
-  let(:slot) { Fabricate(:slot_idle, node: node, execution_type: "test") }
+  let(:slot) { Fabricate(:slot_available, node: node, execution_type: "test") }
   let(:task_persist_logs) { false }
   let(:task) { Fabricate(:task, slot: slot, runner_id: runner_id, status: task_status, persist_logs: task_persist_logs) }
   let(:task_status) { "running" }

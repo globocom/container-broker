@@ -29,7 +29,7 @@ RSpec.describe RunTaskJob, type: :job do
     shared_examples "releases slot and task" do
       it "releases the slot" do
         perform
-        expect(slot).to be_idle
+        expect(slot).to be_available
       end
 
       it "marks task to retry" do
