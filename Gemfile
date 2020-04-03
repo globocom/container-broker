@@ -2,8 +2,6 @@
 
 source "https://rubygems.org/"
 
-ruby "2.6.3"
-
 git_source(:github) do |repo_name|
   repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
   "https://github.com/#{repo_name}.git"
@@ -14,7 +12,11 @@ gem "mongoid_enumerable"
 gem "mongoid_rails_migrations"
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem "rails", "~> 5.1.6"
+gem "rails", "~> 6.0"
+
+gem "e2mmap"
+gem "thwait"
+
 # Use sqlite3 as the database for Active Record
 # gem 'sqlite3'
 # Use Puma as the app server
@@ -31,13 +33,9 @@ gem "jbuilder", "~> 2.5"
 gem "docker-api"
 
 group :development, :test do
-  # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem "byebug", platforms: %i[mri mingw x64_mingw]
-  # Adds support for Capybara system testing and selenium driver
-  gem "capybara", "~> 2.13"
   gem "fabrication"
-  gem "rspec-rails"
-  gem "selenium-webdriver"
+  gem "rspec-rails", "~> 4.0.0"
 end
 
 group :test do

@@ -18,7 +18,7 @@ class Node
   field :slots_execution_types, type: Hash, default: {}
   field :runner_config, type: Hash, default: {}
 
-  enumerable :status, %w[available unstable unavailable], default: "unavailable", after_change: :status_change
+  enumerable :status, %w[available unstable unavailable], default: "unavailable"
   enumerable :runner_provider, %w[docker kubernetes], default: :docker
 
   has_many :slots
