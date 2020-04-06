@@ -87,6 +87,10 @@ RSpec.describe KubernetesClient do
               volumeMounts: {
                 name: "nfs-ef",
                 mountPath: "/tmp/ef-shared"
+              },
+              securityContext: {
+                runAsUser: 1001,
+                runAsGroup: 1002
               }
             }
           ],

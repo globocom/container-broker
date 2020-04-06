@@ -78,6 +78,7 @@ RSpec.describe Runners::Docker::RunTask, type: :service do
       {
         "Image" => "#{image}:#{image_tag}",
         "name" => runner_id,
+        "User" => "1001:1002",
         "HostConfig" => {
           "Binds" => [
             "/tmp/ef-shared:/tmp/workdir",

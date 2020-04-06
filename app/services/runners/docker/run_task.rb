@@ -40,10 +40,16 @@ module Runners
         binds << Filer::Container.bind(task.storage_mount) if task.storage_mount.present?
         binds << Filer::Ingest.bind(task.ingest_storage_mount) if task.ingest_storage_mount.present?
 
+        user = [
+          Settings.run_container_as.user_id,
+          Settings.run_container_as.group_id
+        ].join(":")
+
         ::Docker::Container.create(
           {
             "name" => name,
             "Image" => task.image,
+            "User" => user,
             "HostConfig" => {
               "Binds" => binds,
               "NetworkMode" => ENV["DOCKER_CONTAINERS_NETWORK"].to_s
