@@ -36,7 +36,7 @@ RSpec.describe "Tasks", type: :request do
     context "with valid data" do
       it "respond with HTTP 200" do
         perform
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it "creates a task" do
@@ -95,7 +95,7 @@ RSpec.describe "Tasks", type: :request do
 
     it "responds with success" do
       perform
-      expect(response).to be_success
+      expect(response).to be_successful
     end
   end
 
@@ -118,7 +118,7 @@ RSpec.describe "Tasks", type: :request do
 
     it "responds with success" do
       perform
-      expect(response).to be_success
+      expect(response).to be_successful
     end
   end
 
@@ -135,7 +135,7 @@ RSpec.describe "Tasks", type: :request do
         task.reload
         expect(task).to be_error
 
-        expect(response).to be_success
+        expect(response).to be_successful
       end
     end
 
@@ -170,7 +170,7 @@ RSpec.describe "Tasks", type: :request do
       expect(Task.find(task2)).to be_nil
       expect(Task.find(task3)).to be_nil
 
-      expect(response).to be_success
+      expect(response).to be_successful
     end
   end
 
