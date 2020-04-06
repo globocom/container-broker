@@ -37,7 +37,11 @@ class KubernetesClient
                 requests: { cpu: Settings.kubernetes.requests.cpu, memory: Settings.kubernetes.requests.memory },
                 limits: { cpu: Settings.kubernetes.limits.cpu, memory: Settings.kubernetes.limits.memory }
               },
-              volumeMounts: internal_mounts
+              volumeMounts: internal_mounts,
+              securityContext: {
+                runAsUser: Settings.run_container_as.user_id,
+                runAsGroup: Settings.run_container_as.group_id
+              }
             }
           ],
           restartPolicy: "Never",

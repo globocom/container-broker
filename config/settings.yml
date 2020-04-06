@@ -11,6 +11,7 @@ ignore_containers:
   - encoding-factory
 cors_origins:
   - http://localhost:3000
+  - http://localhost:3001
 
 
 kubernetes:
