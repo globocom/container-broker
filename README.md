@@ -75,3 +75,8 @@ Command: `tsuru app-deploy -a container-broker-dev`
 ```shell
 socat TCP-LISTEN:2376,reuseaddr,fork UNIX-CONNECT:/var/run/docker.sock
 ```
+
+
+***REMOVED***
+***REMOVED***
+***REMOVED***
