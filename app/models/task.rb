@@ -24,7 +24,7 @@ class Task
   field :persist_logs, type: Boolean, default: false
   field :tags, type: Hash, default: {}
 
-  enumerable :status, %w[waiting starting started retry failed completed error]
+  enumerable :status, %w[waiting starting started retry failed completed error], after_change: :status_changed
 
   belongs_to :slot, optional: true
 
@@ -122,5 +122,19 @@ class Task
     random_suffix = SecureRandom.alphanumeric(8).downcase
 
     "#{prefix}-#{random_suffix}"
+  end
+
+  private
+
+  def status_changed(old_value, new_value)
+    return if old_value == new_value
+
+    post_task_event = PostTaskEvent.new(self)
+    case new_value.to_sym
+    when :completed
+      post_task_event.success
+    when :error
+      post_task_event.error
+    end
   end
 end

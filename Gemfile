@@ -58,6 +58,7 @@ end
 
 gem "active_model_serializers"
 gem "awesome_print"
+gem "backstage_api_client"
 gem "config"
 gem "guard-rspec"
 gem "kubeclient"
