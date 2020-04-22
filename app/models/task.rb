@@ -31,10 +31,7 @@ class Task
   index({ created_at: 1 }, expire_after_seconds: 1.month)
   index(tags: 1)
   index(status: 1)
-  index("tags.api_id" => 1)
-  index("tags.event_id" => 1)
-  index("tags.slug" => 1)
-  index("tags.action" => 1)
+  TaskTag.distinct(:name).each { |key| index("tags.#{key}" => 1) }
 
   before_validation :normalize_tags
   before_create { |task| task.created_at = Time.zone.now }
