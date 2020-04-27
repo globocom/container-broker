@@ -11,6 +11,8 @@ module Runners
         raise Node::NodeConnectionError, "#{e.class}: #{e.message}"
       end
 
+      private
+
       def create_pod(task:, node:, runner_id:)
         CreateClient.new.perform(node: node).create_pod(
           pod_name: runner_id,
