@@ -114,7 +114,7 @@ RSpec.describe Task, type: :model do
   end
 
   context "generating runner id" do
-    subject(:task) { Fabricate(:task, name: " Test - with Spaces, _ underlines and special chars.") }
+    subject(:task) { Fabricate(:task, name: " Test - with Spaces, _ underlines and special chars. Very long name") }
 
     it "starts with an alphanumeric char" do
       expect(task.generate_runner_id).to start_with(/\w/)
@@ -138,6 +138,10 @@ RSpec.describe Task, type: :model do
 
     it "need to be a DNS compatible name" do
       expect(task.generate_runner_id).to match(/[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)
+    end
+
+    it "limit length to MAX_NAME_SIZE" do
+      expect(task.generate_runner_id).to have(Constants::Runner::MAX_NAME_SIZE).characters
     end
   end
 

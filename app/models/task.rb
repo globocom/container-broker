@@ -117,8 +117,9 @@ class Task
   def generate_runner_id
     prefix = name.gsub("_", "-").parameterize
     random_suffix = SecureRandom.alphanumeric(8).downcase
+    max_prefix_size = Constants::Runner::MAX_NAME_SIZE - random_suffix.length - 1
 
-    "#{prefix}-#{random_suffix}"
+    "#{prefix.truncate(max_prefix_size, omission: "")}-#{random_suffix}"
   end
 
   private

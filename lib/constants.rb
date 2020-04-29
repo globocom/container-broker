@@ -5,4 +5,8 @@ module Constants
     FORMAT = /\A([a-z0-9])+(\-[a-z0-9]+)*\z/.freeze
     INVALID_FORMAT_MESSAGE = "only allows lowercase letters, numbers and hyphen symbol"
   end
+
+  class Runner
+    MAX_NAME_SIZE = 63
+  end
 end
