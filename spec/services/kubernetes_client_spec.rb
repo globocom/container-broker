@@ -21,19 +21,23 @@ RSpec.describe KubernetesClient do
     let(:image) { "busybox" }
     let(:cmd) { "ls" }
     let(:internal_mounts) do
-      {
-        name: "nfs-ef",
-        mountPath: "/tmp/ef-shared"
-      }
+      [
+        {
+          name: "nfs-ef",
+          mountPath: "/tmp/ef-shared"
+        }
+      ]
     end
     let(:external_mounts) do
-      {
-        name: "nfs-ef",
-        nfs: {
-          server: "efactory.cmfdnc01",
-          path: "/dev/project"
+      [
+        {
+          name: "nfs-ef",
+          nfs: {
+            server: "efactory.cmfdnc01",
+            path: "/dev/project"
+          }
         }
-      }
+      ]
     end
     let(:resource) { Kubeclient::Resource.new }
 
@@ -84,10 +88,12 @@ RSpec.describe KubernetesClient do
                   memory: 4
                 }
               },
-              volumeMounts: {
-                name: "nfs-ef",
-                mountPath: "/tmp/ef-shared"
-              },
+              volumeMounts: [
+                {
+                  name: "nfs-ef",
+                  mountPath: "/tmp/ef-shared"
+                }
+              ],
               securityContext: {
                 runAsUser: 1001,
                 runAsGroup: 1002
@@ -105,13 +111,15 @@ RSpec.describe KubernetesClient do
               effect: "NoSchedule"
             }
           ],
-          volumes: {
-            name: "nfs-ef",
-            nfs: {
-              server: "efactory.cmfdnc01",
-              path: "/dev/project"
+          volumes: [
+            {
+              name: "nfs-ef",
+              nfs: {
+                server: "efactory.cmfdnc01",
+                path: "/dev/project"
+              }
             }
-          }
+          ]
         }
       )
 
