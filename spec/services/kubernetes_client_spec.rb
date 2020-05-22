@@ -97,6 +97,12 @@ RSpec.describe KubernetesClient do
               securityContext: {
                 runAsUser: 1001,
                 runAsGroup: 1002
+              },
+              livenessProbe: {
+                exec: {
+                  command: ["ls", "/tmp/ef-shared"]
+                },
+                periodSeconds: 30
               }
             }
           ],
@@ -130,6 +136,41 @@ RSpec.describe KubernetesClient do
       expect(pod_client).to receive(:create_pod).with(resource)
 
       create_pod
+    end
+
+    context "when there are volume mounts" do
+      it "creates readiness probe options" do
+        expect(Kubeclient::Resource).to receive(:new).with(
+          hash_including(
+            spec: hash_including(
+              containers: [
+                hash_including(livenessProbe: kind_of(Hash))
+              ]
+            )
+          )
+        )
+
+        create_pod
+      end
+    end
+
+    context "when there is no volume mounts" do
+      let(:internal_mounts) { nil }
+      let(:external_mounts) { nil }
+
+      it "creates readiness probe options" do
+        expect(Kubeclient::Resource).to receive(:new).with(
+          hash_including(
+            spec: hash_including(
+              containers: [
+                hash_including(livenessProbe: nil)
+              ]
+            )
+          )
+        )
+
+        create_pod
+      end
     end
   end
 

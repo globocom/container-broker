@@ -101,7 +101,19 @@ class KubernetesClient
       securityContext: {
         runAsUser: Settings.run_container_as.user_id,
         runAsGroup: Settings.run_container_as.group_id
-      }
+      },
+      livenessProbe: liveness_probe_options(internal_mounts: internal_mounts)
+    }
+  end
+
+  def liveness_probe_options(internal_mounts:)
+    return if Array(internal_mounts).empty?
+
+    {
+      exec: {
+        command: %w[ls] + internal_mounts.map { |mount| mount[:mountPath] }
+      },
+      periodSeconds: Settings.kubernetes.liveness_probe_seconds_interval
     }
   end
 

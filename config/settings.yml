@@ -15,6 +15,7 @@ cors_origins:
 
 
 kubernetes:
+  liveness_probe_seconds_interval: 30
   requests:
     memory: <%= ENV.fetch("KUBERNETES_REQUESTS_MEMORY", "4G") %>
     cpu: <%= ENV.fetch("KUBERNETES_REQUESTS_CPU", 4) %>
