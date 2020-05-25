@@ -155,8 +155,8 @@ RSpec.describe KubernetesClient do
     end
 
     context "when there is no volume mounts" do
-      let(:internal_mounts) { nil }
-      let(:external_mounts) { nil }
+      let(:internal_mounts) { [] }
+      let(:external_mounts) { [] }
 
       it "creates readiness probe options" do
         expect(Kubeclient::Resource).to receive(:new).with(

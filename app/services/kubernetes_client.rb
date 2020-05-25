@@ -107,7 +107,7 @@ class KubernetesClient
   end
 
   def liveness_probe_options(internal_mounts:)
-    return if Array(internal_mounts).empty?
+    return if internal_mounts.empty?
 
     {
       exec: {
