@@ -56,8 +56,7 @@ RSpec.describe "Tasks", type: :request do
           cmd: task_cmd,
           storage_mount: task_storage_mount,
           ingest_storage_mount: task_ingest_storage_mount,
-          tags: task_tags,
-          request_id: request_id
+          tags: task_tags.merge(request_id: request_id)
         )
       end
     end

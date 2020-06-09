@@ -23,7 +23,6 @@ class Task
   field :try_count, type: Integer, default: 0
   field :persist_logs, type: Boolean, default: false
   field :tags, type: Hash, default: {}
-  field :request_id, type: String
 
   enumerable :status, %w[waiting starting started retry failed completed error], after_change: :status_changed
 
@@ -122,6 +121,10 @@ class Task
     max_prefix_size = Constants::Runner::MAX_NAME_SIZE - random_suffix.length - 1
 
     "#{prefix.truncate(max_prefix_size, omission: "")}-#{random_suffix}"
+  end
+
+  def request_id
+    tags&.dig("request_id")
   end
 
   private

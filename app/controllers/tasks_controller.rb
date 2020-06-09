@@ -2,6 +2,7 @@
 
 class TasksController < ApplicationController
   before_action :set_task, only: %i[show logs mark_as_error]
+  before_action :set_request_id, only: %i[create]
 
   def create
     @task = Task.new(task_params)
@@ -58,6 +59,11 @@ class TasksController < ApplicationController
       :persist_logs,
       :execution_type,
       tags: {}
-    ).merge(request_id: request.request_id)
+    )
+  end
+
+  def set_request_id
+    params[:task][:tags] ||= {}
+    params[:task][:tags][:request_id] = request.request_id
   end
 end
