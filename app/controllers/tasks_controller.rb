@@ -58,6 +58,6 @@ class TasksController < ApplicationController
       :persist_logs,
       :execution_type,
       tags: {}
-    )
+    ).merge(request_id: request.request_id)
   end
 end
