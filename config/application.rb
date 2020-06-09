@@ -26,5 +26,9 @@ module ContainerBroker
     # -- all .rb files in that directory are automatically loaded.
 
     config.eager_load_paths << Rails.root.join("lib")
+
+    config.log_tags = [
+      ->(request) { "request_id=#{request.request_id}" }
+    ]
   end
 end
