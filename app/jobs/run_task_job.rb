@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class RunTaskJob < ApplicationJob
+  extend RequestIdFromTask
+
   queue_as :default
 
   def perform(task:, slot:)
