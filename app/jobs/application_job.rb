@@ -17,7 +17,7 @@ class ApplicationJob < ActiveJob::Base
   end
 
   around_perform do |job, block|
-    request_id = job.class.try(:request_id_from_args, job.arguments.first)
+    request_id = job.class.request_id_from_args(job.arguments.first)
 
     if request_id
       Rails.logger.tagged("request_id=#{request_id}") do
@@ -27,4 +27,6 @@ class ApplicationJob < ActiveJob::Base
       block.call
     end
   end
+
+  def self.request_id_from_args(_args); end
 end
