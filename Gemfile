@@ -33,6 +33,7 @@ gem "jbuilder", "~> 2.5"
 gem "docker-api"
 
 group :development, :test do
+  gem "bundler-audit"
   gem "byebug", platforms: %i[mri mingw x64_mingw]
   gem "fabrication"
   gem "rspec-rails", "~> 4.0.0"
