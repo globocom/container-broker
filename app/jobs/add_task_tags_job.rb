@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class AddTaskTagsJob < ApplicationJob
+  extend RequestIdFromTask
+
   queue_as :default
 
   def perform(task:)

@@ -18,6 +18,7 @@ RSpec.describe "Tasks", type: :request do
         "slug" => "tag1"
       }
     end
+    let(:request_id) { SecureRandom.uuid }
 
     let(:data) do
       {
@@ -31,6 +32,10 @@ RSpec.describe "Tasks", type: :request do
           execution_type: task_execution_type
         }
       }
+    end
+
+    before do
+      allow_any_instance_of(ActionDispatch::Request).to receive(:request_id).and_return(request_id)
     end
 
     context "with valid data" do
@@ -51,7 +56,7 @@ RSpec.describe "Tasks", type: :request do
           cmd: task_cmd,
           storage_mount: task_storage_mount,
           ingest_storage_mount: task_ingest_storage_mount,
-          tags: task_tags
+          tags: task_tags.merge(request_id: request_id)
         )
       end
     end

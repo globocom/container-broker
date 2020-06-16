@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class UpdateTaskStatusJob < ApplicationJob
+  extend RequestIdFromTask
+
   class InvalidContainerStatusError < StandardError; end
 
   queue_as :default

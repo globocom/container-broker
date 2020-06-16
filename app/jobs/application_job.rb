@@ -15,4 +15,18 @@ class ApplicationJob < ActiveJob::Base
       time: time
     )
   end
+
+  around_perform do |job, block|
+    request_id = job.class.request_id_from_args(job.arguments.first)
+
+    if request_id
+      Rails.logger.tagged("request_id=#{request_id}") do
+        CurrentThreadRequestId.set(request_id) { block.call }
+      end
+    else
+      block.call
+    end
+  end
+
+  def self.request_id_from_args(_args); end
 end

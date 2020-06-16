@@ -31,6 +31,7 @@ class Task
   index({ created_at: 1 }, expire_after_seconds: 1.month)
   index(tags: 1)
   index(status: 1)
+  index(request_id: 1)
   TaskTag.distinct(:name).each { |key| index("tags.#{key}" => 1) }
 
   before_validation :normalize_tags
@@ -111,7 +112,7 @@ class Task
   end
 
   def to_s
-    "Task #{name} #{uuid} (#{status} runner_id: #{runner_id})"
+    "Task #{name} #{uuid} (#{status} runner_id: #{runner_id}) request_id=#{request_id}"
   end
 
   def generate_runner_id
@@ -120,6 +121,10 @@ class Task
     max_prefix_size = Constants::Runner::MAX_NAME_SIZE - random_suffix.length - 1
 
     "#{prefix.truncate(max_prefix_size, omission: "")}-#{random_suffix}"
+  end
+
+  def request_id
+    tags&.dig("request_id")
   end
 
   private
