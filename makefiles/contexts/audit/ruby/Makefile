@@ -6,9 +6,12 @@
 .DEFAULT_GOAL := all
 .PHONY: all
 
+IGNORE_FILE := $(base_path)/.bundler-audit.ignore
+
+ifneq (,$(wildcard $(IGNORE_FILE)))
+	IGNORE_ARG := --ignore $(shell cat $(IGNORE_FILE))
+endif
+
 ## all (default): run bundle audit
 all: bundle
-	@cd $(base_path) && bundle exec bundle audit --update
-
-ignore:
-	@cd $(base_path) && bundle exec bundle audit --update --ignore $(advisories)
+	@cd $(base_path) && bundle exec bundle audit --update $(IGNORE_ARG)
