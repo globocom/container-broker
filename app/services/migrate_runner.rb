@@ -17,7 +17,7 @@ class MigrateRunner
   end
 
   def migrated?
-    self.class.redis_client.exists("#{KEY_PREFIX}_#{runner_id}")
+    self.class.redis_client.exists?("#{KEY_PREFIX}_#{runner_id}")
   end
 
   def self.redis_client
