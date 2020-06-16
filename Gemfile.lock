@@ -358,8 +358,9 @@ GEM
       redis (>= 4.1.0)
     sidekiq-failures (1.0.0)
       sidekiq (>= 4.0.0)
-    sidekiq-pro (4.0.2)
-      sidekiq (>= 5.0.5)
+    sidekiq-pro (5.0.1)
+      concurrent-ruby (>= 1.0.5)
+      sidekiq (>= 6.0.1)
     sidekiq-scheduler (3.0.0)
       redis (>= 3, < 5)
       rufus-scheduler (~> 3.2)
@@ -437,9 +438,9 @@ DEPENDENCIES
   rspec-rails (~> 4.0.0)
   rubocop (~> 0.74.0)
   sentry-raven
-  sidekiq (~> 6.0.0)
+  sidekiq
   sidekiq-failures
-  sidekiq-pro (>= 4)
+  sidekiq-pro
   sidekiq-scheduler
   spring
   spring-commands-rspec
