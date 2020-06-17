@@ -33,6 +33,7 @@ gem "jbuilder", "~> 2.5"
 gem "docker-api"
 
 group :development, :test do
+  gem "bundler-audit"
   gem "byebug", platforms: %i[mri mingw x64_mingw]
   gem "fabrication"
   gem "rspec-rails", "~> 4.0.0"
@@ -67,7 +68,7 @@ gem "redis-namespace"
 gem "sentry-raven"
 gem "sidekiq"
 gem "sidekiq-failures"
-gem "sidekiq-pro", ">= 4"
+gem "sidekiq-pro"
 gem "sidekiq-scheduler"
 
 gem "measures", "~> 4.0"
