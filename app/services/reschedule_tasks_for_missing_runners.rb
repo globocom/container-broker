@@ -31,6 +31,7 @@ class RescheduleTasksForMissingRunners
     node = slot&.node
     Raven.capture_exception(
       message,
+      level: :info,
       extra: {
         runner: slot&.node&.runner_provider,
         runner_id: runner_id,
