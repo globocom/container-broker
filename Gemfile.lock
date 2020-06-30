@@ -182,6 +182,9 @@ GEM
       ffi-compiler (>= 1.0, < 2.0)
     i18n (1.8.3)
       concurrent-ruby (~> 1.0)
+    idempotent-request (0.1.5)
+      oj (~> 3.0)
+      rack (~> 2.0)
     jaro_winkler (1.5.3)
     jbuilder (2.7.0)
       activesupport (>= 4.2.0)
@@ -254,6 +257,7 @@ GEM
       multi_json (~> 1.3)
       multi_xml (~> 0.5)
       rack (>= 1.2, < 3)
+    oj (3.10.6)
     parallel (1.17.0)
     parser (2.6.4.1)
       ast (~> 2.4.0)
@@ -419,6 +423,7 @@ DEPENDENCIES
   e2mmap
   fabrication
   guard-rspec
+  idempotent-request
   jbuilder (~> 2.5)
   kubeclient
   listen (>= 3.0.5, < 3.2)
