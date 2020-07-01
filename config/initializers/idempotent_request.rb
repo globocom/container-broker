@@ -6,7 +6,7 @@ Rails.application.config.middleware.use(
     Redis.new(RedisUrlParser.call(Settings.redis_url)),
     expire_time: 1.day
   ),
-  header_key: "Idempotency-Key",
+  header_key: "X-Idempotency-Key",
   policy: IdempotentRequest::Policy,
   callback: IdempotentRequest::Callback
 )
