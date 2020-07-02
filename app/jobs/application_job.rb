@@ -20,7 +20,7 @@ class ApplicationJob < ActiveJob::Base
     request_id = job.class.request_id_from_args(job.arguments.first)
 
     if request_id
-      Rails.logger.tagged("request_id=#{request_id}") do
+      Rails.logger.tagged(" request_id=#{request_id} ") do
         CurrentThreadRequestId.set(request_id) { block.call }
       end
     else
