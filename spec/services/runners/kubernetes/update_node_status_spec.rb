@@ -44,6 +44,14 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
     subject.perform(node: node)
   end
 
+  it "does not mark unstable node as available" do
+    node.unstable!
+
+    expect(node).to_not receive(:available!)
+
+    subject.perform(node: node)
+  end
+
   it "mark node as capacity unreached" do
     expect { subject.perform(node: node) }.to change(node, :runner_capacity_reached).to(false)
   end

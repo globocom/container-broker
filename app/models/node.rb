@@ -75,7 +75,6 @@ class Node
   def register_success
     Rails.logger.debug("Registering success in #{self}")
     update!(last_success_at: Time.zone.now)
-    available!
   end
 
   def to_s

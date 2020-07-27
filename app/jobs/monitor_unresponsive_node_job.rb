@@ -9,6 +9,7 @@ class MonitorUnresponsiveNodeJob < ApplicationJob
 
       Rails.logger.debug("Marking #{node} as available again")
       node.register_success
+      node.available!
 
       RunTasksForAllExecutionTypesJob.perform_later
     end

@@ -141,4 +141,18 @@ RSpec.describe Runners::Docker::UpdateNodeStatus, type: :service do
       end
     end
   end
+
+  it "updates node last success" do
+    expect(node).to receive(:register_success)
+
+    subject.perform(node: node)
+  end
+
+  it "does not mark unstable node as available" do
+    node.unstable!
+
+    expect(node).to_not receive(:available!)
+
+    subject.perform(node: node)
+  end
 end
