@@ -41,6 +41,8 @@ module Runners
           .new(runner_ids: execution_infos.map(&:id), started_tasks: started_tasks)
           .perform
 
+        node.register_success
+
         send_metrics(node: node, execution_infos: execution_infos)
       rescue Excon::Error, ::Docker::Error::DockerError => e
         node.register_error(e.message)
