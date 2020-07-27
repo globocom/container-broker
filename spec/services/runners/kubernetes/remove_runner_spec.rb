@@ -41,7 +41,7 @@ RSpec.describe Runners::Kubernetes::RemoveRunner, type: :service do
       end
 
       it "persists error in node" do
-        expect { subject.perform(node: node, runner_id: runner_id) }.to change(node, :last_error).to("error")
+        expect { subject.perform(node: node, runner_id: runner_id) }.to change(node, :last_error).to(start_with("error at "))
       end
     end
   end

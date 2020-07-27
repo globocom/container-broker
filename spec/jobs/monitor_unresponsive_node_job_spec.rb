@@ -38,7 +38,7 @@ RSpec.describe MonitorUnresponsiveNodeJob, type: :job do
       end
 
       it "sets last error" do
-        expect { subject.perform(node: node) }.to change(node, :last_error).to("RuntimeError: error getting docker info")
+        expect { subject.perform(node: node) }.to change(node, :last_error).to(start_with("RuntimeError: error getting docker info at "))
       end
     end
   end
@@ -67,7 +67,7 @@ RSpec.describe MonitorUnresponsiveNodeJob, type: :job do
       end
 
       it "sets last error" do
-        expect { subject.perform(node: node) }.to change(node, :last_error).to("RuntimeError: error getting docker info")
+        expect { subject.perform(node: node) }.to change(node, :last_error).to(start_with("RuntimeError: error getting docker info"))
       end
     end
   end

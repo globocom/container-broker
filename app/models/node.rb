@@ -52,7 +52,7 @@ class Node
   def register_error(error)
     Rails.logger.info("Registering error in #{self}: #{error}")
 
-    update!(last_error: error)
+    update!(last_error: "#{error} at #{Time.zone.now}")
 
     if available?
       unstable!
