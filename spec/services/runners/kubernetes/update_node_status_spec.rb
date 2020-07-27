@@ -38,8 +38,8 @@ RSpec.describe Runners::Kubernetes::UpdateNodeStatus, type: :service do
     allow(kubernetes_client).to receive(:fetch_pods).and_return(pods)
   end
 
-  it "updates node last success" do
-    expect(node).to receive(:register_success)
+  it "does mark node as success" do
+    expect(node).to_not receive(:register_success)
 
     subject.perform(node: node)
   end
