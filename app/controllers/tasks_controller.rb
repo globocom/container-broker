@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class TasksController < ApplicationController
-  before_action :set_task, only: %i[show logs mark_as_error]
+  before_action :set_task, only: %i[show logs mark_as_error kill_container]
   before_action :set_request_id, only: %i[create]
 
   def create
@@ -41,6 +41,14 @@ class TasksController < ApplicationController
     else
       render json: { message: "Task must have failed status to be marked as error" }, status: :unprocessable_entity
     end
+  end
+
+  def kill_container
+    KillTaskContainer.new(task: @task).perform
+
+    head :ok
+  rescue KillTaskContainer::TaskNotRunningError => e
+    render json: { message: e.message }, status: :bad_request
   end
 
   private
