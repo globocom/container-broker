@@ -17,6 +17,7 @@ Rails.application.routes.draw do
 
     member do
       put :mark_as_error
+      post :kill_container
     end
 
     collection do

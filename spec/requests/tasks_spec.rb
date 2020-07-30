@@ -206,4 +206,50 @@ RSpec.describe "Tasks", type: :request do
       end
     end
   end
+
+  describe "POST /tasks/:uuid/kill_container" do
+    let(:node) { Fabricate(:node) }
+    let(:slot) { Fabricate(:slot, node: node) }
+    let(:task) { Fabricate(:task, status: status, slot: slot) }
+    let(:kill_task_container) { instance_double(KillTaskContainer, perform: nil) }
+
+    subject(:perform) { post "/tasks/#{task.uuid}/kill_container" }
+
+    context "when task is running" do
+      before do
+        allow(KillTaskContainer).to receive(:new)
+          .with(task: task)
+          .and_return(kill_task_container)
+      end
+      let(:status) { "started" }
+
+      it "returns OK" do
+        perform
+
+        expect(response).to be_successful
+      end
+
+      it "calls KillTaskContainer" do
+        perform
+
+        expect(kill_task_container).to have_received(:perform)
+      end
+    end
+
+    context "when task is not running" do
+      let(:status) { "waiting" }
+
+      it "returns BAD_REQUEST" do
+        perform
+
+        expect(response).to be_bad_request
+      end
+
+      it "returns error message" do
+        perform
+
+        expect(json_response).to match(hash_including("message" => "#{task} is not running"))
+      end
+    end
+  end
 end
