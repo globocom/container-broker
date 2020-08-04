@@ -103,7 +103,7 @@ class Task
 
   def force_retry!
     update(try_count: 0)
-    waiting!
+    retry!
     RunTasksJob.perform_later(execution_type: execution_type)
   end
 
