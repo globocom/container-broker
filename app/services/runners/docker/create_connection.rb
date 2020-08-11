@@ -9,7 +9,7 @@ module Runners
         ::Docker::Connection.new(
           node.hostname,
           connect_timeout: 5,
-          read_timeout: 5,
+          read_timeout: 15,
           write_timeout: 5
         )
       end
