@@ -6,6 +6,7 @@ require "redis_url_parser"
 require "idempotent_request/callback"
 require "idempotent_request/policy"
 require "constants"
+require "current_thread_request_id"
 
 # Gems
 require "config"
