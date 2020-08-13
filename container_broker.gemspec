@@ -26,62 +26,41 @@ Gem::Specification.new do |spec|
   spec.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
 
   spec.add_dependency "rails", "~> 6.0.3", ">= 6.0.3.2"
+
+  spec.add_dependency "mongoid"
+  spec.add_dependency "mongoid_enumerable"
+
+  # spec.add_dependency "mongoid_rails_migrations"
+  # spec.add_dependency "jbuilder", "~> 2.5"
+  # spec.add_dependency "e2mmap"
+  # spec.add_dependency "thwait"
+
+  spec.add_development_dependency "byebug"#, platforms: %i[mri mingw x64_mingw]
+  spec.add_development_dependency "fabrication"
+  spec.add_development_dependency "rspec-rails", "~> 4.0.0"
+  spec.add_development_dependency "database_cleaner"
+  spec.add_development_dependency "rspec-collection_matchers"
+  spec.add_development_dependency "rspec-json_expectations"
+  spec.add_development_dependency "rspec-nc"
+
+  spec.add_development_dependency "listen", ">= 3.0.5", "< 3.2"
+
+  spec.add_development_dependency "spring"
+  spec.add_development_dependency "spring-commands-rspec"
+  spec.add_development_dependency "spring-watcher-listen", "~> 2.0.0"
+  spec.add_development_dependency "guard-rspec"
+  spec.add_development_dependency "rubocop"
+
+  spec.add_dependency "active_model_serializers"
+  spec.add_dependency "config"
+  spec.add_dependency "idempotent-request"
+  spec.add_dependency "kubeclient"
+  spec.add_dependency "mongoid-uuid"
+  spec.add_dependency "redis-namespace"
+  spec.add_dependency "sentry-raven"
+  spec.add_dependency "sidekiq"
+  spec.add_dependency "sidekiq-failures"
+  spec.add_dependency "sidekiq-scheduler"
+  spec.add_dependency "docker-api"
+  spec.add_dependency "measures"
 end
-#   gem "mongoid"
-# gem "mongoid_enumerable"
-# gem "mongoid_rails_migrations"
-# gem "jbuilder", "~> 2.5"
-
-
-# gem "e2mmap"
-# gem "thwait"
-
-# gem "puma", "~> 3.7"
-# gem "rack-cors"
-
-# # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
-# # Use Redis adapter to run Action Cable in production
-# # gem 'redis', '~> 4.0'
-# # Use ActiveModel has_secure_password
-# # gem 'bcrypt', '~> 3.1.7'
-
-
-# gem "bundler-audit"
-# gem "byebug", platforms: %i[mri mingw x64_mingw]
-# gem "fabrication"
-# gem "rspec-rails", "~> 4.0.0"
-
-# gem "database_cleaner"
-# gem "mini_racer"
-# gem "rspec-collection_matchers"
-# gem "rspec-json_expectations"
-# gem "rspec-nc"
-
-# gem "listen", ">= 3.0.5", "< 3.2"
-# gem "web-console", ">= 3.3.0"
-
-# gem "spring"
-# gem "spring-commands-rspec"
-# gem "spring-watcher-listen", "~> 2.0.0"
-
-# gem "active_model_serializers"
-# gem "awesome_print"
-# gem "backstage_api_client"
-# gem "config"
-# gem "guard-rspec"
-# gem "idempotent-request"
-# gem "kubeclient"
-# gem "mongoid-uuid"
-# gem "redis-namespace"
-# gem "sentry-raven"
-# gem "sidekiq"
-# gem "sidekiq-failures"
-# gem "sidekiq-pro"
-# gem "sidekiq-scheduler"
-
-# gem "measures", "~> 4.0"
-
-# gem "rubocop", "~> 0.74.0"
-
-
-# spec.add_development_dependency "sqlite3"

@@ -37,11 +37,7 @@ ContainerBroker::Engine.routes.draw do
   end
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 
-  root to: redirect(Settings.backstage_admin.url)
+  # root to: redirect(Settings.backstage_admin.url)
 
   get "/healthcheck" => "healthcheck#index"
-
-  require "sidekiq/pro/web"
-  require "sidekiq-scheduler/web"
-  mount Sidekiq::Web => "/jobs"
 end

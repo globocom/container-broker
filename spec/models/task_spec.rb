@@ -145,14 +145,14 @@ RSpec.describe Task, type: :model do
     end
   end
 
-  context "posting events" do
-    let(:post_task_event_instance) { instance_double(PostTaskEvent) }
-
-    before do
-      allow(PostTaskEvent).to receive(:new)
-        .with(subject)
-        .and_return(post_task_event_instance)
-    end
+  xcontext "posting events" do
+    # TODO: Move to private project
+    # let(:post_task_event_instance) { instance_double(PostTaskEvent) }
+    # before do
+    #   allow(PostTaskEvent).to receive(:new)
+    #     .with(subject)
+    #     .and_return(post_task_event_instance)
+    # end
 
     context "when status does not change" do
       before { subject.update!(status: :completed) }

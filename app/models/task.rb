@@ -130,14 +130,15 @@ class Task
   private
 
   def status_changed(old_value, new_value)
-    return if old_value == new_value
+    # TODO: Add in private project
+    # return if old_value == new_value
 
-    post_task_event = PostTaskEvent.new(self)
-    case new_value.to_sym
-    when :completed
-      post_task_event.success
-    when :error
-      post_task_event.error
-    end
+    # post_task_event = PostTaskEvent.new(self)
+    # case new_value.to_sym
+    # when :completed
+    #   post_task_event.success
+    # when :error
+    #   post_task_event.error
+    # end
   end
 end
