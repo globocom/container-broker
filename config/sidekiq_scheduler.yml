@@ -1,0 +1,18 @@
+update_nodes_status:
+  cron: '*/5 * * * * *'
+  class: UpdateAllNodesStatusJob
+run_tasks:
+  in: '10s'
+  class: RunTasksForAllExecutionTypesJob
+monitor_unresponsive_nodes:
+  cron: '*/30 * * * * *'
+  class: MonitorUnresponsiveNodesJob
+remove_unreferenced_tags:
+  cron: '0 30 4 * * *'
+  class: RemoveUnusedTagsJob
+timeout_failed_tasks:
+  cron: '0 */15 * * * *'
+  class: TimeoutFailedTasksJob
+collect_load_metrics:
+  cron: '*/5 * * * * *'
+  class: CollectLoadMetricsJob
