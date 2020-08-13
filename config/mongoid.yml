@@ -1,32 +1,10 @@
-# development:
-#   clients:
-#     default:
-#       database: container-broker_development
-#       hosts:
-#         - <%= ENV["CONTAINER_BROKER_MONGODB_HOST"] || "localhost" %>:27017
-#       options:
-#         max_pool_size: 50
-
-# test:
-#   clients:
-#     default:
-#       database: container-broker_test
-#       hosts:
-#         - <%= ENV["MONGODB_URL"] || "localhost:27017" %>
-#       options:
-#         read:
-#           mode: :primary
-#         max_pool_size: 1
-# dev:
-#   clients:
-#     default:
-#       uri: <%= ENV["DBAAS_MONGODB_ENDPOINT"] %>
-#       options:
-#         max_pool_size: 50
-
-# production:
-#   clients:
-#     default:
-#       uri: <%= ENV["DBAAS_MONGODB_ENDPOINT"] %>
-#       options:
-#         max_pool_size: 50
+test:
+  clients:
+    default:
+      database: container-broker_test
+      hosts:
+        - <%= ENV["MONGODB_URL"] || "localhost:27017" %>
+      options:
+        read:
+          mode: :primary
+        max_pool_size: 1
