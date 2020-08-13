@@ -5,6 +5,7 @@ class Task
   include Mongoid::Document
   include Mongoid::Uuid
   include MongoidEnumerable
+  extend BaseObservable
 
   field :name, type: String
   field :runner_id, type: String
@@ -130,6 +131,10 @@ class Task
   private
 
   def status_changed(old_value, new_value)
+    self.class.observers.each do |observer|
+      observer.new(self).status_change(old_value, new_value)
+    end
+
     # TODO: Add in private project
     # return if old_value == new_value
 
