@@ -1,3 +1,9 @@
+PATH
+  remote: .
+  specs:
+    container_broker (0.0.1)
+      rails (~> 6.0.3, >= 6.0.3.2)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -383,6 +389,7 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
+    sqlite3 (1.4.2)
     systemu (2.6.5)
     terminal-notifier (2.0.0)
     thor (1.0.1)
@@ -417,6 +424,7 @@ DEPENDENCIES
   bundler-audit
   byebug
   config
+  container_broker!
   database_cleaner
   docker-api
   e2mmap
@@ -449,6 +457,7 @@ DEPENDENCIES
   spring
   spring-commands-rspec
   spring-watcher-listen (~> 2.0.0)
+  sqlite3
   thwait
   web-console (>= 3.3.0)
 
