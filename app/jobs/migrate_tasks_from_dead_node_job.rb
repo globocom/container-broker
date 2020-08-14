@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class MigrateTasksFromDeadNodeJob < ApplicationJob
+class MigrateTasksFromDeadNodeJob < ContainerBrokerBaseJob
   queue_as :default
 
   def perform(node:)

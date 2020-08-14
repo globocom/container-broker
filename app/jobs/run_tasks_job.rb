@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class RunTasksJob < ApplicationJob
+class RunTasksJob < ContainerBrokerBaseJob
   attr_reader :execution_type
 
   def perform(execution_type:)

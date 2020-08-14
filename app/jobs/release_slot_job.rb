@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ReleaseSlotJob < ApplicationJob
+class ReleaseSlotJob < ContainerBrokerBaseJob
   class InvalidSlotContainerId < StandardError; end
   queue_as :default
 

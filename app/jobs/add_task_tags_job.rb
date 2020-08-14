@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class AddTaskTagsJob < ApplicationJob
+class AddTaskTagsJob < ContainerBrokerBaseJob
   extend RequestIdFromTask
 
   queue_as :default

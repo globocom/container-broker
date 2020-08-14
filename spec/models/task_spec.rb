@@ -144,42 +144,4 @@ RSpec.describe Task, type: :model do
       expect(task.generate_runner_id).to have(Constants::Runner::MAX_NAME_SIZE).characters
     end
   end
-
-  xcontext "posting events" do
-    # TODO: Move to private project
-    # let(:post_task_event_instance) { instance_double(PostTaskEvent) }
-    # before do
-    #   allow(PostTaskEvent).to receive(:new)
-    #     .with(subject)
-    #     .and_return(post_task_event_instance)
-    # end
-
-    context "when status does not change" do
-      before { subject.update!(status: :completed) }
-
-      it "does not post an event" do
-        expect(post_task_event_instance).to_not receive(:success)
-
-        subject.completed!
-      end
-    end
-
-    context "when status change" do
-      context "and it's completed" do
-        it "posts success event" do
-          expect(post_task_event_instance).to receive(:success)
-
-          subject.completed!
-        end
-      end
-
-      context "and it's error" do
-        it "post error event" do
-          expect(post_task_event_instance).to receive(:error)
-
-          subject.error!
-        end
-      end
-    end
-  end
 end

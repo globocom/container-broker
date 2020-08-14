@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class MonitorUnresponsiveNodeJob < ApplicationJob
+class MonitorUnresponsiveNodeJob < ContainerBrokerBaseJob
   queue_as :default
 
   def perform(node:)

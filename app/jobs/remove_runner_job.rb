@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class RemoveRunnerJob < ApplicationJob
+class RemoveRunnerJob < ContainerBrokerBaseJob
   queue_as :default
 
   def perform(node:, runner_id:)

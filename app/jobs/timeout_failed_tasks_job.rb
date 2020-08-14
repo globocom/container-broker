@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class TimeoutFailedTasksJob < ApplicationJob
+class TimeoutFailedTasksJob < ContainerBrokerBaseJob
   queue_as :default
 
   def perform(*_args)

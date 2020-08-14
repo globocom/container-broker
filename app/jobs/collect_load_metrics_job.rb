@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class CollectLoadMetricsJob < ApplicationJob
+class CollectLoadMetricsJob < ContainerBrokerBaseJob
   queue_as :default
 
   def perform

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class UpdateNodeStatusJob < ApplicationJob
+class UpdateNodeStatusJob < ContainerBrokerBaseJob
   queue_as :default
 
   def perform(node:)

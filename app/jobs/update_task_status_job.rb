@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class UpdateTaskStatusJob < ApplicationJob
+class UpdateTaskStatusJob < ContainerBrokerBaseJob
   extend RequestIdFromTask
 
   class InvalidContainerStatusError < StandardError; end

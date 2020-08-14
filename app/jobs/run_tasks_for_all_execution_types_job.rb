@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class RunTasksForAllExecutionTypesJob < ApplicationJob
+class RunTasksForAllExecutionTypesJob < ContainerBrokerBaseJob
   queue_as :default
 
   def perform

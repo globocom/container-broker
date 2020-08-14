@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class AdjustNodeSlotsJob < ApplicationJob
+class AdjustNodeSlotsJob < ContainerBrokerBaseJob
   queue_as :default
 
   def perform(node:)

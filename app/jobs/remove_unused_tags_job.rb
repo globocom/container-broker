@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class RemoveUnusedTagsJob < ApplicationJob
+class RemoveUnusedTagsJob < ContainerBrokerBaseJob
   queue_as :default
 
   def perform(*_args)
