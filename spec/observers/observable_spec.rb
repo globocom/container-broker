@@ -12,14 +12,20 @@ RSpec.describe Observable do
   let(:observer_class) { double }
   let(:observer) { double }
 
-  before do
-    allow(observer_class).to receive(:new).with(subject).and_return(observer)
-  end
+  before { allow(observer_class).to receive(:new).with(subject).and_return(observer) }
+  after { observable_class.remove_observer(observer_class) }
 
   it "accepts observers" do
     observable_class.add_observer(observer_class)
 
     expect(observable_class.observers).to include(observer_class)
+  end
+
+  it "removes observers" do
+    observable_class.add_observer(observer_class)
+    observable_class.remove_observer(observer_class)
+
+    expect(observable_class.observers).to_not include(observer_class)
   end
 
   it "creates observer instances" do

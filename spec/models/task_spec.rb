@@ -160,6 +160,8 @@ RSpec.describe Task, type: :model do
       allow(observer_class).to receive(:new).with(subject).and_return(observer)
     end
 
+    after { Task.remove_observer(observer_class) }
+
     it "calls observers" do
       expect(observer).to receive(:status_change).with(subject.status, "completed")
 

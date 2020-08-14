@@ -11,6 +11,10 @@ module Observable
     observers << observer
   end
 
+  def remove_observer(observer)
+    observers.delete(observer)
+  end
+
   def observer_instances_for(model)
     observers.map do |observer|
       observer.new(model)
