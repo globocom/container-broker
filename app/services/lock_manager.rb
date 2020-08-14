@@ -61,7 +61,7 @@ class LockManager
   end
 
   def redis_set(options)
-    redis_client.set(key, 1, options.merge(ex: expire))
+    redis_client.set(key, 1, **options.merge(ex: expire))
   end
 
   def redis_client
