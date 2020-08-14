@@ -21,6 +21,6 @@ class MigrateRunner
   end
 
   def self.redis_client
-    redis_from_url(Settings.redis_url)
+    Redis.new(RedisUrlParser.call(Settings.redis_url))
   end
 end
