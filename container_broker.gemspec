@@ -1,12 +1,12 @@
 $:.push File.expand_path("lib", __dir__)
 
 # Maintain your gem's version:
-# require "container_broker/version"
+require "container_broker/version"
 
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |spec|
   spec.name        = "container_broker"
-  spec.version     = "0.0.1"#ContainerBroker::VERSION
+  spec.version     = ContainerBroker::VERSION
   spec.authors     = ["Douglas Lise", "Mateus Nava", "João Vieira"]
   spec.email       = ["douglaslise@gmail.com", "nava.mateus@gmail.com", "joaocv3@gmail.com"]
   spec.homepage    = ""
@@ -17,7 +17,8 @@ Gem::Specification.new do |spec|
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
   # to allow pushing to a single host or delete this section to allow pushing to any host.
   if spec.respond_to?(:metadata)
-    spec.metadata["allowed_push_host"] = "TODO: Set to 'http://mygemserver.com'"
+    # TODO: Change to rubygems
+    spec.metadata['allowed_push_host'] = 'https://rubygems.org/'
   else
     raise "RubyGems 2.0 or newer is required to protect against " \
       "public gem pushes."
@@ -30,12 +31,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "mongoid"
   spec.add_dependency "mongoid_enumerable"
 
-  # spec.add_dependency "mongoid_rails_migrations"
-  # spec.add_dependency "jbuilder", "~> 2.5"
-  # spec.add_dependency "e2mmap"
-  # spec.add_dependency "thwait"
-
-  spec.add_development_dependency "byebug"#, platforms: %i[mri mingw x64_mingw]
+  spec.add_development_dependency "byebug"
   spec.add_development_dependency "fabrication"
   spec.add_development_dependency "rspec-rails", "~> 4.0.0"
   spec.add_development_dependency "database_cleaner"
