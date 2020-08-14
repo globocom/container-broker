@@ -50,6 +50,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "spring-watcher-listen", "~> 2.0.0"
   spec.add_development_dependency "guard-rspec"
   spec.add_development_dependency "rubocop"
+  spec.add_development_dependency "bundler-audit"
 
   spec.add_dependency "active_model_serializers"
   spec.add_dependency "config"
