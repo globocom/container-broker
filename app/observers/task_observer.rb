@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-## OPEN SOURCE
 class TaskObserver
   attr_reader :task
 

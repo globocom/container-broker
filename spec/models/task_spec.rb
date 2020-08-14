@@ -144,4 +144,26 @@ RSpec.describe Task, type: :model do
       expect(task.generate_runner_id).to have(Constants::Runner::MAX_NAME_SIZE).characters
     end
   end
+
+  context "when status changes" do
+    let(:observer_class) do
+      Class.new(TaskObserver) do
+        def status_change(old_value, new_value); end
+      end
+    end
+
+    let(:observer) { observer_class.new(subject) }
+
+    before do
+      Task.add_observer(observer_class)
+
+      allow(observer_class).to receive(:new).with(subject).and_return(observer)
+    end
+
+    it "calls observers" do
+      expect(observer).to receive(:status_change).with(subject.status, "completed")
+
+      subject.completed!
+    end
+  end
 end
