@@ -7,11 +7,11 @@ $:.push File.expand_path("lib", __dir__)
 Gem::Specification.new do |spec|
   spec.name        = "container_broker"
   spec.version     = "0.0.1"#ContainerBroker::VERSION
-  spec.authors     = ["Douglas Lise", "Mateus Nava"]
-  spec.email       = ["douglas.lise@corp.globo.com"]
+  spec.authors     = ["Douglas Lise", "Mateus Nava", "João Vieira"]
+  spec.email       = ["douglaslise@gmail.com", "nava.mateus@gmail.com", "joaocv3@gmail.com"]
   spec.homepage    = ""
-  spec.summary     = "Summary of ContainerBroker."
-  spec.description = "Description of ContainerBroker."
+  spec.summary     = "ContainerBroker"
+  spec.description = "ContainerBroker"
   spec.license     = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
