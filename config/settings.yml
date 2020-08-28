@@ -1,19 +1,5 @@
-ignore_containers:
-  - fluentbit
-  - redis
-  - mongo
-  - elasticsearch
-  - netdata
-  - ef
-  - sftp
-  - quit-container
-  - k8s
-  - encoding-factory
-cors_origins:
-  - http://localhost:3000
-  - http://localhost:3001
-
-
+ignore_containers: []
+cors_origins: []
 kubernetes:
   liveness_probe_seconds_interval: 30
   requests:
@@ -22,3 +8,17 @@ kubernetes:
   limits:
     memory: <%= ENV.fetch("KUBERNETES_LIMITS_MEMORY", "8G") %>
     cpu: <%= ENV.fetch("KUBERNETES_LIMITS_CPU", 8) %>
+sentry:
+  enabled: false
+measures:
+  enabled: false
+run_container_as:
+  user_id: root
+  group_id: root
+timeout_tasks_after_hours: <%= 20.hours %>
+task_retry_count: 3
+redis_url: <%= ENV["DBAAS_SENTINEL_ENDPOINT"] %>
+filer_dir_base: /nfs
+ingest_filer_dir_base: /opt/ef-shared
+delete_container_after_run: <%= ENV.fetch("DELETE_CONTAINER_AFTER_RUN", true) %>
+node_unavailable_after_seconds: <%= 2.minutes %>

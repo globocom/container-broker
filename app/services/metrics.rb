@@ -3,12 +3,10 @@
 require "measures"
 
 class Metrics
-  attr_reader :client, :metric
+  attr_reader :metric
 
   def initialize(metric)
     @metric = metric
-    @transport = Measures::Transports::UDP.new(Settings.measures.host, Settings.measures.port)
-    @client = Measures::Client.new(@transport, Settings.measures.index, Settings.measures.owner)
   end
 
   def count(data = {})
@@ -33,5 +31,13 @@ class Metrics
 
   def enabled?
     Settings.measures.enabled
+  end
+
+  def transport
+    Measures::Transports::UDP.new(Settings.measures.host, Settings.measures.port)
+  end
+
+  def client
+    Measures::Client.new(@transport, Settings.measures.index, Settings.measures.owner)
   end
 end
