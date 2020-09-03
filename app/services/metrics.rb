@@ -38,6 +38,6 @@ class Metrics
   end
 
   def client
-    Measures::Client.new(@transport, Settings.measures.index, Settings.measures.owner)
+    Measures::Client.new(transport, Settings.measures.index, Settings.measures.owner)
   end
 end
