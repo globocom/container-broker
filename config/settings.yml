@@ -21,6 +21,14 @@ redis_url: <%= ENV["DBAAS_SENTINEL_ENDPOINT"] %>
 delete_container_after_run: <%= ENV.fetch("DELETE_CONTAINER_AFTER_RUN", true) %>
 node_unavailable_after_seconds: <%= 2.minutes %>
 storage_mounts:
-
-  filer_dir_base: /nfs
-  ingest_filer_dir_base: /opt/ef-shared
+  docker:
+    shared: "/opt/shared"
+    tmp: "/tmp"
+  kubernetes:
+    shared:
+      nfs:
+        server: "nfs-server.test"
+        path: "/shared"
+    tmp:
+      local:
+        path: "/tmp"
