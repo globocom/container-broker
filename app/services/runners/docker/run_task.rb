@@ -36,9 +36,7 @@ module Runners
       end
 
       def create_container(task:, slot:, name:)
-        binds = []
-        binds << Filer::Container.bind(task.storage_mount) if task.storage_mount.present?
-        binds << Filer::Ingest.bind(task.ingest_storage_mount) if task.ingest_storage_mount.present?
+        binds = Filer.new.perform(task_storage_mounts: task.storage_mounts)
 
         user = [
           Settings.run_container_as.user_id,

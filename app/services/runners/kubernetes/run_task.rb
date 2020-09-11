@@ -19,34 +19,21 @@ module Runners
           image: task.image,
           cmd: task.cmd,
           internal_mounts: internal_mounts(task: task),
-          external_mounts: external_mounts(task: task, node: node),
+          external_mounts: external_mounts(task: task),
           node_selector: node.runner_config["node_selector"]
         )
       end
 
-      def internal_mounts(task:)
-        return [] if task.ingest_storage_mount.blank?
-
-        [
-          {
-            name: NFS_NAME,
-            mountPath: task.ingest_storage_mount
-          }
-        ]
+      def filer(task:)
+        Filer.new.perform(task_storage_mounts: task.storage_mounts)
       end
 
-      def external_mounts(task:, node:)
-        return [] if task.ingest_storage_mount.blank?
+      def internal_mounts(task:)
+        filer(task: task)[:internal]
+      end
 
-        [
-          {
-            name: NFS_NAME,
-            nfs: {
-              server: node.runner_config["nfs_server"],
-              path: node.runner_config["nfs_path"]
-            }
-          }
-        ]
+      def external_mounts(task:)
+        filer(task: task)[:external]
       end
 
       def add_metric(task)

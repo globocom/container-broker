@@ -8,8 +8,12 @@ RSpec.describe "Tasks", type: :request do
     let(:task_name) { "test task" }
     let(:task_image) { "busybox:1.25" }
     let(:task_cmd) { "sleep 5" }
-    let(:task_storage_mount) { "/var/log" }
-    let(:task_ingest_storage_mount) { "/ingest" }
+    let(:storage_mounts) do
+      {
+        "shared_nfs" => "/mnt/nfs/task",
+        "temp" => "/tmp/task"
+      }
+    end
     let(:task_execution_type) { "test" }
     let(:task_tags) do
       {
@@ -26,8 +30,7 @@ RSpec.describe "Tasks", type: :request do
           name: task_name,
           image: task_image,
           cmd: task_cmd,
-          storage_mount: task_storage_mount,
-          ingest_storage_mount: task_ingest_storage_mount,
+          storage_mounts: storage_mounts,
           tags: task_tags,
           execution_type: task_execution_type
         }
@@ -54,8 +57,7 @@ RSpec.describe "Tasks", type: :request do
           name: task_name,
           image: task_image,
           cmd: task_cmd,
-          storage_mount: task_storage_mount,
-          ingest_storage_mount: task_ingest_storage_mount,
+          storage_mounts: storage_mounts,
           tags: task_tags.merge(request_id: request_id)
         )
       end

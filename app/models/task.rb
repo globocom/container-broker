@@ -12,8 +12,7 @@ class Task
   field :image, type: String
   field :execution_type, type: String
   field :cmd, type: String
-  field :storage_mount, type: String
-  field :ingest_storage_mount, type: String
+  field :storage_mounts, type: Hash, default: {}
   field :exit_code, type: Integer
   field :error, type: String
   field :logs, type: BSON::Binary
@@ -47,6 +46,7 @@ class Task
     with: Constants::ExecutionType::FORMAT,
     message: Constants::ExecutionType::INVALID_FORMAT_MESSAGE
   }
+  validate :storage_mount_identifiers_exist
 
   def set_logs(logs)
     self.logs = BSON::Binary.new(logs.dup, :generic)
@@ -134,5 +134,15 @@ class Task
     self.class.observer_instances_for(self).each do |observer|
       observer.status_change(old_value, new_value)
     end
+  end
+
+  def storage_mount_identifiers_exist
+    valid = Node.all_runner_provider.any? do |runner|
+      (storage_mounts.keys.map(&:to_s) - Settings.storage_mounts[runner].keys.map(&:to_s)).any?
+    end
+
+    return unless valid
+
+    errors.add(:storage_mounts, "Storage mounts are invalid")
   end
 end

@@ -18,7 +18,9 @@ run_container_as:
 timeout_tasks_after_hours: <%= 20.hours %>
 task_retry_count: 3
 redis_url: <%= ENV["DBAAS_SENTINEL_ENDPOINT"] %>
-filer_dir_base: /nfs
-ingest_filer_dir_base: /opt/ef-shared
 delete_container_after_run: <%= ENV.fetch("DELETE_CONTAINER_AFTER_RUN", true) %>
 node_unavailable_after_seconds: <%= 2.minutes %>
+storage_mounts:
+
+  filer_dir_base: /nfs
+  ingest_filer_dir_base: /opt/ef-shared
