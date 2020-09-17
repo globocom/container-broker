@@ -61,6 +61,45 @@ RSpec.describe "Tasks", type: :request do
           tags: task_tags.merge(request_id: request_id)
         )
       end
+
+      context "using old storage mounts config" do
+        let(:data) do
+          {
+            task: {
+              name: task_name,
+              image: task_image,
+              cmd: task_cmd,
+              storage_mount: "/tmp/temp",
+              ingest_storage_mount: "/tmp/ingest",
+              tags: task_tags,
+              execution_type: task_execution_type
+            }
+          }
+        end
+
+        before do
+          allow(Settings).to receive(:storage_mounts).and_return(
+            OpenStruct.new(
+              docker: OpenStruct.new(ingest_nfs: "/mnt/nfs/ingest"),
+              kubernetes: OpenStruct.new(ingest_nfs: "/mnt/nfs/ingest")
+            )
+          )
+        end
+
+        it "responds with success" do
+          perform
+
+          expect(response).to be_successful
+        end
+
+        it "creates task using new storage mount" do
+          perform
+
+          expect(Task.last.storage_mounts).to eq(
+            "ingest_nfs" => "/tmp/ingest"
+          )
+        end
+      end
     end
 
     context "with invalid data" do
