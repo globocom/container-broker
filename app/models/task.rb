@@ -137,11 +137,11 @@ class Task
   end
 
   def storage_mount_identifiers_exist
-    valid = Node.all_runner_provider.any? do |runner|
-      (storage_mounts.keys.map(&:to_s) - Settings.storage_mounts[runner].keys.map(&:to_s)).any?
+    valid = Node.pluck(:runner_provider).uniq.all? do |runner|
+      (storage_mounts.keys.map(&:to_s) - Settings.storage_mounts[runner].keys.map(&:to_s)).empty?
     end
 
-    return unless valid
+    return if valid
 
     errors.add(:storage_mounts, "Storage mounts are invalid")
   end
