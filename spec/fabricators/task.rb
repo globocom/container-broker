@@ -5,8 +5,12 @@ Fabricator(:task) do
   runner_id { SecureRandom.hex(32) }
   image "busybox:1.25"
   cmd "sleep 5"
-  storage_mount "/tmp"
-  ingest_storage_mount "/opt/ef-shared"
+  storage_mounts do
+    {
+      "shared_nfs" => "/mnt/nfs/task",
+      "temp" => "/tmp/task"
+    }
+  end
   status "waiting"
   slot nil
   exit_code nil

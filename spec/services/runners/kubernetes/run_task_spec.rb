@@ -61,8 +61,12 @@ RSpec.describe Runners::Kubernetes::RunTask do
           hash_including(
             internal_mounts: [
               {
-                name: described_class::NFS_NAME,
-                mountPath: task.ingest_storage_mount
+                name: "shared_nfs",
+                mountPath: "/mnt/nfs/task"
+              },
+              {
+                name: "temp",
+                mountPath: "/tmp/task"
               }
             ]
           )
@@ -74,10 +78,16 @@ RSpec.describe Runners::Kubernetes::RunTask do
           hash_including(
             external_mounts: [
               {
-                name: described_class::NFS_NAME,
+                name: "shared_nfs",
                 nfs: {
-                  server: node.runner_config["nfs_server"],
-                  path: node.runner_config["nfs_path"]
+                  server: "nfs.test",
+                  path: "/mnt/nfs/node"
+                }
+              },
+              {
+                name: "temp",
+                local: {
+                  path: "/mnt/local/node"
                 }
               }
             ]
@@ -87,7 +97,7 @@ RSpec.describe Runners::Kubernetes::RunTask do
     end
 
     context "when task does not have storage mount" do
-      let(:task) { Fabricate(:task, ingest_storage_mount: nil) }
+      let(:task) { Fabricate(:task, storage_mounts: {}) }
 
       it "without internal mounts" do
         expect(kubernetes_client).to have_received(:create_pod)

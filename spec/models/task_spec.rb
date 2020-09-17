@@ -168,4 +168,37 @@ RSpec.describe Task, type: :model do
       subject.completed!
     end
   end
+
+  describe "validating storage mounts" do
+    before do
+      Fabricate(:node_kubernetes)
+      Fabricate(:node_docker)
+    end
+
+    subject(:task) { Fabricate(:task, storage_mounts: storage_mounts) }
+
+    context "when invalid" do
+      let(:storage_mounts) do
+        {
+          "invalid" => "/tmp/invalid"
+        }
+      end
+
+      it "raises an error" do
+        expect { task }.to raise_error(Mongoid::Errors::Validations)
+      end
+    end
+
+    context "when valid" do
+      let(:storage_mounts) do
+        {
+          "temp" => "/tmp/invalid"
+        }
+      end
+
+      it "does not raise an error" do
+        expect { task }.to_not raise_error(Mongoid::Errors::Validations)
+      end
+    end
+  end
 end

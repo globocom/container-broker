@@ -6,14 +6,11 @@ RSpec.describe Runners::Docker::RunTask, type: :service do
   let(:node) { Fabricate(:node) }
   let(:runner_id) { "task-nametask-nametask-nametask-name-xf9865g" }
   let(:task) do
-    Task.create!(
-      name: "task-name",
-      image: "#{image}:#{image_tag}",
-      cmd: "-i input.txt -metadata comment='Encoded by Globo.com' output.mp4",
-      storage_mount: "/tmp/workdir",
-      ingest_storage_mount: "/ingest",
-      execution_type: "test"
-    )
+    Fabricate(:task,
+              name: "task-name",
+              image: "#{image}:#{image_tag}",
+              cmd: "-i input.txt -metadata comment='Encoded by Globo.com' output.mp4",
+              execution_type: "test")
   end
 
   let(:slot) { Fabricate(:slot_attaching, node: node, execution_type: "test") }
@@ -81,8 +78,8 @@ RSpec.describe Runners::Docker::RunTask, type: :service do
         "User" => "1001:1002",
         "HostConfig" => {
           "Binds" => [
-            "/tmp/ef-shared:/tmp/workdir",
-            "/opt/ef-shared:/ingest"
+            "/mnt/nfs/node:/mnt/nfs/task",
+            "/tmp/node:/tmp/task"
           ],
           "NetworkMode" => ""
         },

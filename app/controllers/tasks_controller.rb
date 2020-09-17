@@ -62,10 +62,9 @@ class TasksController < ApplicationController
       :name,
       :image,
       :cmd,
-      :storage_mount,
-      :ingest_storage_mount,
       :persist_logs,
       :execution_type,
+      storage_mounts: {},
       tags: {}
     )
   end
