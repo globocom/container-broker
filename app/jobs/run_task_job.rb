@@ -6,6 +6,9 @@ class RunTaskJob < ContainerBrokerBaseJob
   queue_as :default
 
   def perform(task:, slot:)
+    # TODO: remove after successful deploy
+    task.update!(storage_mounts: { ingest_nfs: task.attributes["ingest_storage_mount"] }) if task.attributes["ingest_storage_mount"] && task.storage_mounts.blank?
+
     Rails.logger.debug("Performing RunTaskJob for #{task} #{slot}")
 
     raise "Invalid task status - #{task}" unless task.starting?

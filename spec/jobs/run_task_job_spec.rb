@@ -25,6 +25,20 @@ RSpec.describe RunTaskJob, type: :job do
     allow(task).to receive(:generate_runner_id).and_return(runner_id)
   end
 
+  context "migrating tasks with ingest_storage_mount" do
+    let(:task) { Fabricate(:task, storage_mounts: {}) }
+
+    before do
+      task.attributes["ingest_storage_mount"] = "/tmp/ingest"
+    end
+
+    it "migrates to new format" do
+      perform
+
+      expect(task.storage_mounts).to eq(ingest_nfs: "/tmp/ingest")
+    end
+  end
+
   context "when run task returns an error" do
     shared_examples "releases slot and task" do
       it "releases the slot" do
