@@ -68,9 +68,9 @@ class TasksController < ApplicationController
       tags: {}
     ).tap do |permitted_params|
       # TODO: Remove after migrate encoder
-      if params[:task].key?(:ingest_storage_mount)
+      if params.key?(:ingest_storage_mount) || params[:task].key?(:ingest_storage_mount)
         permitted_params[:storage_mounts] = {
-          "ingest-nfs" => params.dig(:task, :ingest_storage_mount)
+          "ingest-nfs" => params[:ingest_storage_mount] || params.dig(:task, :ingest_storage_mount)
         }
       end
     end
