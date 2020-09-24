@@ -80,8 +80,8 @@ RSpec.describe "Tasks", type: :request do
         before do
           allow(Settings).to receive(:storage_mounts).and_return(
             OpenStruct.new(
-              docker: OpenStruct.new(ingest_nfs: "/mnt/nfs/ingest"),
-              kubernetes: OpenStruct.new(ingest_nfs: "/mnt/nfs/ingest")
+              docker: OpenStruct.new("ingest-nfs" => "/mnt/nfs/ingest"),
+              kubernetes: OpenStruct.new("ingest-nfs" => "/mnt/nfs/ingest")
             )
           )
         end
@@ -96,7 +96,7 @@ RSpec.describe "Tasks", type: :request do
           perform
 
           expect(Task.last.storage_mounts).to eq(
-            "ingest_nfs" => "/tmp/ingest"
+            "ingest-nfs" => "/tmp/ingest"
           )
         end
       end

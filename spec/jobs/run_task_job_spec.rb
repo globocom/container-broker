@@ -35,7 +35,7 @@ RSpec.describe RunTaskJob, type: :job do
     it "migrates to new format" do
       perform
 
-      expect(task.storage_mounts).to eq(ingest_nfs: "/tmp/ingest")
+      expect(task.storage_mounts).to eq("ingest-nfs" => "/tmp/ingest")
     end
   end
 
