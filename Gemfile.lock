@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    container_broker (0.0.9)
+    container_broker (0.0.10)
       active_model_serializers
       config
       docker-api
