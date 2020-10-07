@@ -197,7 +197,7 @@ RSpec.describe Task, type: :model do
       end
 
       it "does not raise an error" do
-        expect { task }.to_not raise_error(Mongoid::Errors::Validations)
+        expect { task }.to_not raise_error
       end
     end
   end
