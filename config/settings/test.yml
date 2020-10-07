@@ -1,0 +1,27 @@
+task_retry_count: 3
+redis_url: <%= ENV["REDIS_URL"] || "redis://localhost:6379/0" %>
+delete_container_after_run: true
+node_unavailable_after_seconds: <%= 5.minutes %>
+timeout_tasks_after_hours: <%= 20.hours %>
+sentry:
+  enabled: false
+measures:
+  enabled: false
+backstage_admin:
+  url: admin.test
+run_container_as:
+  user_id: 1001
+  group_id: 1002
+storage_mounts:
+  docker:
+    shared_nfs: /mnt/nfs/node
+    temp: /tmp/node
+    ingest-nfs: /tmp/ingest_nfs
+  kubernetes:
+    shared_nfs:
+      nfs:
+        server: nfs.test
+        path: /mnt/nfs/node
+    temp:
+      local:
+        path: /mnt/local/node
