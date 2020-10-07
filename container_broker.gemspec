@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.version     = ContainerBroker::VERSION
   spec.authors     = ["Douglas Lise", "Mateus Nava", "João Vieira"]
   spec.email       = ["douglaslise@gmail.com", "nava.mateus@gmail.com", "joaocv3@gmail.com"]
-  spec.homepage    = ""
+  spec.homepage    = "https://github.com/globocom/container-broker"
   spec.summary     = "ContainerBroker"
   spec.description = "ContainerBroker"
   spec.license     = "MIT"
