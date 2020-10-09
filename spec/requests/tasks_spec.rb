@@ -91,14 +91,6 @@ RSpec.describe "Tasks", type: :request do
 
           expect(response).to be_successful
         end
-
-        it "creates task using new storage mount" do
-          perform
-
-          expect(Task.last.storage_mounts).to eq(
-            "ingest-nfs" => "/tmp/ingest"
-          )
-        end
       end
     end
 
