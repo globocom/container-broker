@@ -19,7 +19,6 @@ class Task
   field :created_at, type: DateTime
   field :started_at, type: DateTime
   field :finished_at, type: DateTime
-  field :progress, type: String
   field :try_count, type: Integer, default: 0
   field :persist_logs, type: Boolean, default: false
   field :tags, type: Hash, default: {}

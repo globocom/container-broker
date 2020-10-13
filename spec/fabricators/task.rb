@@ -19,7 +19,6 @@ Fabricator(:task) do
   created_at "2018-03-01 18:10:00"
   started_at "2018-03-01 18:10:00"
   finished_at "2018-03-01 18:10:00"
-  progress nil
   try_count 0
   tags { { "x" => "y" } }
   execution_type "io"
