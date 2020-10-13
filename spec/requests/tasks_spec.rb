@@ -122,7 +122,6 @@ RSpec.describe "Tasks", type: :request do
         "error" => task.error,
         "exit_code" => task.exit_code,
         "finished_at" => task.finished_at.iso8601(3),
-        "progress" => task.progress,
         "seconds_running" => task.seconds_running,
         "started_at" => task.started_at.iso8601(3),
         "status" => task.status,
