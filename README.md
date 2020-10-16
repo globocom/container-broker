@@ -1,5 +1,16 @@
 # Container Broker
 
+## Key Features
+- Run any Docker based task
+- A Node only needs Docker HTTP API
+- Separate Tasks by execution type
+- Easily get Task logs
+- Automatically retry jobs
+- Enqueue tasks if no slots available
+- Distribute load between Nodes
+- If a node dies, tasks are automatically moved to another healthy Node (Failover)
+- Support external volume mounts
+
 ## Installation
 
 Add this line to your application's Gemfile:
