@@ -28,7 +28,7 @@ jobs:
       run: |
         bundle config path vendor/bundle
     - name: Lint
-      run:  make lint/ruby/autocorrect
+      run:  make lint/ruby
 
   test:
     runs-on: ubuntu-latest
