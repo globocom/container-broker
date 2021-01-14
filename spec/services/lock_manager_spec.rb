@@ -27,7 +27,7 @@ RSpec.describe LockManager do
 
       it "tries locking until achieve lock" do
         expect(subject).to receive(:try_lock).thrice
-        subject.lock {}
+        subject.lock
       end
 
       context "with a block" do
@@ -57,11 +57,11 @@ RSpec.describe LockManager do
         end
 
         it "returns false" do
-          expect(subject.lock {}).to be_falsey
+          expect(subject.lock).to be_falsey
         end
 
         it "does not release the lock" do
-          subject.lock {}
+          subject.lock
           expect(subject.locked).to be_falsey
         end
       end
