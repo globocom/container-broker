@@ -54,18 +54,18 @@ RSpec.describe RescheduleTasksForMissingRunners, type: :service do
             runner: node.runner_provider,
             runner_id: runner_id,
             slot: {
-              id: slot.id,
+              uuid: slot.uuid,
               name: slot.name,
               status: slot.status,
               runner_id: slot.runner_id
             },
             node: {
-              id: node.id,
+              uuid: node.uuid,
               name: node.name,
               status: node.status
             },
             task: {
-              id: started_task.id,
+              uuid: started_task.uuid,
               name: started_task.name,
               status: started_task.status
             }

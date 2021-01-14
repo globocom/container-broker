@@ -36,18 +36,18 @@ class RescheduleTasksForMissingRunners
         runner: slot&.node&.runner_provider,
         runner_id: runner_id,
         slot: {
-          id: slot&.id,
+          uuid: slot&.uuid,
           name: slot&.name,
           status: slot&.status,
           runner_id: slot&.runner_id
         },
         node: {
-          id: node&.id,
+          uuid: node&.uuid,
           name: node&.name,
           status: node&.status
         },
         task: {
-          id: task.id,
+          uuid: task.uuid,
           name: task.name,
           status: task.status
         }
