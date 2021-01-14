@@ -83,10 +83,8 @@ class Node
     "Node #{name} #{uuid} #{runner_provider} (#{status}#{last_success})"
   end
 
-  def run_with_lock_no_wait
-    LockManager.new(type: self.class.to_s, id: id, wait: false, expire: 5.minutes).lock do
-      yield
-    end
+  def run_with_lock_no_wait(&block)
+    LockManager.new(type: self.class.to_s, id: id, wait: false, expire: 5.minutes).lock(&block)
   end
 
   private

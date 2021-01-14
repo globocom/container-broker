@@ -5,11 +5,11 @@ AllCops:
     - app/**/*.rb
     - config/**/*.rb
     - lib/**/*.rb
-    - features/**/*.rb
     - spec/**/*.rb
     - Gemfile
   Exclude:
     - bin/**/*
+  NewCops: enable
 
 # Configuration parameters: EnforcedStyle, ConsistentQuotesInMultiline.
 # SupportedStyles: single_quotes, double_quotes
@@ -26,11 +26,14 @@ Metrics/BlockLength:
   Exclude:
     - spec/**/*.rb
 
-Metrics/LineLength:
+Layout/LineLength:
   Max: 200
 
 Metrics/ClassLength:
   Max: 120
 
 Style/Documentation:
+  Enabled: false
+
+Naming/VariableNumber:
   Enabled: false

@@ -16,9 +16,9 @@ module Runners
         Runners::ExecutionInfo.new(
           id: pod&.metadata&.name,
           status: status,
-          exit_code: container_status&.state&.terminated&.exitCode,
+          exit_code: exit_code,
           started_at: started_at,
-          finished_at: container_status&.state&.terminated&.finishedAt,
+          finished_at: finished_at,
           error: error_message,
           schedule_pending: schedule_pending?
         )
@@ -52,6 +52,14 @@ module Runners
 
       def terminated_with_success?
         container_status&.state&.terminated&.exitCode&.zero?
+      end
+
+      def exit_code
+        container_status&.state&.terminated&.exitCode
+      end
+
+      def finished_at
+        container_status&.state&.terminated&.finishedAt
       end
 
       def reason_is_error?

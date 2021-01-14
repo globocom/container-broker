@@ -2,6 +2,7 @@
 
 class LockManager
   attr_reader :expire, :wait, :locked, :key
+
   KEY_PREFIX = "lockmanager"
 
   def initialize(type:, id:, expire:, wait: true)
@@ -13,7 +14,7 @@ class LockManager
   def lock
     if lock!
       begin
-        yield(self)
+        yield(self) if block_given?
       ensure
         unlock!
       end

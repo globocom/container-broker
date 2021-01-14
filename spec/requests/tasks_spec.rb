@@ -142,7 +142,7 @@ RSpec.describe "Tasks", type: :request do
 
     before do
       logs = "Abc\xCCTeste"
-      task.set_logs(logs + "") # Create a unfreezed string because mongoid is incompatible
+      task.set_logs(logs.to_s) # Create a unfreezed string because mongoid is incompatible
       task.save
     end
 

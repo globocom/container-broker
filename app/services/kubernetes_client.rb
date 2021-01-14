@@ -2,7 +2,9 @@
 
 class KubernetesClient
   class PodNotFoundError < StandardError; end
+
   class NetworkError < StandardError; end
+
   class LogsNotFoundError < StandardError; end
 
   LOG_UNAVAILABLE_HTTP_ERROR = 400
@@ -20,7 +22,7 @@ class KubernetesClient
   end
 
   # rubocop:disable Metrics/ParameterLists
-  def create_pod(pod_name:, image:, cmd:, internal_mounts: [], external_mounts: [], node_selector:)
+  def create_pod(pod_name:, image:, cmd:, node_selector:, internal_mounts: [], external_mounts: [])
     handle_exception do
       pod = Kubeclient::Resource.new(
         metadata: {

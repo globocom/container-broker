@@ -2,6 +2,7 @@
 
 class MongoidSerializableModel
   attr_reader :model
+
   include GlobalID::Identification
 
   def initialize(model)
