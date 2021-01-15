@@ -8,7 +8,7 @@
 
 export RAILS_ENV=test
 
-RUBY_FILES = $(abspath $(addprefix $(base_path)/,app config lib features spec Gemfile))
+RUBY_FILES = $(abspath $(addprefix $(base_path)/,app config lib spec Gemfile))
 RUBOCOP = bundle exec rubocop
 
 ## all (default): run lint for ruby files
