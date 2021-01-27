@@ -8,12 +8,14 @@ class StatusController < ApplicationController
   end
 
   def tasks
+    limit = params.fetch(:limit, LIMIT_TASKS).to_i
+
     @tasks = Task
              .only(Task.attribute_names - %w[logs])
              .includes(:slot)
              .order_by("created_at" => "desc")
-             .batch_size(LIMIT_TASKS)
-             .limit(LIMIT_TASKS)
+             .batch_size(limit)
+             .limit(limit)
 
     @tasks = @tasks.where(status: params[:status]) if params[:status].present?
     if params[:tags]
