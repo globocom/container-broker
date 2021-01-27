@@ -38,7 +38,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec-json_expectations"
   spec.add_development_dependency "rspec-nc"
 
-  spec.add_development_dependency "listen", ">= 3.0.5", "< 3.2"
+  spec.add_development_dependency "listen"
 
   spec.add_development_dependency "spring"
   spec.add_development_dependency "spring-commands-rspec"
