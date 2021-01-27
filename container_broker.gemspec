@@ -52,7 +52,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "idempotent-request"
   spec.add_dependency "kubeclient"
   spec.add_dependency "mongoid-uuid"
-  spec.add_dependency "redis-namespace"
   spec.add_dependency "sentry-raven"
   spec.add_dependency "sidekiq"
   spec.add_dependency "sidekiq-failures"
