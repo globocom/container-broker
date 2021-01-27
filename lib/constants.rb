@@ -2,7 +2,7 @@
 
 module Constants
   class ExecutionType
-    FORMAT = /\A([a-z0-9])+(-[a-z0-9]+)*\z/.freeze
+    FORMAT = /\A([a-z0-9])+(-[a-z0-9]+)*\z/
     INVALID_FORMAT_MESSAGE = "only allows lowercase letters, numbers and hyphen symbol"
   end
 
