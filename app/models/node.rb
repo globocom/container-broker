@@ -21,11 +21,11 @@ class Node
   enumerable :status, %w[available unstable unavailable], default: "unavailable"
   enumerable :runner_provider, %w[docker kubernetes], default: :docker
 
-  has_many :slots
+  has_many :slots, dependent: :destroy
 
   scope :accepting_new_tasks, -> { where(accept_new_tasks: true, :runner_capacity_reached.in => [nil, false]) }
 
-  validates :hostname, presence: true
+  validates :hostname, presence: true, uniqueness: true
   validates :slots_execution_types, presence: true
   validate :execution_types_format
 
